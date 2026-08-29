@@ -1,0 +1,48 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/db/prisma'
+import { getCurrentAdmin } from '@/lib/auth/jwt'
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const weights = await prisma.cattleWeight.findMany({
+      where: { cattleId: params.id },
+      orderBy: { measurementDate: 'asc' },
+      include: { media: true },
+    })
+    return NextResponse.json({ success: true, data: weights })
+  } catch (error) {
+    console.error('Error fetching weights:', error)
+    return NextResponse.json({ error: 'Failed to fetch weights' }, { status: 500 })
+  }
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const admin = await getCurrentAdmin()
+    if (!admin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { weight, measurementDate, notes } = await request.json()
+
+    const newWeight = await prisma.cattleWeight.create({
+      data: {
+        cattleId: params.id,
+        weight: parseFloat(weight),
+        measurementDate: new Date(measurementDate),
+        notes: notes || null,
+      },
+    })
+
+    return NextResponse.json({ success: true, data: newWeight })
+  } catch (error) {
+    console.error('Error creating weight:', error)
+    return NextResponse.json({ error: 'Failed to create weight' }, { status: 500 })
+  }
+}
