@@ -88,9 +88,8 @@ COPY --from=builder /app/package-lock.json ./
 # Install production dependencies only
 RUN npm ci --legacy-peer-deps --omit=dev
 
-# Copy and fix Prisma binary permissions
-RUN cp /root/.cache/prisma/binaries/*/prisma-bin-*/prisma /usr/local/bin/ 2>/dev/null || true
-RUN chmod +x /usr/local/bin/prisma 2>/dev/null || true
+# Install Prisma CLI and tsx globally for db commands
+RUN npm install -g prisma@5.15.0 tsx@4.10.0
 
 USER nextjs
 
