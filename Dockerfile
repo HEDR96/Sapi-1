@@ -12,7 +12,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client using local binary
+# Generate Prisma client
 RUN ./node_modules/.bin/prisma generate
 
 # Build Next.js
@@ -24,21 +24,17 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Install Prisma globally as root first (for migrations)
-RUN apk add --no-cache openssl && \
-    npm install -g prisma@5.15.0
-
-# Create user
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
-# Create necessary directories
+# Create directories
 RUN mkdir -p /app/public /app/.next/static
 
 # Copy built application
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 USER nextjs
 

@@ -36,13 +36,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    # Run migrations then start app
-    command: >
-      sh -c "
-        npx prisma@5.15.0 db push &&
-        npm run db:seed &&
-        node server.js
-      "
 
 volumes:
   postgres_data:

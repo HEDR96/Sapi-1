@@ -2,65 +2,70 @@
 
 # Cattle Catalog Docker Setup Script
 
-echo "🐄 Cattle Catalog Docker Setup"
+echo "Cattle Catalog Docker Setup"
 echo "================================"
 
 # Colors
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 # Check if Docker is running
-echo -e "${YELLOW}Checking Docker...${NC}"
+echo "Checking Docker..."
 if ! docker info > /dev/null 2>&1; then
-    echo "❌ Docker is not running. Please start Docker Desktop."
+    echo "Docker is not running. Please start Docker."
     exit 1
 fi
-echo -e "${GREEN}✅ Docker is running${NC}"
+echo "Docker is running"
+
+# Install dependencies if not exists
+if [ ! -d "node_modules" ]; then
+    echo "Installing dependencies..."
+    npm install
+fi
+
+# Install Prisma locally
+echo "Installing Prisma CLI locally..."
+npm install prisma@5.15.0 --save-dev
 
 # Create .env file if not exists
 if [ ! -f .env ]; then
-    echo -e "${YELLOW}Creating .env file...${NC}"
+    echo "Creating .env file..."
     cp .env.example .env
-    echo -e "${GREEN}✅ .env file created${NC}"
-else
-    echo -e "${GREEN}✅ .env file already exists${NC}"
 fi
 
-# Build and start containers
-echo -e "${YELLOW}Building Docker containers...${NC}"
-docker-compose build
+# Update DATABASE_URL for local
+sed -i 's|DATABASE_URL=.*|DATABASE_URL="postgresql://postgres:postgres123@localhost:5432/cattle_catalog"|' .env
 
-echo -e "${YELLOW}Starting containers...${NC}"
-docker-compose up -d
+# Start database first
+echo "Starting database..."
+docker-compose up -d db
 
-# Wait for database to be ready
-echo -e "${YELLOW}Waiting for database to be ready...${NC}"
-sleep 10
+# Wait for database
+echo "Waiting for database (15 seconds)..."
+sleep 15
 
 # Run Prisma migrations
-echo -e "${YELLOW}Running database migrations...${NC}"
-docker-compose exec app npx prisma db push
+echo "Running database migrations..."
+npx prisma db push
 
 # Seed database
-echo -e "${YELLOW}Seeding database...${NC}"
-docker-compose exec app npm run db:seed
+echo "Seeding database..."
+npm run db:seed
+
+# Build and start app
+echo "Building and starting containers..."
+docker-compose up -d --build
 
 echo ""
 echo "================================"
-echo -e "${GREEN}🎉 Setup Complete!${NC}"
+echo "Setup Complete!"
 echo ""
 echo "Access the application:"
-echo -e "  🌐 App: ${YELLOW}http://localhost:3000${NC}"
-echo -e "  📊 Admin: ${YELLOW}http://localhost:3000/admin${NC}"
+echo "  App: http://localhost:3000"
+echo "  Admin: http://localhost:3000/admin"
 echo ""
 echo "Admin credentials:"
 echo "  Email: admin@sapikatalog.com"
 echo "  Password: admin123"
-echo ""
-echo "Useful commands:"
-echo "  docker-compose logs -f     # View logs"
-echo "  docker-compose down       # Stop containers"
-echo "  docker-compose restart    # Restart containers"
-echo "  docker-compose exec db psql -U postgres -d cattle_catalog  # DB CLI"
 echo "================================"
