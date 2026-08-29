@@ -1,0 +1,52 @@
+# Dependencies
+node_modules
+.npm
+
+# Next.js
+.next
+out
+
+# Git
+.git
+.gitignore
+
+# Docker files (to avoid confusion)
+docker-compose.yml
+Dockerfile
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Scripts
+scripts/
+
+# Environment files (use env variables in production)
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Testing
+coverage
+.nyc_output
+
+# Misc
+*.pem
+*.tsbuildinfo
+next-env.d.ts
