@@ -36,14 +36,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    # Auto-setup: run prisma db push and seed on first start
-    # Use init to run once, then CMD for subsequent starts
-    init: true
+    # Database setup: prisma db push only (no seed - run manually)
     command: >
       sh -c "
         echo 'Running database setup...' &&
         prisma db push --skip-generate &&
-        npx prisma db seed || echo 'Seed skipped or failed' &&
         echo 'Starting application...' &&
         node server.js
       "
