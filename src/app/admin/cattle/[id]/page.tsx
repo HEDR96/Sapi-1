@@ -175,7 +175,7 @@ export default function EditCattlePage() {
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
                 <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

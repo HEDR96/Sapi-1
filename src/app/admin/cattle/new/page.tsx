@@ -118,7 +118,7 @@ export default function NewCattlePage() {
               <div className="space-y-2">
                 <Label htmlFor="breed">Jenis Sapi *</Label>
                 <Select value={form.breed} onValueChange={(v) => setForm({ ...form, breed: v })}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-white">
                     <SelectValue placeholder="Pilih jenis sapi" />
                   </SelectTrigger>
                   <SelectContent>
@@ -135,7 +135,7 @@ export default function NewCattlePage() {
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
                 <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
