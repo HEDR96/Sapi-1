@@ -46,18 +46,14 @@ export function VerificationForm({ email, onSuccess, onBack }: VerificationFormP
   const handleResend = async () => {
     setResending(true)
     try {
-      const res = await fetch('/api/auth/resend-verify', {
+      await fetch('/api/auth/resend-verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       })
-      if (res.ok) {
-        alert('Kode verifikasi baru telah dikirim ke email Anda')
-      } else {
-        alert('Gagal mengirim ulang kode')
-      }
+      // Silent success - no alert
     } catch {
-      alert('Terjadi kesalahan')
+      // Silent fail
     } finally {
       setResending(false)
     }
