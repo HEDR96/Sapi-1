@@ -9,13 +9,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
+import { ImageUploader } from '@/components/admin/ImageUploader'
 
 export default function NewCattlePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
-    code: '',
     name: '',
     breed: '',
     status: 'AVAILABLE',
@@ -25,10 +25,15 @@ export default function NewCattlePage() {
     targetWeight: '',
     description: '',
     mainImage: '',
+    quantity: '1',
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  const handleImageChange = (url: string) => {
+    setForm({ ...form, mainImage: url })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,6 +50,7 @@ export default function NewCattlePage() {
           height: form.height ? parseFloat(form.height) : null,
           price: parseFloat(form.price),
           targetWeight: form.targetWeight ? parseFloat(form.targetWeight) : null,
+          quantity: parseInt(form.quantity) || 1,
         }),
       })
 
@@ -95,39 +101,35 @@ export default function NewCattlePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="code">Kode Sapi *</Label>
-                <Input
-                  id="code"
-                  name="code"
-                  value={form.code}
-                  onChange={handleChange}
-                  placeholder="NF-26001"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="name">Nama Sapi *</Label>
                 <Input
                   id="name"
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  placeholder="Brahman Alpha"
+                  placeholder="Bima"
                   required
                 />
+                <p className="text-xs text-muted-foreground">
+                  Kode sapi akan dibuat otomatis
+                </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="breed">Jenis Sapi *</Label>
-                <Input
-                  id="breed"
-                  name="breed"
-                  value={form.breed}
-                  onChange={handleChange}
-                  placeholder="Limousin"
-                  required
-                />
+                <Select value={form.breed} onValueChange={(v) => setForm({ ...form, breed: v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih jenis sapi" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Limousin">Limousin</SelectItem>
+                    <SelectItem value="Simental">Simental</SelectItem>
+                    <SelectItem value="Brahman">Brahman</SelectItem>
+                    <SelectItem value="Angus">Angus</SelectItem>
+                    <SelectItem value="PO">Peranakan Ongole (PO)</SelectItem>
+                    <SelectItem value="Lainnya">Lainnya</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
@@ -138,11 +140,28 @@ export default function NewCattlePage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="AVAILABLE">Tersedia</SelectItem>
+                    <SelectItem value="BOOKED">Diboeking</SelectItem>
                     <SelectItem value="SOLD">Terjual</SelectItem>
-                    <SelectItem value="RESERVED">Diboeking</SelectItem>
                     <SelectItem value="ARCHIVED">Diarchive</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="quantity">Jumlah Stok *</Label>
+                <Input
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  min="0"
+                  value={form.quantity}
+                  onChange={handleChange}
+                  placeholder="1"
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  Jumlah sapi yang tersedia
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -163,6 +182,7 @@ export default function NewCattlePage() {
                   id="height"
                   name="height"
                   type="number"
+                  step="0.1"
                   value={form.height}
                   onChange={handleChange}
                   placeholder="145"
@@ -177,7 +197,7 @@ export default function NewCattlePage() {
                   type="number"
                   value={form.price}
                   onChange={handleChange}
-                  placeholder="45000000"
+                  placeholder="26500000"
                   required
                 />
               </div>
@@ -188,21 +208,23 @@ export default function NewCattlePage() {
                   id="targetWeight"
                   name="targetWeight"
                   type="number"
+                  step="0.1"
                   value={form.targetWeight}
                   onChange={handleChange}
-                  placeholder="650"
+                  placeholder="610"
                 />
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="mainImage">URL Foto Utama</Label>
-                <Input
-                  id="mainImage"
-                  name="mainImage"
+                <Label>Foto Utama</Label>
+                <ImageUploader
                   value={form.mainImage}
-                  onChange={handleChange}
-                  placeholder="https://..."
+                  onChange={handleImageChange}
+                  folder="cattle"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Upload gambar JPG atau PNG. Maksimal 5MB.
+                </p>
               </div>
 
               <div className="space-y-2 md:col-span-2">

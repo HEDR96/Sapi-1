@@ -81,6 +81,7 @@ export interface CattleWithRelations {
   targetWeight: number | null
   description: string | null
   mainImage: string | null
+  quantity: number
   createdAt: Date
   updatedAt: Date
   weights?: CattleWeightWithMedia[]
@@ -128,9 +129,10 @@ export interface CattleFilters {
 }
 
 export interface JWTPayload {
-  adminId: string
+  adminId?: string
+  userId?: string
   email: string
-  role: AdminRole
+  role: AdminRole | 'USER'
   iat?: number
   exp?: number
 }
@@ -139,7 +141,7 @@ export interface JWTPayload {
 export const STATUS_LABELS: Record<Status, string> = {
   AVAILABLE: 'TERSEDIA',
   SOLD: 'TERJUAL',
-  RESERVED: 'DIBOOKING',
+  BOOKED: 'DIBOOKING',
   ARCHIVED: 'DIARCHIVE',
 }
 

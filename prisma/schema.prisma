@@ -10,7 +10,7 @@ datasource db {
 enum Status {
   AVAILABLE
   SOLD
-  RESERVED
+  BOOKED
   ARCHIVED
 }
 
@@ -34,6 +34,18 @@ enum AdminRole {
   STAFF
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
 model Cattle {
   id           String   @id @default(cuid())
   code         String   @unique
@@ -46,6 +58,7 @@ model Cattle {
   targetWeight Float?   @map("target_weight")
   description  String?  @db.Text
   mainImage    String?  @map("main_image")
+  quantity     Int      @default(1)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
@@ -53,6 +66,7 @@ model Cattle {
   healthRecords CattleHealthRecord[]
   feedRecords   CattleFeedRecord[]
   media         CattleMedia[]
+  bookings      Booking[]
 
   @@index([status])
   @@index([breed])
@@ -138,8 +152,56 @@ model Admin {
   id        String    @id @default(cuid())
   email     String    @unique
   password  String
-  name      String
-  role      AdminRole @default(STAFF)
+  name     String
+  role     AdminRole @default(STAFF)
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String?
+  name          String?
+  role          UserRole  @default(USER)
+  emailVerified Boolean   @default(false)
+  verificationCode String?
+  verificationExpiry DateTime?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  bookings Booking[]
+
+  @@index([email])
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  cattleId   String        @map("cattle_id")
+  cattle     Cattle        @relation(fields: [cattleId], references: [id], onDelete: Cascade)
+  userId     String        @map("user_id")
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quantity   Int           @default(1)
+  status     BookingStatus @default(PENDING)
+  notes      String?
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+
+  @@index([cattleId])
+  @@index([userId])
+  @@index([status])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId   String?  @map("user_id")
+  title     String
+  message   String   @db.Text
+  type      String   @default("INFO")
+  isRead    Boolean  @default(false)
+  data      String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([isRead])
 }

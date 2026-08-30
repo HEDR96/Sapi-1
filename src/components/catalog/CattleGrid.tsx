@@ -2,10 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { CattleCard } from './CattleCard'
-import { SearchFilter, Filters } from './SearchFilter'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { CattleCardSkeleton } from '@/components/shared/LoadingSkeleton'
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
+import { SearchFilter, Filters } from './SearchFilter'
 import { Status, PaginatedResponse, CattleWithRelations } from '@/types'
 
 export function CattleGrid() {
@@ -32,6 +31,10 @@ export function CattleGrid() {
       if (filterParams.search) params.set('search', filterParams.search)
       if (filterParams.status !== 'ALL') params.set('status', filterParams.status)
       if (filterParams.breed !== 'ALL') params.set('breed', filterParams.breed)
+      if (filterParams.minPrice !== undefined) params.set('minPrice', filterParams.minPrice.toString())
+      if (filterParams.maxPrice !== undefined) params.set('maxPrice', filterParams.maxPrice.toString())
+      if (filterParams.minWeight !== undefined) params.set('minWeight', filterParams.minWeight.toString())
+      if (filterParams.maxWeight !== undefined) params.set('maxWeight', filterParams.maxWeight.toString())
 
       const res = await fetch(`/api/cattle?${params.toString()}`)
       const data: PaginatedResponse<CattleWithRelations> = await res.json()
@@ -65,88 +68,100 @@ export function CattleGrid() {
   }
 
   return (
-    <section id="catalog" className="py-12">
-      <div className="container">
+    <section id="katalog" className="reveal mx-auto max-w-[1500px] px-4 pb-5 sm:px-5 lg:px-8">
+      {/* Search & Filter */}
+      <div className="mb-4">
         <SearchFilter onSearch={handleSearch} initialFilters={filters} />
-
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
-            {[...Array(8)].map((_, i) => (
-              <CattleCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : cattle.length === 0 ? (
-          <EmptyState
-            title="Tidak ada sapi ditemukan"
-            description="Coba ubah filter atau kata kunci pencarian Anda."
-          />
-        ) : (
-          <>
-            <p className="text-sm text-muted-foreground mt-6 mb-4">
-              Menampilkan {cattle.length} dari {pagination.total} sapi
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {cattle.map((c) => {
-                const item = c as CattleWithRelations & { lastWeight?: number | null }
-                return (
-                  <CattleCard
-                    key={c.id}
-                    code={c.code}
-                    name={c.name}
-                    breed={c.breed}
-                    status={c.status}
-                    price={Number(c.price)}
-                    lastWeight={item.lastWeight || null}
-                    mainImage={c.mainImage}
-                  />
-                )
-              })}
-            </div>
-
-            {pagination.totalPages > 1 && (
-              <Pagination className="mt-8">
-                <PaginationContent>
-                  <PaginationItem>
-                    <button
-                      onClick={() => handlePageChange(pagination.page - 1)}
-                      disabled={pagination.page === 1}
-                      className="flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
-                    >
-                      Previous
-                    </button>
-                  </PaginationItem>
-                  {[...Array(Math.min(5, pagination.totalPages))].map((_, i) => {
-                    const page = i + 1
-                    return (
-                      <PaginationItem key={page}>
-                        <button
-                          onClick={() => handlePageChange(page)}
-                          className={`flex h-10 w-10 items-center justify-center rounded-md border border-input text-sm font-medium ring-offset-background transition-colors ${
-                            pagination.page === page
-                              ? 'bg-background text-foreground'
-                              : 'hover:bg-accent hover:text-accent-foreground'
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      </PaginationItem>
-                    )
-                  })}
-                  <PaginationItem>
-                    <button
-                      onClick={() => handlePageChange(pagination.page + 1)}
-                      disabled={pagination.page === pagination.totalPages}
-                      className="flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
-                    >
-                      Next
-                    </button>
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            )}
-          </>
-        )}
       </div>
+
+      {/* Results Info */}
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-[11px] text-[hsl(var(--forest))/60]">
+          {loading ? 'Memuat...' : `Menampilkan ${cattle.length} dari ${pagination.total} sapi`}
+        </p>
+      </div>
+
+      {/* Grid */}
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+          {[...Array(6)].map((_, i) => (
+            <CattleCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : cattle.length === 0 ? (
+        <EmptyState
+          title="Tidak ada sapi ditemukan"
+          description="Coba ubah filter atau kata kunci pencarian Anda."
+        />
+      ) : (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+            {cattle.map((c) => {
+              const item = c as CattleWithRelations & { lastWeight?: number | null; quantity?: number }
+              return (
+                <CattleCard
+                  key={c.id}
+                  id={c.id}
+                  code={c.code}
+                  name={c.name}
+                  breed={c.breed}
+                  status={c.status}
+                  price={Number(c.price)}
+                  lastWeight={item.lastWeight || null}
+                  mainImage={c.mainImage}
+                  quantity={c.quantity || 1}
+                />
+              )
+            })}
+          </div>
+
+          {/* Pagination */}
+          {pagination.totalPages > 1 && (
+            <div className="mt-6 flex items-center justify-center gap-2">
+              <button
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={pagination.page === 1}
+                className="rounded-md border border-[hsl(var(--line))] bg-white px-4 py-2 text-[11px] font-semibold text-[hsl(var(--forest))] disabled:opacity-35 disabled:cursor-not-allowed hover:bg-[hsl(var(--cream))] transition-colors"
+              >
+                ← Sebelumnya
+              </button>
+              <div className="flex items-center gap-1">
+                {[...Array(Math.min(5, pagination.totalPages))].map((_, i) => {
+                  let pageNum = i + 1
+                  if (pagination.totalPages > 5) {
+                    if (pagination.page > 3) {
+                      pageNum = pagination.page - 2 + i
+                    }
+                    if (pagination.page > pagination.totalPages - 2) {
+                      pageNum = pagination.totalPages - 4 + i
+                    }
+                  }
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`h-9 w-9 rounded-md text-[11px] font-semibold transition-colors ${
+                        pagination.page === pageNum
+                          ? 'bg-[hsl(var(--forest))] text-white'
+                          : 'border border-[hsl(var(--line))] bg-white text-[hsl(var(--forest))] hover:bg-[hsl(var(--cream))]'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  )
+                })}
+              </div>
+              <button
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={pagination.page === pagination.totalPages}
+                className="rounded-md border border-[hsl(var(--line))] bg-white px-4 py-2 text-[11px] font-semibold text-[hsl(var(--forest))] disabled:opacity-35 disabled:cursor-not-allowed hover:bg-[hsl(var(--cream))] transition-colors"
+              >
+                Selanjutnya →
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </section>
   )
 }

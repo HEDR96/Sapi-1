@@ -11,34 +11,56 @@ import { id } from 'date-fns/locale'
  * Format amount as Indonesian Rupiah currency
  * @example formatCurrency(45000000) -> "Rp 45.000.000"
  */
-export function formatCurrency(amount: number): string {
-  const formatted = new Intl.NumberFormat('id-ID').format(amount)
-  return `Rp ${formatted}`
+export function formatCurrency(amount: number | string): string {
+  const num = typeof amount === 'string' ? parseFloat(amount) : amount
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(num)
 }
 
 /**
- * Format weight in kilograms
- * @example formatWeight(527) -> "527 Kg"
+ * Format weight in kilograms with 1 decimal place
+ * @example formatWeight(527.456) -> "527.5 Kg"
  */
-export function formatWeight(weight: number): string {
-  return `${weight} Kg`
+export function formatWeight(weight: number | null | undefined): string {
+  if (weight === null || weight === undefined) return '-'
+  return `${Number(weight).toFixed(1)} kg`
+}
+
+/**
+ * Format weight for chart/calculation with 2 decimal places
+ * @example formatWeightPrecise(527.456) -> "527.46"
+ */
+export function formatWeightPrecise(weight: number | string | null): string {
+  if (weight === null || weight === undefined) return '0'
+  const num = typeof weight === 'string' ? parseFloat(weight) : weight
+  return num.toFixed(2)
 }
 
 /**
  * Format height in centimeters
  * @example formatHeight(145) -> "145 cm"
  */
-export function formatHeight(height: number): string {
-  return `${height} cm`
+export function formatHeight(height: number | null | undefined): string {
+  if (height === null || height === undefined) return '-'
+  return `${Number(height).toFixed(1)} cm`
 }
 
 /**
  * Format date as Indonesian long format
  * @example formatDate(new Date(2025, 7, 10)) -> "10 Agustus 2025"
  */
-export function formatDate(date: Date | string): string {
-  const d = typeof date === 'string' ? parseISO(date) : date
-  return format(d, 'd MMMM yyyy', { locale: id })
+export function formatDate(date: Date | string | null): string {
+  if (!date) return '-'
+  const d = typeof date === 'string' ? new Date(date) : date
+  return d.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
 }
 
 /**
@@ -64,4 +86,39 @@ export function formatRelativeTime(date: Date | string): string {
  */
 export function formatCode(code: string): string {
   return code.toUpperCase()
+}
+
+/**
+ * Format ADG (Average Daily Gain)
+ * @example formatADG(1.456) -> "1.5 kg/hari"
+ */
+export function formatADG(adg: number): string {
+  if (!adg || isNaN(adg)) return '-'
+  return `${adg.toFixed(2)} kg/hari`
+}
+
+/**
+ * Format percentage
+ * @example formatPercentage(85.5) -> "85.5%"
+ */
+export function formatPercentage(value: number): string {
+  return `${value.toFixed(1)}%`
+}
+
+/**
+ * Format price for display
+ * @example formatPriceDisplay(45000000) -> "Rp 45.000.000"
+ */
+export function formatPriceDisplay(price: number | string): string {
+  return formatCurrency(price)
+}
+
+/**
+ * Generate unique cattle code
+ * @example generateCattleCode() -> "NF-26001"
+ */
+export function generateCattleCode(): string {
+  const year = new Date().getFullYear()
+  const random = Math.floor(Math.random() * 9000) + 1000
+  return `NF-${year}${random}`
 }

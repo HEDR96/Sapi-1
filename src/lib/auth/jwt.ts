@@ -20,19 +20,23 @@ export function verifyToken(token: string): JWTPayload | null {
 
 export async function getTokenFromCookies(): Promise<string | null> {
   const cookieStore = await cookies()
-  const token = cookieStore.get('admin_token')?.value
+  // Check both cookie names for backward compatibility
+  const token = cookieStore.get('auth_token')?.value || cookieStore.get('admin_token')?.value
   return token || null
 }
 
-export async function getCurrentAdmin(): Promise<JWTPayload | null> {
+export async function getCurrentUser(): Promise<JWTPayload | null> {
   const token = await getTokenFromCookies()
   if (!token) return null
   return verifyToken(token)
 }
 
+// Alias for backward compatibility with admin routes
+export const getCurrentAdmin = getCurrentUser
+
 export function setAuthCookie(token: string): { name: string; value: string; options: object } {
   return {
-    name: 'admin_token',
+    name: 'auth_token',
     value: token,
     options: {
       httpOnly: true,
@@ -46,7 +50,7 @@ export function setAuthCookie(token: string): { name: string; value: string; opt
 
 export function clearAuthCookie(): { name: string; value: string; options: object } {
   return {
-    name: 'admin_token',
+    name: 'auth_token',
     value: '',
     options: {
       httpOnly: true,
@@ -56,4 +60,8 @@ export function clearAuthCookie(): { name: string; value: string; options: objec
       path: '/',
     },
   }
+}
+
+export function generateVerificationCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString()
 }

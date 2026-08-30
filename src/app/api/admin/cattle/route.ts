@@ -1,7 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
-import { getCurrentAdmin } from '@/lib/auth/jwt'
-import { CreateCattleSchema } from '@/lib/validations/cattle'
+import { getCurrentUser } from '@/lib/auth/jwt'
+
+// Auto-generate cattle code with sequential numbering
+async function generateCattleCode(): Promise<string> {
+  const year = new Date().getFullYear()
+  const prefix = `NF-${year}`
+
+  // Get the last cattle code with this year's prefix
+  const lastCattle = await prisma.cattle.findFirst({
+    where: {
+      code: {
+        startsWith: prefix,
+      },
+    },
+    orderBy: {
+      code: 'desc',
+    },
+    select: {
+      code: true,
+    },
+  })
+
+  if (lastCattle) {
+    // Extract the number from the last code (e.g., "NF-20260001" -> 1)
+    const parts = lastCattle.code.split('-')
+    const lastNum = parseInt(parts[parts.length - 1], 10)
+    const newNum = lastNum + 1
+    return `${prefix}${String(newNum).padStart(4, '0')}`
+  }
+
+  // First cattle of the year
+  return `${prefix}0001`
+}
 
 export async function GET() {
   try {
@@ -29,26 +60,38 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const admin = await getCurrentAdmin()
+    const admin = await getCurrentUser()
     if (!admin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
-    const data = CreateCattleSchema.parse(body)
+
+    // Auto-generate code if not provided
+    let code = body.code
+    if (!code) {
+      code = await generateCattleCode()
+    }
+
+    // Check if code already exists
+    const existing = await prisma.cattle.findUnique({ where: { code } })
+    if (existing) {
+      return NextResponse.json({ error: 'Kode sapi sudah digunakan' }, { status: 400 })
+    }
 
     const cattle = await prisma.cattle.create({
       data: {
-        code: data.code,
-        name: data.name,
-        breed: data.breed,
-        status: data.status,
-        birthDate: data.birthDate,
-        height: data.height,
-        price: data.price,
-        targetWeight: data.targetWeight,
-        description: data.description,
-        mainImage: data.mainImage,
+        code,
+        name: body.name,
+        breed: body.breed,
+        status: body.status || 'AVAILABLE',
+        birthDate: new Date(body.birthDate),
+        height: body.height ? parseFloat(body.height) : null,
+        price: parseFloat(body.price),
+        targetWeight: body.targetWeight ? parseFloat(body.targetWeight) : null,
+        description: body.description || null,
+        mainImage: body.mainImage || null,
+        quantity: body.quantity ? parseInt(body.quantity) : 1,
       },
     })
 

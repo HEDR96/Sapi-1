@@ -47,11 +47,11 @@ async function main() {
     { code: 'NF-26001', name: 'Brahman Alpha', breed: 'Brahman', status: Status.AVAILABLE, height: 152, price: 55000000, targetWeight: 680, birthDate: new Date('2025-01-15'), mainImage: cattleImages[0] },
     { code: 'NF-26002', name: 'Simental Bravo', breed: 'Simental', status: Status.AVAILABLE, height: 158, price: 62000000, targetWeight: 720, birthDate: new Date('2025-02-20'), mainImage: cattleImages[1] },
     { code: 'NF-26003', name: 'Angus Charlie', breed: 'Angus', status: Status.SOLD, height: 145, price: 48000000, targetWeight: 620, birthDate: new Date('2025-03-10'), mainImage: cattleImages[2] },
-    { code: 'NF-26004', name: 'Brahman Beta', breed: 'Brahman', status: Status.RESERVED, height: 160, price: 65000000, targetWeight: 750, birthDate: new Date('2025-01-25'), mainImage: cattleImages[3] },
+    { code: 'NF-26004', name: 'Brahman Beta', breed: 'Brahman', status: Status.BOOKED, height: 160, price: 65000000, targetWeight: 750, birthDate: new Date('2025-01-25'), mainImage: cattleImages[3] },
     { code: 'NF-26005', name: 'Limousin Delta', breed: 'Limousin', status: Status.AVAILABLE, height: 148, price: 52000000, targetWeight: 650, birthDate: new Date('2025-04-05'), mainImage: cattleImages[4] },
     { code: 'NF-26006', name: 'Simental Echo', breed: 'Simental', status: Status.ARCHIVED, height: 155, price: 42000000, targetWeight: 600, birthDate: new Date('2025-02-15'), mainImage: cattleImages[5] },
     { code: 'NF-26007', name: 'Angus Foxtrot', breed: 'Angus', status: Status.AVAILABLE, height: 142, price: 58000000, targetWeight: 700, birthDate: new Date('2025-03-22'), mainImage: cattleImages[6] },
-    { code: 'NF-26008', name: 'Brahman Gamma', breed: 'Brahman', status: Status.RESERVED, height: 138, price: 45000000, targetWeight: 580, birthDate: new Date('2025-05-01'), mainImage: cattleImages[7] },
+    { code: 'NF-26008', name: 'Brahman Gamma', breed: 'Brahman', status: Status.BOOKED, height: 138, price: 45000000, targetWeight: 580, birthDate: new Date('2025-05-01'), mainImage: cattleImages[7] },
     { code: 'NF-26009', name: 'Limousin Hotel', breed: 'Limousin', status: Status.AVAILABLE, height: 156, price: 61000000, targetWeight: 710, birthDate: new Date('2025-04-18'), mainImage: cattleImages[0] },
     { code: 'NF-26010', name: 'Simental India', breed: 'Simental', status: Status.SOLD, height: 150, price: 38000000, targetWeight: 590, birthDate: new Date('2025-01-08'), mainImage: cattleImages[1] },
   ]

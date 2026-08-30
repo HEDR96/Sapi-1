@@ -1,11 +1,65 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import { Status } from '@/types'
 
 interface Statistics {
   total: number
   available: number
   sold: number
+}
+
+interface CounterProps {
+  end: number
+  suffix: string
+  duration?: number
+}
+
+function AnimatedCounter({ end, suffix, duration = 1200 }: CounterProps) {
+  const [count, setCount] = useState(0)
+  const ref = useRef<HTMLDivElement>(null)
+  const hasAnimated = useRef(false)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasAnimated.current) {
+            hasAnimated.current = true
+            const startTime = performance.now()
+
+            const tick = (now: number) => {
+              const elapsed = now - startTime
+              const progress = Math.min(elapsed / duration, 1)
+              const eased = 1 - Math.pow(1 - progress, 3)
+              const current = Math.floor(end * eased)
+              setCount(current)
+
+              if (progress < 1) {
+                requestAnimationFrame(tick)
+              }
+            }
+
+            requestAnimationFrame(tick)
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.5 }
+    )
+
+    if (ref.current) {
+      observer.observe(ref.current)
+    }
+
+    return () => observer.disconnect()
+  }, [end, duration])
+
+  return (
+    <div ref={ref} className="counter text-[18px] font-extrabold text-[hsl(var(--forest))]">
+      {count}{suffix}
+    </div>
+  )
 }
 
 export function StatisticsBar() {
@@ -21,8 +75,8 @@ export function StatisticsBar() {
         const items = data.items || []
         setStats({
           total: data.total || 0,
-          available: items.filter((c: { status: string }) => c.status === 'AVAILABLE').length,
-          sold: items.filter((c: { status: string }) => c.status === 'SOLD').length,
+          available: items.filter((c: { status: Status }) => c.status === 'AVAILABLE').length,
+          sold: items.filter((c: { status: Status }) => c.status === 'SOLD').length,
         })
       } catch (error) {
         console.error('Failed to fetch stats:', error)
@@ -33,28 +87,41 @@ export function StatisticsBar() {
     fetchStats()
   }, [])
 
-  const statItems = [
-    { label: 'Total Sapi', value: stats.total, color: 'text-primary' },
-    { label: 'Tersedia', value: stats.available, color: 'text-green-600' },
-    { label: 'Terjual', value: stats.sold, color: 'text-red-600' },
-  ]
-
   return (
-    <section className="bg-muted/50 py-8">
+    <section className="bg-[hsl(var(--cream))]/50 py-8">
       <div className="container">
         <div className="grid grid-cols-3 gap-4 md:gap-8">
-          {statItems.map((stat) => (
-            <div key={stat.label} className="text-center">
-              {loading ? (
-                <div className="h-12 w-20 mx-auto bg-muted animate-pulse rounded" />
-              ) : (
-                <p className={`text-3xl md:text-4xl font-bold ${stat.color}`}>
-                  {stat.value}
-                </p>
-              )}
-              <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
-            </div>
-          ))}
+          {loading ? (
+            <>
+              <div className="text-center">
+                <div className="mx-auto h-12 w-20 animate-pulse rounded bg-[hsl(var(--muted))]" />
+                <div className="mt-1 h-4 w-16 mx-auto animate-pulse rounded bg-[hsl(var(--muted))]" />
+              </div>
+              <div className="text-center">
+                <div className="mx-auto h-12 w-20 animate-pulse rounded bg-[hsl(var(--muted))]" />
+                <div className="mt-1 h-4 w-16 mx-auto animate-pulse rounded bg-[hsl(var(--muted))]" />
+              </div>
+              <div className="text-center">
+                <div className="mx-auto h-12 w-20 animate-pulse rounded bg-[hsl(var(--muted))]" />
+                <div className="mt-1 h-4 w-16 mx-auto animate-pulse rounded bg-[hsl(var(--muted))]" />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="text-center">
+                <AnimatedCounter end={stats.total} suffix="" />
+                <p className="mt-1 text-sm text-[hsl(var(--forest))/60]">Total Sapi</p>
+              </div>
+              <div className="text-center">
+                <AnimatedCounter end={stats.available} suffix="" />
+                <p className="mt-1 text-sm text-emerald-600">Tersedia</p>
+              </div>
+              <div className="text-center">
+                <AnimatedCounter end={stats.sold} suffix="" />
+                <p className="mt-1 text-sm text-rose-600">Terjual</p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </section>
