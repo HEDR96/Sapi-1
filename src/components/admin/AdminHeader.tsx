@@ -1,7 +1,12 @@
+'use client'
+
 import { ShieldCheck, Menu, Bell, User, LogOut } from 'lucide-react'
 import Link from 'next/link'
+import { useLogout } from '@/components/auth/LogoutButton'
 
 export function AdminHeader() {
+  const { handleLogout } = useLogout()
+
   return (
     <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-[hsl(var(--line))] bg-white px-4">
       <div className="flex items-center gap-3">
@@ -30,7 +35,11 @@ export function AdminHeader() {
           </div>
           <span className="hidden md:block text-[11px] font-medium text-[hsl(var(--forest))]">Admin</span>
         </button>
-        <button className="grid h-9 w-9 place-items-center rounded-full hover:bg-red-50 text-[hsl(var(--forest))/60 hover:text-red-600" aria-label="Logout">
+        <button
+          onClick={handleLogout}
+          className="grid h-9 w-9 place-items-center rounded-full hover:bg-red-50 text-[hsl(var(--forest))/60] hover:text-red-600"
+          aria-label="Logout"
+        >
           <LogOut className="h-4 w-4" />
         </button>
       </div>

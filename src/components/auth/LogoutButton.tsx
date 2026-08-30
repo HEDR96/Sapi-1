@@ -1,9 +1,10 @@
+// D:\Sapi\src\components\auth\LogoutButton.tsx
 'use client'
 
 import { useRouter } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 
-export function LogoutButton() {
+export function useLogout() {
   const router = useRouter()
 
   const handleLogout = async () => {
@@ -15,6 +16,12 @@ export function LogoutButton() {
       console.error('Logout error:', error)
     }
   }
+
+  return { handleLogout }
+}
+
+export function LogoutButton() {
+  const { handleLogout } = useLogout()
 
   return (
     <button
