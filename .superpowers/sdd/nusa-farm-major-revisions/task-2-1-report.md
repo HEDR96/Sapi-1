@@ -6,7 +6,7 @@
 - Created `src/lib/email/` directory
 - Implemented `sendVerificationEmail(email, code)` function
 - Uses Resend API to send HTML email with verification code
-- Email template styled with Nusa Farm branding (color #173F31, cream #F7F2E7)
+- Email template styled with samadyafarm.id branding (color #173F31, cream #F7F2E7)
 - Returns `{ success: true }` or `{ success: false, error }`
 
 ## Modified Files

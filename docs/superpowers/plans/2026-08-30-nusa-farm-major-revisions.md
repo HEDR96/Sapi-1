@@ -1,8 +1,8 @@
-# Nusa Farm Major Revisions Implementation Plan
+# samadyafarm.id Major Revisions Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Implementasi 16 revision items dan fitur baru sesuai design spec untuk Nusa Farm website.
+**Goal:** Implementasi 16 revision items dan fitur baru sesuai design spec untuk samadyafarm.id website.
 
 **Architecture:** Implementasi dilakukan secara bertahap dari quick fixes (styling) → Auth System → Supabase → Booking System → Data & Features. Menggunakan modular component structure dengan clear separation of concerns.
 
@@ -225,12 +225,12 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 export async function sendVerificationEmail(email: string, code: string) {
   try {
     await resend.emails.send({
-      from: 'Nusa Farm <noreply@nusafarm.id>',
+      from: 'samadyafarm.id <noreply@nusafarm.id>',
       to: email,
-      subject: 'Kode Verifikasi Nusa Farm',
+      subject: 'Kode Verifikasi samadyafarm.id',
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #173F31;">Nusa Farm</h1>
+          <h1 style="color: #173F31;">samadyafarm.id</h1>
           <p>Kode verifikasi Anda:</p>
           <div style="background: #F7F2E7; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 8px; border-radius: 8px;">
             ${code}
@@ -1277,7 +1277,7 @@ export function MediaTab({ media }: MediaTabProps) {
 // In CattleProfile.tsx - add handleShare function
 const handleShare = async () => {
   const url = window.location.href
-  const text = `Lihat sapi ${cattle.name} (${cattle.code}) di Nusa Farm`
+  const text = `Lihat sapi ${cattle.name} (${cattle.code}) di samadyafarm.id`
 
   if (navigator.share) {
     try {
@@ -1379,7 +1379,7 @@ export async function generateQRPdf(cattle: {
   // Add Info
   doc.setFontSize(24)
   doc.setTextColor(23, 63, 49)
-  doc.text('NUSA FARM', 75, 25)
+  doc.text('samadyafarm.id', 75, 25)
 
   doc.setFontSize(12)
   doc.setTextColor(100)

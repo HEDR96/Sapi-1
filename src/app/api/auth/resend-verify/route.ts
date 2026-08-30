@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
 
+export const dynamic = 'force-dynamic'
+
 function generate6DigitCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString()
 }

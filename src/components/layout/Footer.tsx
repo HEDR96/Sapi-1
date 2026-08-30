@@ -33,12 +33,12 @@ export function Footer() {
               <ShieldCheck className="h-4 w-4" />
             </div>
             <div>
-              <div className="text-[13px] font-extrabold tracking-[.08em]">NUSA FARM</div>
+              <div className="text-[13px] font-extrabold tracking-[.08em]">samadyafarm.id</div>
               <div className="text-[8px] text-[hsl(var(--forest))/60]">KURBAN BERKUALITAS</div>
             </div>
           </div>
           <p className="mt-3 max-w-[260px] text-[10px] leading-5 text-[hsl(var(--forest))/65]">
-            Nusa Farm adalah peternakan modern yang berkomitmen menghadirkan sapi qurban berkualitas dengan transparansi penuh.
+            samadyafarm.id adalah peternakan modern yang berkomitmen menghadirkan sapi qurban berkualitas dengan transparansi penuh.
           </p>
         </div>
 
@@ -77,7 +77,7 @@ export function Footer() {
             <li>0812-3456-7890</li>
             <li>halo@nusafarm.id</li>
             <li>
-              Kandang Utama Nusa Farm,<br />
+              Kandang Utama samadyafarm.id,<br />
               Kab. Bogor, Jawa Barat
             </li>
           </ul>
@@ -103,7 +103,7 @@ export function Footer() {
 
       {/* Bottom bar */}
       <div className="flex flex-col gap-2 px-4 py-2 text-[9px] text-[hsl(var(--forest))/55] sm:flex-row sm:items-center sm:justify-between">
-        <div>© {currentYear} Nusa Farm. All rights reserved.</div>
+        <div>© {currentYear} samadyafarm.id. All rights reserved.</div>
         <div>Dari Peternak untuk Ummat.</div>
       </div>
     </footer>

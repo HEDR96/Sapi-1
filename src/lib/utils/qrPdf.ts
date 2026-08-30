@@ -23,7 +23,7 @@ export async function generateQRPdf(cattle: {
   // Add Info
   doc.setFontSize(24)
   doc.setTextColor(23, 63, 49)
-  doc.text('NUSA FARM', 75, 25)
+  doc.text('samadyafarm.id', 75, 25)
 
   doc.setFontSize(12)
   doc.setTextColor(100)

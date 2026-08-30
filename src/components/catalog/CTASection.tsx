@@ -41,7 +41,7 @@ export function CTASection() {
           {/* Content */}
           <div>
             <h3 className="text-[22px] font-bold leading-none text-white sm:text-[26px]">
-              Temukan Sapi Terbaik Anda Bersama Nusa Farm
+              Temukan Sapi Terbaik Anda Bersama samadyafarm.id
             </h3>
             <p className="mt-1.5 text-[11px] text-white/80">
               Pilih sapi terbaik, pantau perkembangannya, dan beli dengan lebih tenang.

@@ -4,6 +4,8 @@ import bcrypt from 'bcryptjs'
 import { generateVerificationCode } from '@/lib/auth/jwt'
 import { sendVerificationEmail } from '@/lib/email/resend'
 
+export const dynamic = 'force-dynamic'
+
 function generate6DigitCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString()
 }

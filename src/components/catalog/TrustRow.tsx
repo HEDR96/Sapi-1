@@ -64,7 +64,7 @@ export function TrustRow() {
           <div className="border-b border-[hsl(var(--line))] pb-3 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-4">
             <div className="flex items-center gap-2 text-[9px] font-semibold text-[hsl(var(--forest))/65]">
               <ShieldCheck className="h-3.5 w-3.5 text-[hsl(var(--olive))]" />
-              Komitmen Nusa Farm
+              Komitmen samadyafarm.id
             </div>
             <h3 className="mt-1.5 text-[22px] font-bold leading-[1.02] text-[hsl(var(--forest))] sm:text-[24px]">
               Transparansi & Kepercayaan

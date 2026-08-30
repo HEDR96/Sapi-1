@@ -58,7 +58,7 @@ export function Navbar() {
               <ShieldCheck className="h-4 w-4" />
             </div>
             <div className="leading-tight">
-              <div className="text-[12px] font-extrabold tracking-[.08em] sm:text-[14px]">NUSA FARM</div>
+              <div className="text-[12px] font-extrabold tracking-[.08em] sm:text-[14px]">samadyafarm.id</div>
               <div className="text-[8px] text-[hsl(var(--forest))/60]">KURBAN BERKUALITAS</div>
             </div>
           </Link>

@@ -1,4 +1,4 @@
-# Nusa Farm Website Redesign - Design Spec
+# samadyafarm.id Website Redesign - Design Spec
 
 ## Overview
 Redesign entire website following 100% the reference design from `desian web.html`.

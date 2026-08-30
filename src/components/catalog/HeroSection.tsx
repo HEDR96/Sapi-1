@@ -171,7 +171,7 @@ export function HeroSection() {
           <div className="tag-rope"><span /></div>
           <div className="hole" />
           <div className="text-center text-[10px] font-extrabold tracking-[.02em] text-[hsl(var(--forest))] sm:text-[12px]">
-            NUSA FARM
+            samadyafarm.id
           </div>
           <div className="text-center text-[6px] font-semibold uppercase tracking-[.16em] text-[hsl(var(--forest))/70] sm:text-[7px]">
             Sapi Pilihan

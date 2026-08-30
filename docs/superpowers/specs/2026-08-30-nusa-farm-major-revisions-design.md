@@ -1,4 +1,4 @@
-# Nusa Farm - Major Revisions & New Features Design Spec
+# samadyafarm.id - Major Revisions & New Features Design Spec
 
 ## Overview
 Implementasi 16 revision items dan fitur baru sesuai request user.
@@ -351,7 +351,7 @@ Implement Web Share API dengan fallback:
 ```typescript
 const handleShare = async () => {
   const url = window.location.href
-  const text = `Lihat sapi ${cattle.name} (${cattle.code}) di Nusa Farm`
+  const text = `Lihat sapi ${cattle.name} (${cattle.code}) di samadyafarm.id`
   
   if (navigator.share) {
     try {

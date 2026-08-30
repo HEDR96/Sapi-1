@@ -37,6 +37,9 @@ FROM deps AS builder
 
 WORKDIR /app
 
+# Install openssl for Prisma during build
+RUN apk add --no-cache openssl
+
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 

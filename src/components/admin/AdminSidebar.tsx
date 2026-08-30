@@ -40,7 +40,7 @@ export function AdminSidebar() {
             </div>
             <div>
               <div className="text-[12px] font-extrabold tracking-[.06em] text-[hsl(var(--forest))]">
-                NUSA FARM
+                samadyafarm.id
               </div>
               <div className="text-[7px] text-[hsl(var(--forest))/60]">ADMIN PANEL</div>
             </div>

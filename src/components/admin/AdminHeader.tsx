@@ -13,7 +13,7 @@ export function AdminHeader() {
             <ShieldCheck className="h-4 w-4 text-white" />
           </div>
           <span className="hidden sm:block text-[13px] font-extrabold tracking-[.08em] text-[hsl(var(--forest))]">
-            NUSA FARM
+            samadyafarm.id
           </span>
           <span className="hidden sm:block text-[8px] text-[hsl(var(--forest))/60]">ADMIN</span>
         </Link>

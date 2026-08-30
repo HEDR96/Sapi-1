@@ -1,13 +1,20 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+let supabase: ReturnType<typeof createClient> | null = null
 
-if (!supabaseUrl || !supabaseKey) {
-  console.warn('Supabase credentials not configured. Image uploads will not work.')
+function getSupabaseClient() {
+  if (!supabase) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.warn('Supabase credentials not configured. Image uploads will not work.')
+    }
+
+    supabase = createClient(supabaseUrl, supabaseKey)
+  }
+  return supabase
 }
-
-export const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Helper function to upload image with optimization
 export async function uploadOptimizedImage(
@@ -16,6 +23,8 @@ export async function uploadOptimizedImage(
   folder: string = 'cattle'
 ): Promise<{ success: boolean; url?: string; error?: string }> {
   try {
+    const client = getSupabaseClient()
+    
     // Generate unique filename
     const ext = 'webp' // Convert all images to WebP for optimization
     const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${ext}`
@@ -25,7 +34,7 @@ export async function uploadOptimizedImage(
     const arrayBuffer = await file.arrayBuffer()
     const uint8Array = new Uint8Array(arrayBuffer)
 
-    const { data, error } = await supabase.storage
+    const { data, error } = await client.storage
       .from(bucket)
       .upload(fileName, uint8Array, {
         contentType: 'image/webp',
@@ -39,7 +48,7 @@ export async function uploadOptimizedImage(
     }
 
     // Get public URL
-    const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(data.path)
+    const { data: urlData } = client.storage.from(bucket).getPublicUrl(data.path)
 
     return { success: true, url: urlData.publicUrl }
   } catch (error) {
@@ -54,12 +63,14 @@ export async function deleteImage(
   bucket: string = 'cattle-images'
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    const client = getSupabaseClient()
+    
     // Extract path from full URL if needed
     const filePath = path.includes('/storage/v1/')
       ? path.split('/storage/v1/object/public/')[1]?.split('?')[0] || path
       : path
 
-    const { error } = await supabase.storage.from(bucket).remove([filePath])
+    const { error } = await client.storage.from(bucket).remove([filePath])
 
     if (error) {
       return { success: false, error: error.message }

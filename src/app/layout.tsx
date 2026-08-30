@@ -18,8 +18,8 @@ const cormorant = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Nusa Farm - Qurban Transparan',
-    template: '%s | Nusa Farm',
+    default: 'samadyafarm.id - Qurban Transparan',
+    template: '%s | samadyafarm.id',
   },
   description: 'Katalog sapi qurban dengan tracking progress sapi. Pilih sapi pilihan, pantau perkembangannya, dan beli dengan tenang.',
   keywords: ['katalog sapi', 'sapi qurban', 'peternakan', 'limousin', 'simental', 'brahman', 'qurban', 'idul adha'],

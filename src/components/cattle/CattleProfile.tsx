@@ -82,7 +82,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
 
   const handleShare = async () => {
     const url = window.location.href
-    const text = `Lihat sapi ${cattle.name} (${cattle.code}) di Nusa Farm`
+    const text = `Lihat sapi ${cattle.name} (${cattle.code}) di samadyafarm.id`
 
     if (navigator.share) {
       try {
