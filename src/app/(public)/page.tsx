@@ -8,6 +8,7 @@ import { TrustRow } from '@/components/catalog/TrustRow'
 import { CTASection } from '@/components/catalog/CTASection'
 import { CatalogSwiper } from '@/components/catalog/CatalogSwiper'
 import { PantauPerkembanganSection } from '@/components/home/PantauPerkembanganSection'
+import { RecentComments } from '@/components/home/RecentComments'
 import { CattleWithLatestWeight, CattleWithRelations } from '@/types'
 
 export default function HomePage() {
@@ -73,6 +74,7 @@ export default function HomePage() {
         </div>
       </section>
       <PantauPerkembanganSection cattle={fullCattleData} />
+      <RecentComments />
       <JourneySection />
       <CattleGrid />
       <TrustRow />

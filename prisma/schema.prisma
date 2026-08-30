@@ -67,6 +67,7 @@ model Cattle {
   feedRecords   CattleFeedRecord[]
   media         CattleMedia[]
   bookings      Booking[]
+  comments      Comment[]
 
   @@index([status])
   @@index([breed])
@@ -171,8 +172,24 @@ model User {
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
   bookings Booking[]
+  comments Comment[]
 
   @@index([email])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cattleId  String   @map("cattle_id")
+  cattle    Cattle   @relation(fields: [cattleId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([cattleId])
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model Booking {
