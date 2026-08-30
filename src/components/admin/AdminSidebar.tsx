@@ -5,8 +5,11 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   Beef,
+  Scale,
+  Heart,
+  UtensilsCrossed,
+  Image as ImageIcon,
   Users,
-  FileText,
   Settings,
   X,
 } from 'lucide-react'
@@ -14,10 +17,10 @@ import {
 const navItems = [
   { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/admin/cattle', icon: Beef, label: 'Manajemen Sapi' },
-  { href: '/admin/weights', icon: FileText, label: 'Riwayat Timbang' },
-  { href: '/admin/health', icon: FileText, label: 'Riwayat Kesehatan' },
-  { href: '/admin/feed', icon: FileText, label: 'Riwayat Pakan' },
-  { href: '/admin/media', icon: FileText, label: 'Media' },
+  { href: '/admin/weight', icon: Scale, label: 'Riwayat Timbang' },
+  { href: '/admin/health', icon: Heart, label: 'Riwayat Kesehatan' },
+  { href: '/admin/feed', icon: UtensilsCrossed, label: 'Riwayat Pakan' },
+  { href: '/admin/media', icon: ImageIcon, label: 'Dokumentasi' },
   { href: '/admin/users', icon: Users, label: 'Pengguna' },
   { href: '/admin/settings', icon: Settings, label: 'Pengaturan' },
 ]
