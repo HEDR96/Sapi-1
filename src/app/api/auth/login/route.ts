@@ -3,6 +3,8 @@ import { prisma } from '@/lib/db/prisma'
 import bcrypt from 'bcryptjs'
 import { generateToken, setAuthCookie } from '@/lib/auth/jwt'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json()

@@ -4,6 +4,8 @@ import { getCurrentAdmin } from '@/lib/auth/jwt'
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }

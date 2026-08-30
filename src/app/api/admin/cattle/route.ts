@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
 import { getCurrentUser } from '@/lib/auth/jwt'
 
+export const dynamic = 'force-dynamic'
+
 // Auto-generate cattle code with sequential numbering
 async function generateCattleCode(): Promise<string> {
   const year = new Date().getFullYear()

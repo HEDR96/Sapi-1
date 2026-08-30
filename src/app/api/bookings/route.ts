@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
 import { getCurrentUser } from '@/lib/auth/jwt'
 
+export const dynamic = 'force-dynamic'
+
 // GET - List user's bookings
 export async function GET(request: NextRequest) {
   try {

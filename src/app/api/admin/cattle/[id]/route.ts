@@ -3,6 +3,8 @@ import { prisma } from '@/lib/db/prisma'
 import { getCurrentAdmin } from '@/lib/auth/jwt'
 import { UpdateCattleSchema } from '@/lib/validations/cattle'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
