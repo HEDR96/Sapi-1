@@ -137,6 +137,19 @@ export interface JWTPayload {
   exp?: number
 }
 
+// Cattle with latest weight - used for catalog display
+export interface CattleWithLatestWeight {
+  id: string
+  code: string
+  name: string
+  breed: string
+  status: Status
+  price: import('@prisma/client').Prisma.Decimal
+  mainImage: string | null
+  quantity: number
+  lastWeight: number | null
+}
+
 // Constants
 export const STATUS_LABELS: Record<Status, string> = {
   AVAILABLE: 'TERSEDIA',
