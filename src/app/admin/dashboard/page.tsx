@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Package, TrendingUp, CheckCircle, XCircle, DollarSign, ArrowRight } from 'lucide-react'
+import { useEffect, useState, useCallback } from 'react'
+import { Package, TrendingUp, CheckCircle, XCircle, DollarSign, ArrowRight, RefreshCw } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils/formatters'
 import Link from 'next/link'
 
@@ -9,36 +9,42 @@ interface DashboardStats {
   totalCattle: number
   availableCattle: number
   soldCattle: number
-  reservedCattle: number
+  bookedCattle: number
   totalValue: number
 }
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const res = await fetch('/api/cattle?limit=1000')
+      const data = await res.json()
+
+      const items = data.items || []
+      setStats({
+        totalCattle: data.total || 0,
+        availableCattle: items.filter((c: { status: string }) => c.status === 'AVAILABLE').length,
+        soldCattle: items.filter((c: { status: string }) => c.status === 'SOLD').length,
+        bookedCattle: items.filter((c: { status: string }) => c.status === 'BOOKED').length,
+        totalValue: items.reduce((sum: number, c: { price: number }) => sum + Number(c.price), 0),
+      })
+      setLastUpdated(new Date())
+    } catch (error) {
+      console.error('Failed to fetch stats:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    async function fetchStats() {
-      try {
-        const res = await fetch('/api/cattle?limit=1000')
-        const data = await res.json()
-
-        const items = data.items || []
-        setStats({
-          totalCattle: data.total || 0,
-          availableCattle: items.filter((c: { status: string }) => c.status === 'AVAILABLE').length,
-          soldCattle: items.filter((c: { status: string }) => c.status === 'SOLD').length,
-          reservedCattle: items.filter((c: { status: string }) => c.status === 'BOOKED').length,
-          totalValue: items.reduce((sum: number, c: { price: number }) => sum + Number(c.price), 0),
-        })
-      } catch (error) {
-        console.error('Failed to fetch stats:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchStats()
-  }, [])
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchStats, 30000)
+    return () => clearInterval(interval)
+  }, [fetchStats])
 
   const statCards = [
     {
@@ -61,7 +67,7 @@ export default function AdminDashboardPage() {
     },
     {
       title: 'Diboeking',
-      value: stats?.reservedCattle || 0,
+      value: stats?.bookedCattle || 0,
       icon: TrendingUp,
       color: 'bg-amber-100 text-amber-600',
     },
@@ -72,14 +78,31 @@ export default function AdminDashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-[hsl(var(--forest))]">Dashboard</h2>
-          <p className="text-sm text-[hsl(var(--forest))/60]">Ringkasan data katalog sapi</p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm text-[hsl(var(--forest))/60]">Ringkasan data katalog sapi</p>
+            {lastUpdated && (
+              <span className="text-xs text-[hsl(var(--forest))/40]">
+                • Update: {lastUpdated.toLocaleTimeString('id-ID')}
+              </span>
+            )}
+          </div>
         </div>
-        <Link
-          href="/admin/cattle/new"
-          className="inline-flex items-center gap-2 rounded-md bg-[hsl(var(--forest))] px-4 py-2 text-sm font-semibold text-white hover:bg-[hsl(var(--forest2))] transition-colors"
-        >
-          + Tambah Sapi Baru
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={fetchStats}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-md border border-[hsl(var(--line))] bg-white px-3 py-2 text-sm font-medium text-[hsl(var(--forest))] hover:bg-[hsl(var(--cream))] transition-colors"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+          <Link
+            href="/admin/cattle/new"
+            className="inline-flex items-center gap-2 rounded-md bg-[hsl(var(--forest))] px-4 py-2 text-sm font-semibold text-white hover:bg-[hsl(var(--forest2))] transition-colors"
+          >
+            + Tambah Sapi Baru
+          </Link>
+        </div>
       </div>
 
       {/* Stats Grid */}
