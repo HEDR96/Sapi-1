@@ -2,13 +2,12 @@
 
 import { useState, useRef, useCallback } from 'react'
 import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react'
-import { uploadOptimizedImage } from '@/lib/supabase/client'
+import { uploadToS3 } from '@/lib/storage/upload'
 
 interface ImageUploaderProps {
   value?: string
   onChange: (url: string) => void
   folder?: string
-  bucket?: string
   accept?: string
   maxSize?: number // in MB
 }
@@ -17,7 +16,6 @@ export function ImageUploader({
   value,
   onChange,
   folder = 'cattle',
-  bucket = 'cattle-images',
   accept = 'image/jpeg,image/png,image/jpg',
   maxSize = 5, // 5MB default
 }: ImageUploaderProps) {
@@ -53,18 +51,19 @@ export function ImageUploader({
     setUploadProgress(10)
 
     try {
-      // Simulate progress for user feedback
       setUploadProgress(30)
 
-      const result = await uploadOptimizedImage(file, bucket, folder)
+      // Convert file to buffer and upload to S3
+      const buffer = Buffer.from(await file.arrayBuffer())
+      const url = await uploadToS3(buffer, file.name, file.type, folder)
 
       setUploadProgress(90)
 
-      if (result.success && result.url) {
-        onChange(result.url)
+      if (url) {
+        onChange(url)
         setUploadProgress(100)
       } else {
-        setError(result.error || 'Gagal mengupload gambar')
+        setError('Gagal mengupload gambar')
       }
     } catch (err) {
       console.error('Upload error:', err)
