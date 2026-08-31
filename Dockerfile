@@ -11,7 +11,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Install dependencies
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # =====================
 # Stage 2: Prisma Generate
@@ -22,7 +22,7 @@ WORKDIR /app
 
 # Copy lock file and install deps
 COPY package.json package-lock.json* ./
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # Copy prisma schema
 COPY prisma/ ./prisma/
@@ -89,7 +89,7 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json ./
 
 # Install production dependencies (including sharp)
-RUN npm ci --legacy-peer-deps --omit=dev
+RUN npm install --legacy-peer-deps --omit=dev
 
 # Re-install sharp for image optimization (standalone build issue)
 RUN npm install sharp@latest
