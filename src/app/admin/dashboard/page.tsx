@@ -20,7 +20,8 @@ export default function AdminDashboardPage() {
 
   const fetchStats = useCallback(async () => {
     try {
-      const res = await fetch('/api/cattle?limit=1000')
+      // Use admin API for dashboard to avoid pagination limits
+      const res = await fetch('/api/admin/cattle')
       const data = await res.json()
 
       const items = data.items || []
