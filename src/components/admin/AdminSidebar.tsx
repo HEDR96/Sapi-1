@@ -11,6 +11,7 @@ import {
   Image as ImageIcon,
   Users,
   Settings,
+  Calendar,
   X,
 } from 'lucide-react'
 
@@ -21,6 +22,7 @@ const navItems = [
   { href: '/admin/health', icon: Heart, label: 'Riwayat Kesehatan' },
   { href: '/admin/feed', icon: UtensilsCrossed, label: 'Riwayat Pakan' },
   { href: '/admin/media', icon: ImageIcon, label: 'Dokumentasi' },
+  { href: '/admin/bookings', icon: Calendar, label: 'Booking' },
   { href: '/admin/users', icon: Users, label: 'Pengguna' },
   { href: '/admin/settings', icon: Settings, label: 'Pengaturan' },
 ]
