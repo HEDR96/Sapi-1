@@ -3,10 +3,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { HeroSection } from '@/components/catalog/HeroSection'
 import { JourneySection } from '@/components/catalog/JourneySection'
-import { CattleGrid } from '@/components/catalog/CattleGrid'
 import { TrustRow } from '@/components/catalog/TrustRow'
 import { CTASection } from '@/components/catalog/CTASection'
-import { CatalogSwiper } from '@/components/catalog/CatalogSwiper'
+import { CatalogSection } from '@/components/catalog/CatalogSection'
 import { PantauPerkembanganSection } from '@/components/home/PantauPerkembanganSection'
 import { RecentComments } from '@/components/home/RecentComments'
 import { CattleWithLatestWeight, CattleWithRelations } from '@/types'
@@ -71,29 +70,18 @@ export default function HomePage() {
     <div ref={pageRef} className="mx-auto my-2 max-w-[1500px] overflow-hidden border border-black/30 bg-[hsl(var(--cream2))] shadow-2xl">
       <HeroSection />
 
-      {/* KATALOG - Horizontal Scroll */}
-      <section id="katalog" className="py-6 bg-[hsl(var(--cream2))]">
-        <div className="px-4">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-bold text-[hsl(var(--forest))]">Katalog Sapi</h2>
-              <p className="text-sm text-[hsl(var(--forest))/60]">Pilih sapi untuk melihat detail perkembangan</p>
-            </div>
-          </div>
-          <CatalogSwiper
-            cattle={cattle}
-            onSelect={handleSelectCattle}
-            selectedId={selectedCattle?.id}
-          />
-        </div>
-      </section>
+      {/* KATALOG - Combined Swiper/Grid with Toggle */}
+      <CatalogSection
+        cattle={cattle}
+        onSelect={handleSelectCattle}
+        selectedId={selectedCattle?.id}
+      />
 
       {/* PANTAU PERKEMBANGAN - Below Katalog */}
       <PantauPerkembanganSection cattle={selectedCattle} />
 
       <RecentComments />
       <JourneySection />
-      <CattleGrid />
       <TrustRow />
       <CTASection />
     </div>
