@@ -179,7 +179,7 @@ export function CommentSection({ cattleId, cattleCode, currentUserId }: CommentS
               {currentUserId === comment.user.id && (
                 <button
                   onClick={() => handleDelete(comment.id)}
-                  className="p-1.5 text-[hsl(var(--forest))/40 hover:text-red-500 transition-colors"
+                  className="p-1.5 text-[hsl(var(--forest))/40] hover:text-red-500 transition-colors"
                   title="Hapus komentar"
                 >
                   <Trash2 className="h-4 w-4" />
