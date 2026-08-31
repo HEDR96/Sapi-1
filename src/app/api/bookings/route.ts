@@ -44,6 +44,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'ID sapi dan nomor telepon wajib diisi' }, { status: 400 })
     }
 
+    // Validate quantity
+    if (!Number.isInteger(quantity) || quantity < 1) {
+      return NextResponse.json({ error: 'Jumlah harus minimal 1' }, { status: 400 })
+    }
+
     // Validate phone format
     const phoneRegex = /^(\+62|62|0)[0-9]{9,12}$/
     if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
@@ -68,35 +73,42 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Stok tidak mencukupi (tersedia: ${cattle.quantity})` }, { status: 400 })
     }
 
-    // Create booking
-    const booking = await prisma.booking.create({
-      data: {
-        cattleId,
-        userId,
-        quantity,
-        notes: notes || null,
-        status: 'PENDING',
-      },
-      include: {
-        cattle: { select: { id: true, code: true, name: true } },
-        user: { select: { id: true, name: true, email: true } },
-      },
-    })
+    // Create booking and notification in a transaction
+    const booking = await prisma.$transaction(async (tx) => {
+      // Create booking
+      const newBooking = await tx.booking.create({
+        data: {
+          cattleId,
+          userId,
+          quantity,
+          notes: notes || null,
+          status: 'PENDING',
+        },
+        include: {
+          cattle: { select: { id: true, code: true, name: true } },
+          user: { select: { id: true, name: true, email: true } },
+        },
+      })
 
-    // Create notification for super admin
-    const admins = await prisma.user.findMany({
-      where: { role: 'ADMIN' },
-      select: { id: true },
-    })
+      // Create notification for super admin
+      const admins = await tx.user.findMany({
+        where: { role: 'ADMIN' },
+        select: { id: true },
+      })
 
-    await prisma.notification.createMany({
-      data: admins.map(admin => ({
-        userId: admin.id,
-        title: 'Permintaan Booking Baru',
-        message: `${booking.user.name || 'User'} ingin booking ${cattle.name} (${cattle.code}) - qty: ${quantity}`,
-        type: 'BOOKING_REQUEST',
-        data: JSON.stringify({ bookingId: booking.id, cattleId }),
-      })),
+      if (admins.length > 0) {
+        await tx.notification.createMany({
+          data: admins.map(admin => ({
+            userId: admin.id,
+            title: 'Permintaan Booking Baru',
+            message: `${newBooking.user.name || 'User'} ingin booking ${cattle.name} (${cattle.code}) - qty: ${quantity}`,
+            type: 'BOOKING_REQUEST',
+            data: JSON.stringify({ bookingId: newBooking.id, cattleId }),
+          })),
+        })
+      }
+
+      return newBooking
     })
 
     return NextResponse.json({ success: true, booking })
