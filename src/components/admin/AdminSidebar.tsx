@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import {
   LayoutDashboard,
   Beef,
@@ -29,6 +30,14 @@ const navItems = [
 
 export function AdminSidebar() {
   const pathname = usePathname()
+  const [pendingBookingsCount, setPendingBookingsCount] = useState(0)
+
+  useEffect(() => {
+    fetch('/api/admin/bookings?status=PENDING')
+      .then(res => res.json())
+      .then(data => setPendingBookingsCount(data.bookings?.length || 0))
+      .catch(() => {})
+  }, [])
 
   return (
     <>
@@ -72,6 +81,11 @@ export function AdminSidebar() {
                   >
                     <item.icon className="h-4 w-4" />
                     {item.label}
+                    {item.href === '/admin/bookings' && pendingBookingsCount > 0 && (
+                      <span className="ml-auto h-5 min-w-[20px] flex items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold px-1.5">
+                        {pendingBookingsCount > 99 ? '99+' : pendingBookingsCount}
+                      </span>
+                    )}
                   </Link>
                 </li>
               )
