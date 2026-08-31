@@ -22,22 +22,23 @@ export default function HomePage() {
     fetch('/api/admin/cattle?status=AVAILABLE&limit=20')
       .then(res => res.json())
       .then(data => {
-        if (data.success && data.data?.items) {
-          // Map to CattleWithLatestWeight
-          const mapped: CattleWithLatestWeight[] = data.data.items.map((c: CattleWithRelations) => ({
-            id: c.id,
-            code: c.code,
-            name: c.name,
-            breed: c.breed,
-            status: c.status,
-            price: c.price,
-            mainImage: c.mainImage,
-            quantity: c.quantity,
-            lastWeight: c.weights?.[0]?.weight || null
-          }))
-          setCattle(mapped)
-          setFullCattleData(data.data.items)
-        }
+        // API returns { items: [...], total: number } directly
+        const items = Array.isArray(data) ? data : data.items || data.data?.items || []
+
+        // Map to CattleWithLatestWeight
+        const mapped: CattleWithLatestWeight[] = items.map((c: any) => ({
+          id: c.id,
+          code: c.code,
+          name: c.name,
+          breed: c.breed,
+          status: c.status,
+          price: c.price,
+          mainImage: c.mainImage,
+          quantity: c.quantity,
+          lastWeight: c.lastWeight || c.weights?.[0]?.weight || null
+        }))
+        setCattle(mapped)
+        setFullCattleData(items)
       })
       .catch(console.error)
 
