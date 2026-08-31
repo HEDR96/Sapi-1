@@ -17,6 +17,7 @@ import { formatCurrency, formatWeight, formatHeight, formatDate, formatADG } fro
 import { calculateWeightStats, estimateTargetCompletion } from '@/lib/utils/calculations'
 import { MessageCircle, Share2, ChevronLeft, ChevronRight, X, Check } from 'lucide-react'
 import { CattleWithRelations } from '@/types'
+import { BookingModal } from './BookingModal'
 
 interface CattleProfileProps {
   cattle: CattleWithRelations
@@ -29,6 +30,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
   const [currentUserId, setCurrentUserId] = useState<string | undefined>()
+  const [showBookingModal, setShowBookingModal] = useState(false)
 
   const weightData = cattle.weights?.map((w) => ({
     id: w.id,
@@ -102,6 +104,14 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
     } else {
       await navigator.clipboard.writeText(url)
       alert('Link copied to clipboard!')
+    }
+  }
+
+  const handleBookingClick = () => {
+    if (!currentUserId) {
+      window.dispatchEvent(new CustomEvent('openAuthModal'))
+    } else {
+      setShowBookingModal(true)
     }
   }
 
@@ -238,7 +248,10 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
                   Bagikan
                 </button>
                 {(isAvailable) && (
-                  <button className="col-span-2 flex items-center justify-center gap-2 rounded-lg bg-[hsl(var(--gold))] px-3 py-3 text-[12px] font-semibold text-[hsl(var(--forest))] hover:bg-[hsl(var(--gold))/90 transition-colors">
+                  <button
+                    onClick={handleBookingClick}
+                    className="col-span-2 flex items-center justify-center gap-2 rounded-lg bg-[hsl(var(--gold))] px-3 py-3 text-[12px] font-semibold text-[hsl(var(--forest))] hover:bg-[hsl(var(--gold))/90 transition-colors"
+                  >
                     <Check className="h-4 w-4" />
                     Booking Sekarang
                   </button>
@@ -380,6 +393,22 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
             {lightboxIndex + 1} / {allImages.length}
           </div>
         </div>
+      )}
+
+      {/* Booking Modal */}
+      {showBookingModal && (
+        <BookingModal
+          isOpen={showBookingModal}
+          onClose={() => setShowBookingModal(false)}
+          cattle={{
+            id: cattle.id,
+            name: cattle.name,
+            code: cattle.code,
+            price: Number(cattle.price),
+            quantity: cattle.quantity || 1,
+          }}
+          onSuccess={() => alert('Booking berhasil! Anda akan dihubungi oleh admin.')}
+        />
       )}
     </div>
   )
