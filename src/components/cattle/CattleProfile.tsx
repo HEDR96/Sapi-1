@@ -250,7 +250,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
                 {(isAvailable) && (
                   <button
                     onClick={handleBookingClick}
-                    className="col-span-2 flex items-center justify-center gap-2 rounded-lg bg-[hsl(var(--gold))] px-3 py-3 text-[12px] font-semibold text-[hsl(var(--forest))] hover:bg-[hsl(var(--gold))/90 transition-colors"
+                    className="col-span-2 flex items-center justify-center gap-2 rounded-lg bg-[hsl(var(--gold))] px-3 py-3 text-[12px] font-semibold text-[hsl(var(--forest))] hover:bg-[hsl(var(--gold))/90] transition-colors"
                   >
                     <Check className="h-4 w-4" />
                     Booking Sekarang

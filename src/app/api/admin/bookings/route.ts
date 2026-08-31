@@ -60,34 +60,69 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'ID dan action diperlukan' }, { status: 400 })
   }
 
+  if (action !== 'approve' && action !== 'reject') {
+    return NextResponse.json({ error: 'Action harus approve atau reject' }, { status: 400 })
+  }
+
   try {
-    const newStatus = action === 'approve' ? 'CONFIRMED' : 'CANCELLED'
+    const result = await prisma.$transaction(async (tx) => {
+      // Check booking exists and is PENDING
+      const existing = await tx.booking.findUnique({
+        where: { id },
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+          cattle: { select: { id: true, name: true, code: true, status: true, quantity: true } },
+        },
+      })
 
-    const booking = await prisma.booking.update({
-      where: { id },
-      data: { status: newStatus },
-      include: {
-        user: { select: { id: true, name: true, email: true } },
-        cattle: { select: { id: true, name: true, code: true } },
-      },
+      if (!existing) {
+        throw new Error('Booking tidak ditemukan')
+      }
+
+      if (existing.status !== 'PENDING') {
+        throw new Error('Booking sudah diproses')
+      }
+
+      const newStatus = action === 'approve' ? 'CONFIRMED' : 'CANCELLED'
+
+      // Update booking status
+      const booking = await tx.booking.update({
+        where: { id },
+        data: { status: newStatus },
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+          cattle: { select: { id: true, name: true, code: true } },
+        },
+      })
+
+      // If approving, update cattle status to BOOKED
+      if (action === 'approve') {
+        await tx.cattle.update({
+          where: { id: booking.cattleId },
+          data: { status: 'BOOKED' },
+        })
+      }
+
+      // Create notification for user
+      await tx.notification.create({
+        data: {
+          userId: booking.user.id,
+          title: action === 'approve' ? 'Booking Diterima' : 'Booking Ditolak',
+          message: action === 'approve'
+            ? `Booking Anda untuk ${booking.cattle.name} (${booking.cattle.code}) telah diterima!`
+            : `Maaf, booking Anda untuk ${booking.cattle.name} (${booking.cattle.code}) ditolak.`,
+          type: action === 'approve' ? 'BOOKING_CONFIRMED' : 'BOOKING_CANCELLED',
+          data: JSON.stringify({ bookingId: booking.id }),
+        },
+      })
+
+      return booking
     })
 
-    // Create notification for user
-    await prisma.notification.create({
-      data: {
-        userId: booking.user.id,
-        title: action === 'approve' ? 'Booking Diterima' : 'Booking Ditolak',
-        message: action === 'approve'
-          ? `Booking Anda untuk ${booking.cattle.name} (${booking.cattle.code}) telah diterima!`
-          : `Maaf, booking Anda untuk ${booking.cattle.name} (${booking.cattle.code}) ditolak.`,
-        type: action === 'approve' ? 'BOOKING_CONFIRMED' : 'BOOKING_CANCELLED',
-        data: JSON.stringify({ bookingId: booking.id }),
-      },
-    })
-
-    return NextResponse.json({ success: true, booking })
-  } catch (error) {
+    return NextResponse.json({ success: true, booking: result })
+  } catch (error: any) {
     console.error('Update booking error:', error)
-    return NextResponse.json({ error: 'Terjadi kesalahan' }, { status: 500 })
+    const message = error.message || 'Terjadi kesalahan'
+    return NextResponse.json({ error: message }, { status: 400 })
   }
 }
