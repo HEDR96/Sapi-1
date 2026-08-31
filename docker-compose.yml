@@ -27,13 +27,15 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
       NODE_ENV: production
       DATABASE_URL: "postgresql://postgres:postgres123@db:5432/cattle_catalog"
       JWT_SECRET: "cattle-catalog-super-secret-jwt-key-2024"
       JWT_EXPIRES_IN: "24h"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
-      # iDrive E2 Storage
+      # iDrive E2 Storage - loaded from .env via env_file above
       IDRIVE_ACCESS_KEY_ID: "${IDRIVE_ACCESS_KEY_ID}"
       IDRIVE_SECRET_ACCESS_KEY: "${IDRIVE_SECRET_ACCESS_KEY}"
       IDRIVE_BUCKET: "${IDRIVE_BUCKET}"

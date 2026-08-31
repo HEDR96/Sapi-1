@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { ZodError } from 'zod'
 import { prisma } from '@/lib/db/prisma'
 import { CattleQuerySchema } from '@/lib/validations/cattle'
 
@@ -81,6 +82,19 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('Error fetching cattle:', error)
+
+    // Handle Zod validation errors with 400 status
+    if (error instanceof ZodError) {
+      const issues = error.errors.map(e => ({
+        field: e.path.join('.'),
+        message: e.message,
+      }))
+      return NextResponse.json(
+        { error: 'Validation failed', issues },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
       { error: 'Failed to fetch cattle' },
       { status: 500 }
