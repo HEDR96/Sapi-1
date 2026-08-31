@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { CatalogSwiper } from './CatalogSwiper'
 import { CattleCard } from './CattleCard'
 import { CattleWithLatestWeight, CattleWithRelations } from '@/types'
 import { LayoutGrid, Columns3 } from 'lucide-react'
+import { SearchFilter, Filters } from './SearchFilter'
 
 interface CatalogSectionProps {
   cattle: CattleWithLatestWeight[]
@@ -14,6 +15,34 @@ interface CatalogSectionProps {
 
 export function CatalogSection({ cattle, onSelect, selectedId }: CatalogSectionProps) {
   const [viewMode, setViewMode] = useState<'swiper' | 'grid'>('swiper')
+  const [filters, setFilters] = useState<Filters>({
+    search: '',
+    status: 'ALL',
+    breed: 'ALL',
+  })
+
+  const handleSearch = (newFilters: Filters) => {
+    setFilters(newFilters)
+  }
+
+  const filteredCattle = useMemo(() => {
+    return cattle.filter(c => {
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase()
+        const matchesSearch =
+          c.name.toLowerCase().includes(searchLower) ||
+          c.code.toLowerCase().includes(searchLower)
+        if (!matchesSearch) return false
+      }
+      if (filters.status !== 'ALL' && c.status !== filters.status) return false
+      if (filters.breed !== 'ALL' && c.breed !== filters.breed) return false
+      if (filters.minPrice && Number(c.price) < filters.minPrice) return false
+      if (filters.maxPrice && Number(c.price) > filters.maxPrice) return false
+      if (filters.minWeight && (!c.lastWeight || c.lastWeight < filters.minWeight)) return false
+      if (filters.maxWeight && (!c.lastWeight || c.lastWeight > filters.maxWeight)) return false
+      return true
+    })
+  }, [cattle, filters])
 
   return (
     <section id="katalog" className="py-6 bg-[hsl(var(--cream2))]">
@@ -23,9 +52,7 @@ export function CatalogSection({ cattle, onSelect, selectedId }: CatalogSectionP
           <div>
             <h2 className="text-xl font-bold text-[hsl(var(--forest))]">Katalog Sapi</h2>
             <p className="text-sm text-[hsl(var(--forest))/60]">
-              {viewMode === 'swiper'
-                ? 'Geser untuk melihat sapi lainnya'
-                : `Menampilkan ${cattle.length} sapi`}
+              Menampilkan {filteredCattle.length} dari {cattle.length} sapi
             </p>
           </div>
 
@@ -56,20 +83,32 @@ export function CatalogSection({ cattle, onSelect, selectedId }: CatalogSectionP
           </div>
         </div>
 
+        {/* Search Filter */}
+        <div className="mb-4">
+          <SearchFilter onSearch={handleSearch} initialFilters={filters} />
+        </div>
+
         {/* Content */}
-        {cattle.length === 0 ? (
-          <div className="flex items-center justify-center h-48 text-[hsl(var(--forest))/50]">
-            Belum ada sapi tersedia
+        {filteredCattle.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-48 text-[hsl(var(--forest))/50]">
+            <div className="text-4xl mb-2">🔍</div>
+            <p>Tidak ada sapi yang sesuai filter</p>
+            <button
+              onClick={() => setFilters({ search: '', status: 'ALL', breed: 'ALL' })}
+              className="mt-2 text-sm text-[hsl(var(--forest))] hover:underline"
+            >
+              Reset filter
+            </button>
           </div>
         ) : viewMode === 'swiper' ? (
           <CatalogSwiper
-            cattle={cattle}
+            cattle={filteredCattle}
             onSelect={onSelect}
             selectedId={selectedId}
           />
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {cattle.map((c) => (
+            {filteredCattle.map((c) => (
               <div
                 key={c.id}
                 onClick={() => onSelect(c)}
