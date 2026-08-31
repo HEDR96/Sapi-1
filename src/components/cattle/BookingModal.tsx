@@ -30,6 +30,14 @@ export function BookingModal({ isOpen, onClose, cattle, onSuccess }: BookingModa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    // Validate phone format
+    const phoneRegex = /^(\+62|62|0)[0-9]{9,12}$/
+    if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
+      setError('Format nomor telepon tidak valid')
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -150,7 +158,7 @@ export function BookingModal({ isOpen, onClose, cattle, onSuccess }: BookingModa
                     onChange={(e) => setQuantity(Number(e.target.value))}
                     className="w-full rounded-lg border border-[hsl(var(--line))] px-3 py-2.5 text-sm text-[hsl(var(--forest))] bg-white focus:border-[hsl(var(--forest))] focus:ring-2 focus:ring-[hsl(var(--forest))] focus:outline-none"
                   >
-                    {Array.from({ length: Math.min(cattle.quantity, 10) }, (_, i) => i + 1).map(n => (
+                    {Array.from({ length: cattle.quantity }, (_, i) => i + 1).map(n => (
                       <option key={n} value={n}>{n}</option>
                     ))}
                   </select>
