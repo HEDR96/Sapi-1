@@ -37,7 +37,7 @@ export function SummaryTab({ cattle }: SummaryTabProps) {
             ADG
           </div>
           <p className="text-lg font-bold text-[hsl(var(--forest))]">
-            {formatADG(weightStats.adg)}
+            {formatADG(weightStats.adg || 0)}
           </p>
         </div>
 

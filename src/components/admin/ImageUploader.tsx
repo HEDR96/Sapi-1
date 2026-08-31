@@ -85,7 +85,7 @@ export function ImageUploader({
     } else {
       setError('File harus berupa gambar')
     }
-  }, [folder, bucket])
+  }, [folder])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null)

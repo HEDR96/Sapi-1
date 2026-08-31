@@ -1,11 +1,11 @@
 'use client'
 
-import { CattleWeight } from '@/types'
+import { CattleWeightWithMedia } from '@/types'
 import { formatWeight, formatDate } from '@/lib/utils/formatters'
 import { TrendingUp } from 'lucide-react'
 
 interface WeightHistoryProps {
-  weights: CattleWeight[]
+  weights: CattleWeightWithMedia[]
 }
 
 export function WeightHistory({ weights }: WeightHistoryProps) {

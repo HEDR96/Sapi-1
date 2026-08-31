@@ -65,7 +65,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Install openssl for Prisma
+# Install openssl for Prisma and sharp
 RUN apk add --no-cache openssl
 
 # Create non-root user
@@ -88,8 +88,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modul
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json ./
 
-# Install production dependencies only
+# Install production dependencies (including sharp)
 RUN npm ci --legacy-peer-deps --omit=dev
+
+# Re-install sharp for image optimization (standalone build issue)
+RUN npm install sharp@latest
 
 # Install Prisma CLI and tsx globally for db commands
 RUN npm install -g prisma@5.15.0 tsx@4.10.0

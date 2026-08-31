@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     const comment = await prisma.comment.create({
       data: {
-        userId: user.userId || user.id,
+        userId: user.userId || '',
         cattleId,
         content,
       },
@@ -86,7 +86,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Check ownership
-    if (comment.userId !== (user.userId || user.id)) {
+    if (comment.userId !== user.userId) {
       return NextResponse.json({ error: 'Tidak diizinkan' }, { status: 403 })
     }
 

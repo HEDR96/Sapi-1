@@ -1,11 +1,11 @@
 'use client'
 
-import { CattleHealthRecord, HealthStatus } from '@/types'
+import { CattleHealthRecordWithMedia, HealthStatus } from '@/types'
 import { formatDate } from '@/lib/utils/formatters'
 import { HEALTH_STATUS_LABELS } from '@/types'
 
 interface HealthTimelineProps {
-  records: CattleHealthRecord[]
+  records: CattleHealthRecordWithMedia[]
 }
 
 const statusColors: Record<HealthStatus, string> = {
