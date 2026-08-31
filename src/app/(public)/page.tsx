@@ -12,9 +12,9 @@ import { RecentComments } from '@/components/home/RecentComments'
 import { CattleWithLatestWeight, CattleWithRelations } from '@/types'
 
 export default function HomePage() {
-  const [selectedCattle, setSelectedCattle] = useState<CattleWithLatestWeight | null>(null)
   const [cattle, setCattle] = useState<CattleWithLatestWeight[]>([])
   const [fullCattleData, setFullCattleData] = useState<CattleWithRelations[]>([])
+  const [selectedCattle, setSelectedCattle] = useState<CattleWithRelations | null>(null)
   const pageRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -60,20 +60,36 @@ export default function HomePage() {
     return () => observer.disconnect()
   }, [])
 
+  // Handler when user selects a cow from catalog
+  const handleSelectCattle = (c: CattleWithLatestWeight) => {
+    const full = fullCattleData.find(x => x.id === c.id) || null
+    setSelectedCattle(full)
+  }
+
   return (
     <div ref={pageRef} className="mx-auto my-2 max-w-[1500px] overflow-hidden border border-black/30 bg-[hsl(var(--cream2))] shadow-2xl">
       <HeroSection />
-      <section className="py-6 bg-[hsl(var(--cream2))]">
+
+      {/* KATALOG - Horizontal Scroll */}
+      <section id="katalog" className="py-6 bg-[hsl(var(--cream2))]">
         <div className="px-4">
-          <h2 className="text-lg font-bold text-[hsl(var(--forest))] mb-4">Pilihan Kami</h2>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-xl font-bold text-[hsl(var(--forest))]">Katalog Sapi</h2>
+              <p className="text-sm text-[hsl(var(--forest))/60]">Pilih sapi untuk melihat detail perkembangan</p>
+            </div>
+          </div>
           <CatalogSwiper
             cattle={cattle}
-            onSelect={setSelectedCattle}
+            onSelect={handleSelectCattle}
             selectedId={selectedCattle?.id}
           />
         </div>
       </section>
-      <PantauPerkembanganSection cattle={fullCattleData} />
+
+      {/* PANTAU PERKEMBANGAN - Below Katalog */}
+      <PantauPerkembanganSection cattle={selectedCattle} />
+
       <RecentComments />
       <JourneySection />
       <CattleGrid />
