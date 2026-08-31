@@ -33,6 +33,12 @@ services:
       JWT_SECRET: "cattle-catalog-super-secret-jwt-key-2024"
       JWT_EXPIRES_IN: "24h"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+      # iDrive E2 Storage
+      IDRIVE_ACCESS_KEY_ID: "${IDRIVE_ACCESS_KEY_ID}"
+      IDRIVE_SECRET_ACCESS_KEY: "${IDRIVE_SECRET_ACCESS_KEY}"
+      IDRIVE_BUCKET: "${IDRIVE_BUCKET}"
+      IDRIVE_ENDPOINT: "${IDRIVE_ENDPOINT}"
+      IDRIVE_REGION: "${IDRIVE_REGION}"
     depends_on:
       db:
         condition: service_healthy
