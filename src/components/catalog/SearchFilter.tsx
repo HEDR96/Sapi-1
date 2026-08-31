@@ -145,7 +145,7 @@ export function SearchFilter({ onSearch, initialFilters }: SearchFilterProps) {
             placeholder="Contoh: 10000000"
             value={filters.minPrice || ''}
             onChange={(e) => handleSearch({ ...filters, minPrice: e.target.value ? Number(e.target.value) : undefined })}
-            className="w-full rounded-md border border-[hsl(var(--line))] bg-white px-3 py-2 text-[11px] text-[hsl(var(--forest))] placeholder:text-[hsl(var(--forest))/40 focus:border-[hsl(var(--forest))] focus:outline-none"
+            className="w-full rounded-md border border-[hsl(var(--line))] bg-white px-3 py-2 text-[11px] text-[hsl(var(--forest))] placeholder:text-[hsl(var(--forest))/40] focus:border-[hsl(var(--forest))] focus:outline-none"
           />
         </div>
 
@@ -157,7 +157,7 @@ export function SearchFilter({ onSearch, initialFilters }: SearchFilterProps) {
             placeholder="Contoh: 50000000"
             value={filters.maxPrice || ''}
             onChange={(e) => handleSearch({ ...filters, maxPrice: e.target.value ? Number(e.target.value) : undefined })}
-            className="w-full rounded-md border border-[hsl(var(--line))] bg-white px-3 py-2 text-[11px] text-[hsl(var(--forest))] placeholder:text-[hsl(var(--forest))/40 focus:border-[hsl(var(--forest))] focus:outline-none"
+            className="w-full rounded-md border border-[hsl(var(--line))] bg-white px-3 py-2 text-[11px] text-[hsl(var(--forest))] placeholder:text-[hsl(var(--forest))/40] focus:border-[hsl(var(--forest))] focus:outline-none"
           />
         </div>
 
@@ -169,7 +169,7 @@ export function SearchFilter({ onSearch, initialFilters }: SearchFilterProps) {
             placeholder="Contoh: 400"
             value={filters.minWeight || ''}
             onChange={(e) => handleSearch({ ...filters, minWeight: e.target.value ? Number(e.target.value) : undefined })}
-            className="w-full rounded-md border border-[hsl(var(--line))] bg-white px-3 py-2 text-[11px] text-[hsl(var(--forest))] placeholder:text-[hsl(var(--forest))/40 focus:border-[hsl(var(--forest))] focus:outline-none"
+            className="w-full rounded-md border border-[hsl(var(--line))] bg-white px-3 py-2 text-[11px] text-[hsl(var(--forest))] placeholder:text-[hsl(var(--forest))/40] focus:border-[hsl(var(--forest))] focus:outline-none"
           />
         </div>
 
@@ -181,7 +181,7 @@ export function SearchFilter({ onSearch, initialFilters }: SearchFilterProps) {
             placeholder="Contoh: 600"
             value={filters.maxWeight || ''}
             onChange={(e) => handleSearch({ ...filters, maxWeight: e.target.value ? Number(e.target.value) : undefined })}
-            className="w-full rounded-md border border-[hsl(var(--line))] bg-white px-3 py-2 text-[11px] text-[hsl(var(--forest))] placeholder:text-[hsl(var(--forest))/40 focus:border-[hsl(var(--forest))] focus:outline-none"
+            className="w-full rounded-md border border-[hsl(var(--line))] bg-white px-3 py-2 text-[11px] text-[hsl(var(--forest))] placeholder:text-[hsl(var(--forest))/40] focus:border-[hsl(var(--forest))] focus:outline-none"
           />
         </div>
 
