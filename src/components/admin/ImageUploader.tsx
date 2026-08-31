@@ -2,7 +2,6 @@
 
 import { useState, useRef, useCallback } from 'react'
 import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react'
-import { uploadToS3 } from '@/lib/storage/upload'
 
 interface ImageUploaderProps {
   value?: string
@@ -51,23 +50,41 @@ export function ImageUploader({
     setUploadProgress(10)
 
     try {
-      setUploadProgress(30)
+      setUploadProgress(20)
 
-      // Convert file to buffer and upload to S3
-      const buffer = Buffer.from(await file.arrayBuffer())
-      const url = await uploadToS3(buffer, file.name, file.type, folder)
+      // Create form data and upload via API
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('folder', folder)
 
-      setUploadProgress(90)
+      setUploadProgress(40)
 
-      if (url) {
-        onChange(url)
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      setUploadProgress(80)
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || 'Gagal mengupload gambar')
+        return
+      }
+
+      if (data.url) {
+        console.log('Upload success, URL:', data.url)
+        onChange(data.url)
         setUploadProgress(100)
       } else {
-        setError('Gagal mengupload gambar')
+        setError('Gagal mengupload gambar: URL tidak ditemukan')
       }
     } catch (err) {
       console.error('Upload error:', err)
-      setError('Terjadi kesalahan saat mengupload')
+      // Show more detailed error message
+      const errorMessage = err instanceof Error ? err.message : 'Terjadi kesalahan saat mengupload'
+      setError(`Upload gagal: ${errorMessage}`)
     } finally {
       setUploading(false)
       setUploadProgress(0)
@@ -122,6 +139,10 @@ export function ImageUploader({
             <X className="h-4 w-4" />
           </button>
         </div>
+        {/* Debug: show the URL */}
+        <p className="text-xs text-[hsl(var(--forest))/40] text-center break-all px-2">
+          URL: {value}
+        </p>
         <p className="text-xs text-[hsl(var(--forest))/50] text-center">
           Klik gambar untuk menghapus
         </p>

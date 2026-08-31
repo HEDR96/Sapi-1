@@ -1,4 +1,4 @@
-import { PutObjectCommand } from '@aws-sdk/client-s3'
+import { PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { s3Client } from './s3'
 
@@ -6,11 +6,18 @@ export async function uploadToS3(
   file: Buffer,
   fileName: string,
   contentType: string,
-  folder: string = 'cattle'
+  folder: string = 'image'
 ): Promise<string> {
   const key = `${folder}/${Date.now()}-${fileName}`
 
-  await s3Client.send(new PutObjectCommand({
+  console.log('Uploading to S3:', {
+    bucket: process.env.IDRIVE_BUCKET,
+    key,
+    contentType,
+    endpoint: process.env.IDRIVE_ENDPOINT,
+  })
+
+  const result = await s3Client.send(new PutObjectCommand({
     Bucket: process.env.IDRIVE_BUCKET,
     Key: key,
     Body: file,
@@ -18,7 +25,12 @@ export async function uploadToS3(
     ACL: 'public-read',
   }))
 
-  return `${process.env.IDRIVE_ENDPOINT}/${process.env.IDRIVE_BUCKET}/${key}`
+  console.log('S3 upload result:', result.$metadata)
+
+  // Return URL - endpoint already contains bucket name
+  const url = `${process.env.IDRIVE_ENDPOINT}/${key}`
+  console.log('Generated public URL:', url)
+  return url
 }
 
 export async function getSignedUploadUrl(

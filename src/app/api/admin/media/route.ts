@@ -53,7 +53,9 @@ export async function POST(request: NextRequest) {
     if (file && file.size > 0) {
       const buffer = Buffer.from(await file.arrayBuffer())
       const fileType = file.type.startsWith('video/') ? 'VIDEO' : 'IMAGE'
-      url = await uploadToS3(buffer, file.name, file.type, 'media')
+      // Use 'video' or 'image' folder based on file type
+      const folder = fileType === 'VIDEO' ? 'video' : 'image'
+      url = await uploadToS3(buffer, file.name, file.type, folder)
     }
 
     if (!url) {

@@ -26,11 +26,23 @@ export default function AdminCattlePage() {
 
   const fetchCattle = async () => {
     try {
-      const params = new URLSearchParams({ limit: '1000' })
-      if (search) params.set('search', search)
-      const res = await fetch(`/api/cattle?${params}`)
+      // Use admin API which returns all cattle without pagination limit
+      const res = await fetch('/api/admin/cattle')
       const data = await res.json()
-      setCattle(data.items || [])
+      let items = data.items || []
+
+      // Filter by search if provided
+      if (search) {
+        const searchLower = search.toLowerCase()
+        items = items.filter(
+          (c: CattleWithRelations) =>
+            c.name.toLowerCase().includes(searchLower) ||
+            c.code.toLowerCase().includes(searchLower) ||
+            c.breed.toLowerCase().includes(searchLower)
+        )
+      }
+
+      setCattle(items)
     } catch (error) {
       console.error('Failed to fetch cattle:', error)
     } finally {

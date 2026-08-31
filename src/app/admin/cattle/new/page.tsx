@@ -220,7 +220,7 @@ export default function NewCattlePage() {
                 <ImageUploader
                   value={form.mainImage}
                   onChange={handleImageChange}
-                  folder="cattle"
+                  folder="image"
                 />
                 <p className="text-xs text-muted-foreground">
                   Upload gambar JPG atau PNG. Maksimal 5MB.

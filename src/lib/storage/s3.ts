@@ -7,5 +7,6 @@ export const s3Client = new S3Client({
     accessKeyId: process.env.IDRIVE_ACCESS_KEY_ID!,
     secretAccessKey: process.env.IDRIVE_SECRET_ACCESS_KEY!,
   },
-  forcePathStyle: true,
+  // Use virtual-hosted style URLs (bucket in hostname)
+  forcePathStyle: false,
 })

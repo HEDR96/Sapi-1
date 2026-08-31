@@ -10,6 +10,7 @@ import { Status, PaginatedResponse, CattleWithRelations } from '@/types'
 export function CattleGrid() {
   const [cattle, setCattle] = useState<CattleWithRelations[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 12,
@@ -24,6 +25,7 @@ export function CattleGrid() {
 
   const fetchCattle = useCallback(async (filterParams: Filters, page: number) => {
     setLoading(true)
+    setError(null)
     try {
       const params = new URLSearchParams()
       params.set('page', page.toString())
@@ -37,9 +39,21 @@ export function CattleGrid() {
       if (filterParams.maxWeight !== undefined) params.set('maxWeight', filterParams.maxWeight.toString())
 
       const res = await fetch(`/api/cattle?${params.toString()}`)
-      const data: PaginatedResponse<CattleWithRelations> = await res.json()
+      const data = await res.json()
 
-      setCattle(data.items)
+      // Handle API errors
+      if (!res.ok) {
+        if (data.issues) {
+          const messages = data.issues.map((i: { message: string }) => i.message).join(', ')
+          setError(`Gagal memuat data: ${messages}`)
+        } else {
+          setError(data.error || 'Gagal memuat data sapi')
+        }
+        setCattle([])
+        return
+      }
+
+      setCattle(data.items || [])
       setPagination({
         page: data.page,
         limit: data.limit,
@@ -48,6 +62,7 @@ export function CattleGrid() {
       })
     } catch (error) {
       console.error('Failed to fetch cattle:', error)
+      setError('Terjadi kesalahan saat memuat data')
     } finally {
       setLoading(false)
     }
@@ -73,6 +88,13 @@ export function CattleGrid() {
       <div className="mb-4">
         <SearchFilter onSearch={handleSearch} initialFilters={filters} />
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
 
       {/* Results Info */}
       <div className="flex items-center justify-between mb-3">
