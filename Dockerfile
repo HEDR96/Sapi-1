@@ -104,6 +104,8 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 ENV NEXT_PUBLIC_APP_URL="http://localhost:3000"
+# Data directory for storing OAuth tokens
+ENV DATA_DIR="/app/data"
 
 # Default command - starts the app
 CMD ["node", "server.js"]

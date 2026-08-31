@@ -1,0 +1,437 @@
+diff --git a/src/app/api/comments/route.ts b/src/app/api/comments/route.ts
+index 3410595..7797a41 100644
+--- a/src/app/api/comments/route.ts
++++ b/src/app/api/comments/route.ts
+@@ -29,72 +29,78 @@ export async function GET(request: NextRequest) {
+ }
+ 
+ // POST /api/comments
+ export async function POST(request: NextRequest) {
+   const user = await getCurrentUser()
+   if (!user) {
+     return NextResponse.json({ error: 'Login diperlukan' }, { status: 401 })
+   }
+ 
+   try {
+     const { cattleId, content } = await request.json()
+ 
+     if (!cattleId || !content) {
+       return NextResponse.json({ error: 'Data tidak lengkap' }, { status: 400 })
+     }
+ 
+     if (content.length < 3 || content.length > 1000) {
+       return NextResponse.json({ error: 'Komentar 3-1000 karakter' }, { status: 400 })
+     }
+ 
++    const userId = user.userId || (user as any).id || ''
++    if (!userId) {
++      return NextResponse.json({ error: 'User ID tidak ditemukan' }, { status: 400 })
++    }
++
+     const comment = await prisma.comment.create({
+       data: {
+-        userId: user.userId || '',
++        userId,
+         cattleId,
+         content,
+       },
+       include: {
+         user: { select: { id: true, name: true } },
+         cattle: { select: { id: true, code: true, name: true } },
+       },
+     })
+ 
+     return NextResponse.json({ success: true, comment })
+   } catch (error) {
+     console.error('Create comment error:', error)
+     return NextResponse.json({ error: 'Terjadi kesalahan' }, { status: 500 })
+   }
+ }
+ 
+ // DELETE /api/comments?id=xxx
+ export async function DELETE(request: NextRequest) {
+   const user = await getCurrentUser()
+   if (!user) {
+     return NextResponse.json({ error: 'Login diperlukan' }, { status: 401 })
+   }
+ 
+   try {
+     const { searchParams } = new URL(request.url)
+     const id = searchParams.get('id')
+ 
+     if (!id) {
+       return NextResponse.json({ error: 'ID diperlukan' }, { status: 400 })
+     }
+ 
+     const comment = await prisma.comment.findUnique({ where: { id } })
+     if (!comment) {
+       return NextResponse.json({ error: 'Komentar tidak ditemukan' }, { status: 404 })
+     }
+ 
+     // Check ownership
+-    if (comment.userId !== user.userId) {
++    const currentUserId = user.userId || (user as any).id || ''
++    if (comment.userId !== currentUserId) {
+       return NextResponse.json({ error: 'Tidak diizinkan' }, { status: 403 })
+     }
+ 
+     await prisma.comment.delete({ where: { id } })
+ 
+     return NextResponse.json({ success: true })
+   } catch (error) {
+     console.error('Delete comment error:', error)
+     return NextResponse.json({ error: 'Terjadi kesalahan' }, { status: 500 })
+   }
+ }
+diff --git a/src/components/cattle/CattleProfile.tsx b/src/components/cattle/CattleProfile.tsx
+index 0d04a43..7ba31e8 100644
+--- a/src/components/cattle/CattleProfile.tsx
++++ b/src/components/cattle/CattleProfile.tsx
+@@ -1,49 +1,51 @@
+ 'use client'
+ 
+-import { useState } from 'react'
++import { useState, useEffect } from 'react'
+ import Image from 'next/image'
+ import Link from 'next/link'
+ import { Breadcrumb } from '@/components/shared/Breadcrumb'
+ import { CattleStats } from './CattleStats'
+ import { QRCodeCard } from './QRCodeCard'
+ import { StatusBadge } from '@/components/catalog/CattleStatusBadge'
+ import { WeightChart } from '@/components/weight/WeightChart'
+ import { WeightHistoryTab } from './WeightHistoryTab'
+ import { HealthHistoryTab } from './HealthHistoryTab'
+ import { FeedHistoryTab } from './FeedHistoryTab'
+ import { MediaTab } from './MediaTab'
++import { CommentSection } from './CommentSection'
+ import { formatCurrency, formatWeight, formatHeight, formatDate, formatADG } from '@/lib/utils/formatters'
+ import { calculateWeightStats, estimateTargetCompletion } from '@/lib/utils/calculations'
+ import { MessageCircle, Share2, ChevronLeft, ChevronRight, X, Check } from 'lucide-react'
+ import { CattleWithRelations } from '@/types'
+ 
+ interface CattleProfileProps {
+   cattle: CattleWithRelations
+ }
+ 
+ type TabKey = 'summary' | 'weights' | 'health' | 'feed' | 'media'
+ 
+ export function CattleProfile({ cattle }: CattleProfileProps) {
+   const [activeTab, setActiveTab] = useState<TabKey>('summary')
+   const [lightboxOpen, setLightboxOpen] = useState(false)
+   const [lightboxIndex, setLightboxIndex] = useState(0)
++  const [currentUserId, setCurrentUserId] = useState<string | undefined>()
+ 
+   const weightData = cattle.weights?.map((w) => ({
+     id: w.id,
+     weight: w.weight,
+     measurementDate: w.measurementDate,
+     notes: w.notes,
+   })) || []
+ 
+   const weightStats = calculateWeightStats(weightData)
+   const targetEstimation = cattle.targetWeight && weightStats.lastWeight
+     ? estimateTargetCompletion(cattle.targetWeight, weightStats.lastWeight, weightStats.adg)
+     : null
+ 
+   const breadcrumbItems = [
+     { label: 'Katalog', href: '/' },
+     { label: cattle.code },
+   ]
+ 
+   const isAvailable = cattle.status === 'AVAILABLE'
+   const isBooked = cattle.status === 'BOOKED'
+@@ -55,40 +57,47 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
+     ...(cattle.media?.filter(m => m.fileType === 'IMAGE').map(m => m.fileUrl) || [])
+   ].filter(Boolean) as string[]
+ 
+   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+ 
+   const openLightbox = (index: number) => {
+     setLightboxIndex(index)
+     setLightboxOpen(true)
+   }
+ 
+   const closeLightbox = () => setLightboxOpen(false)
+ 
+   const nextImage = () => {
+     setLightboxIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1))
+   }
+ 
+   const prevImage = () => {
+     setLightboxIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1))
+   }
+ 
++  useEffect(() => {
++    fetch('/api/auth/me')
++      .then(res => res.ok ? res.json() : null)
++      .then(data => setCurrentUserId(data?.user?.id))
++      .catch(() => {})
++  }, [])
++
+   const tabs = [
+     { key: 'summary', label: 'Ringkasan' },
+     { key: 'weights', label: 'Riwayat Timbang' },
+     { key: 'health', label: 'Kesehatan' },
+     { key: 'feed', label: 'Pakan' },
+     { key: 'media', label: 'Dokumentasi' },
+   ] as const
+ 
+   const handleShare = async () => {
+     const url = window.location.href
+     const text = `Lihat sapi ${cattle.name} (${cattle.code}) di samadyafarm.id`
+ 
+     if (navigator.share) {
+       try {
+         await navigator.share({ title: cattle.name, text, url })
+       } catch (err) {
+         // User cancelled or error
+       }
+     } else {
+       await navigator.clipboard.writeText(url)
+@@ -288,40 +297,46 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
+               </div>
+ 
+               {/* Tab Content */}
+               <div className="pt-4">
+                 {activeTab === 'summary' && (
+                   <SummaryTab weightStats={weightStats} targetEstimation={targetEstimation} cattle={cattle} />
+                 )}
+                 {activeTab === 'weights' && (
+                   <WeightHistoryTab weights={cattle.weights || []} />
+                 )}
+                 {activeTab === 'health' && (
+                   <HealthHistoryTab records={cattle.healthRecords || []} />
+                 )}
+                 {activeTab === 'feed' && (
+                   <FeedHistoryTab records={cattle.feedRecords || []} />
+                 )}
+                 {activeTab === 'media' && (
+                   <MediaTab media={cattle.media || []} />
+                 )}
+               </div>
++
++              <CommentSection
++                cattleId={cattle.id}
++                cattleCode={cattle.code}
++                currentUserId={currentUserId}
++              />
+             </div>
+           </div>
+         </div>
+ 
+         {/* QR Code Section */}
+         <div className="mt-4">
+           <QRCodeCard code={cattle.code} name={cattle.name} />
+         </div>
+       </div>
+ 
+       {/* Image Lightbox */}
+       {lightboxOpen && (
+         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95">
+           <button
+             onClick={closeLightbox}
+             className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 z-10"
+           >
+             <X className="h-6 w-6" />
+           </button>
+ 
+diff --git a/src/components/cattle/CommentSection.tsx b/src/components/cattle/CommentSection.tsx
+new file mode 100644
+index 0000000..29b598d
+--- /dev/null
++++ b/src/components/cattle/CommentSection.tsx
+@@ -0,0 +1,194 @@
++'use client'
++
++import { useState, useEffect } from 'react'
++import { formatRelativeTime } from '@/lib/utils/formatters'
++import { MessageCircle, Send, Trash2, Loader2, User } from 'lucide-react'
++
++interface Comment {
++  id: string
++  content: string
++  createdAt: string
++  user: { id: string; name: string | null }
++  cattle: { code: string; name: string }
++}
++
++interface CommentSectionProps {
++  cattleId: string
++  cattleCode: string
++  currentUserId?: string
++}
++
++export function CommentSection({ cattleId, cattleCode, currentUserId }: CommentSectionProps) {
++  const [comments, setComments] = useState<Comment[]>([])
++  const [loading, setLoading] = useState(true)
++  const [newComment, setNewComment] = useState('')
++  const [submitting, setSubmitting] = useState(false)
++  const [error, setError] = useState('')
++
++  useEffect(() => {
++    fetchComments()
++  }, [cattleId])
++
++  const fetchComments = async () => {
++    try {
++      const res = await fetch(`/api/comments?cattleId=${cattleId}&limit=50`)
++      const data = await res.json()
++      setComments(data.comments || [])
++    } catch {
++      console.error('Failed to fetch comments')
++    } finally {
++      setLoading(false)
++    }
++  }
++
++  const handleSubmit = async (e: React.FormEvent) => {
++    e.preventDefault()
++    if (!newComment.trim() || newComment.length < 3) return
++
++    setSubmitting(true)
++    setError('')
++
++    try {
++      const res = await fetch('/api/comments', {
++        method: 'POST',
++        headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify({ cattleId, content: newComment.trim() }),
++      })
++
++      if (!res.ok) {
++        const data = await res.json()
++        throw new Error(data.error || 'Gagal mengirim komentar')
++      }
++
++      setNewComment('')
++      fetchComments()
++    } catch (err: any) {
++      setError(err.message)
++    } finally {
++      setSubmitting(false)
++    }
++  }
++
++  const handleDelete = async (commentId: string) => {
++    if (!confirm('Hapus komentar ini?')) return
++
++    try {
++      const res = await fetch(`/api/comments?id=${commentId}`, { method: 'DELETE' })
++      if (res.ok) {
++        setComments(prev => prev.filter(c => c.id !== commentId))
++      }
++    } catch {
++      console.error('Failed to delete comment')
++    }
++  }
++
++  return (
++    <div className="mt-6 border-t border-[hsl(var(--line))] pt-6">
++      <h3 className="text-lg font-bold text-[hsl(var(--forest))] mb-4 flex items-center gap-2">
++        <MessageCircle className="h-5 w-5" />
++        Komentar ({comments.length})
++      </h3>
++
++      {/* Comment Form */}
++      {!currentUserId ? (
++        <div className="mb-6 p-4 bg-[hsl(var(--cream))] rounded-lg text-center">
++          <p className="text-sm text-[hsl(var(--forest))/70] mb-2">
++            Login untuk memberikan komentar
++          </p>
++          <button
++            onClick={() => window.dispatchEvent(new CustomEvent('openAuthModal'))}
++            className="text-sm font-semibold text-[hsl(var(--forest))] hover:underline"
++          >
++            Masuk / Daftar
++          </button>
++        </div>
++      ) : (
++        <form onSubmit={handleSubmit} className="mb-6">
++          <textarea
++            value={newComment}
++            onChange={(e) => setNewComment(e.target.value)}
++            placeholder="Tulis komentar Anda..."
++            rows={3}
++            maxLength={1000}
++            className="w-full rounded-lg border border-[hsl(var(--line))] p-3 text-sm text-[hsl(var(--forest))] placeholder:text-[hsl(var(--forest))/50] focus:border-[hsl(var(--forest))] focus:ring-2 focus:ring-[hsl(var(--forest))] focus:outline-none resize-none"
++          />
++          <div className="flex items-center justify-between mt-2">
++            <span className="text-xs text-[hsl(var(--forest))/50]">
++              {newComment.length}/1000 karakter
++            </span>
++            <button
++              type="submit"
++              disabled={submitting || newComment.length < 3}
++              className="flex items-center gap-2 rounded-lg bg-[hsl(var(--forest))] px-4 py-2 text-sm font-semibold text-white hover:bg-[hsl(var(--forest2))] disabled:opacity-50 transition-colors"
++            >
++              {submitting ? (
++                <Loader2 className="h-4 w-4 animate-spin" />
++              ) : (
++                <Send className="h-4 w-4" />
++              )}
++              Kirim
++            </button>
++          </div>
++          {error && (
++            <p className="mt-2 text-sm text-red-600">{error}</p>
++          )}
++        </form>
++      )}
++
++      {/* Comments List */}
++      {loading ? (
++        <div className="space-y-4">
++          {[1, 2, 3].map(i => (
++            <div key={i} className="animate-pulse">
++              <div className="flex items-start gap-3">
++                <div className="w-10 h-10 rounded-full bg-[hsl(var(--cream))]" />
++                <div className="flex-1">
++                  <div className="h-4 w-32 bg-[hsl(var(--cream))] rounded mb-2" />
++                  <div className="h-3 w-full bg-[hsl(var(--cream))] rounded mb-1" />
++                  <div className="h-3 w-2/3 bg-[hsl(var(--cream))] rounded" />
++                </div>
++              </div>
++            </div>
++          ))}
++        </div>
++      ) : comments.length === 0 ? (
++        <div className="text-center py-8 text-[hsl(var(--forest))/50]">
++          <div className="text-4xl mb-2">💬</div>
++          <p className="text-sm">Belum ada komentar. Jadilah yang pertama!</p>
++        </div>
++      ) : (
++        <div className="space-y-4">
++          {comments.map((comment) => (
++            <div key={comment.id} className="flex items-start gap-3 p-3 rounded-lg bg-white border border-[hsl(var(--line))]">
++              <div className="w-10 h-10 rounded-full bg-[hsl(var(--forest))] flex items-center justify-center flex-shrink-0">
++                <User className="h-5 w-5 text-white" />
++              </div>
++              <div className="flex-1 min-w-0">
++                <div className="flex items-center justify-between gap-2">
++                  <span className="font-semibold text-sm text-[hsl(var(--forest))]">
++                    {comment.user.name || 'User'}
++                  </span>
++                  <span className="text-xs text-[hsl(var(--forest))/50]">
++                    {formatRelativeTime(comment.createdAt)}
++                  </span>
++                </div>
++                <p className="mt-1 text-sm text-[hsl(var(--forest))/80] whitespace-pre-wrap break-words">
++                  {comment.content}
++                </p>
++              </div>
++              {currentUserId === comment.user.id && (
++                <button
++                  onClick={() => handleDelete(comment.id)}
++                  className="p-1.5 text-[hsl(var(--forest))/40 hover:text-red-500 transition-colors"
++                  title="Hapus komentar"
++                >
++                  <Trash2 className="h-4 w-4" />
++                </button>
++              )}
++            </div>
++          ))}
++        </div>
++      )}
++    </div>
++  )
++}

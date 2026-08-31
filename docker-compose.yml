@@ -31,18 +31,20 @@ services:
       - .env
     environment:
       NODE_ENV: production
-      # Allow self-signed certificates for IDRIVE E2
-      NODE_TLS_REJECT_UNAUTHORIZED: "0"
       DATABASE_URL: "postgresql://postgres:postgres123@db:5432/cattle_catalog"
       JWT_SECRET: "cattle-catalog-super-secret-jwt-key-2024"
       JWT_EXPIRES_IN: "24h"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
-      # iDrive E2 Storage - loaded from .env via env_file above
-      IDRIVE_ACCESS_KEY_ID: "${IDRIVE_ACCESS_KEY_ID}"
-      IDRIVE_SECRET_ACCESS_KEY: "${IDRIVE_SECRET_ACCESS_KEY}"
-      IDRIVE_BUCKET: "${IDRIVE_BUCKET}"
-      IDRIVE_ENDPOINT: "${IDRIVE_ENDPOINT}"
-      IDRIVE_REGION: "${IDRIVE_REGION}"
+      DATA_DIR: "/app/data"
+      # Google Drive OAuth - loaded from .env via env_file above
+      GOOGLE_OAUTH_CLIENT_ID: "${GOOGLE_OAUTH_CLIENT_ID}"
+      GOOGLE_OAUTH_CLIENT_SECRET: "${GOOGLE_OAUTH_CLIENT_SECRET}"
+      GOOGLE_OAUTH_REDIRECT_URI: "${GOOGLE_OAUTH_REDIRECT_URI}"
+      GOOGLE_DRIVE_IMAGE_FOLDER_ID: "${GOOGLE_DRIVE_IMAGE_FOLDER_ID}"
+      GOOGLE_DRIVE_VIDEO_FOLDER_ID: "${GOOGLE_DRIVE_VIDEO_FOLDER_ID}"
+    volumes:
+      # Mount data directory for token storage
+      - app_data:/app/data
     depends_on:
       db:
         condition: service_healthy
@@ -57,3 +59,4 @@ services:
 
 volumes:
   postgres_data:
+  app_data:
