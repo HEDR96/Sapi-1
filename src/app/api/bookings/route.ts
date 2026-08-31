@@ -2,32 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
 import { getCurrentUser } from '@/lib/auth/jwt'
 
-export const dynamic = 'force-dynamic'
+// GET /api/bookings
+export async function GET() {
+  const user = await getCurrentUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Login diperlukan' }, { status: 401 })
+  }
 
-// GET - List user's bookings
-export async function GET(request: NextRequest) {
+  const userId = user.userId || (user as any).id
+
   try {
-    const user = await getCurrentUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const userId = user.userId || user.adminId
-
     const bookings = await prisma.booking.findMany({
       where: { userId },
       include: {
-        cattle: {
-          select: {
-            id: true,
-            code: true,
-            name: true,
-            breed: true,
-            mainImage: true,
-            price: true,
-            status: true,
-          },
-        },
+        cattle: { select: { id: true, code: true, name: true, mainImage: true, price: true } },
       },
       orderBy: { createdAt: 'desc' },
     })
@@ -39,28 +27,33 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create new booking
+// POST /api/bookings
 export async function POST(request: NextRequest) {
+  const user = await getCurrentUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Login diperlukan' }, { status: 401 })
+  }
+
+  const userId = user.userId || (user as any).id
+
   try {
-    const user = await getCurrentUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const { cattleId, phone, quantity = 1, notes } = await request.json()
+
+    // Validate required fields
+    if (!cattleId || !phone) {
+      return NextResponse.json({ error: 'ID sapi dan nomor telepon wajib diisi' }, { status: 400 })
     }
 
-    const userId = user.userId || user.adminId
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID tidak ditemukan' }, { status: 400 })
+    // Validate phone format
+    const phoneRegex = /^(\+62|62|0)[0-9]{9,12}$/
+    if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
+      return NextResponse.json({ error: 'Format nomor telepon tidak valid' }, { status: 400 })
     }
 
-    const { cattleId, quantity = 1, notes } = await request.json()
-
-    if (!cattleId) {
-      return NextResponse.json({ error: 'ID sapi diperlukan' }, { status: 400 })
-    }
-
-    // Check cattle availability
+    // Check cattle exists and is available
     const cattle = await prisma.cattle.findUnique({
       where: { id: cattleId },
+      select: { id: true, status: true, quantity: true, name: true, code: true }
     })
 
     if (!cattle) {
@@ -71,21 +64,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Sapi tidak tersedia untuk booking' }, { status: 400 })
     }
 
-    if (cattle.quantity < quantity) {
-      return NextResponse.json({ error: 'Jumlah stok tidak mencukupi' }, { status: 400 })
-    }
-
-    // Check if user already has a pending booking for this cattle
-    const existingBooking = await prisma.booking.findFirst({
-      where: {
-        userId,
-        cattleId,
-        status: 'PENDING',
-      },
-    })
-
-    if (existingBooking) {
-      return NextResponse.json({ error: 'Anda sudah memiliki booking pending untuk sapi ini' }, { status: 400 })
+    if (quantity > cattle.quantity) {
+      return NextResponse.json({ error: `Stok tidak mencukupi (tersedia: ${cattle.quantity})` }, { status: 400 })
     }
 
     // Create booking
@@ -98,39 +78,30 @@ export async function POST(request: NextRequest) {
         status: 'PENDING',
       },
       include: {
-        cattle: {
-          select: {
-            id: true,
-            code: true,
-            name: true,
-            breed: true,
-            mainImage: true,
-          },
-        },
+        cattle: { select: { id: true, code: true, name: true } },
+        user: { select: { id: true, name: true, email: true } },
       },
     })
 
-    // Create notification for admin
-    await prisma.notification.create({
-      data: {
-        title: 'Booking Baru',
-        message: `Ada booking baru untuk sapi ${cattle.name} (${cattle.code}) dari ${user.email}. Jumlah: ${quantity}`,
+    // Create notification for super admin
+    const admins = await prisma.user.findMany({
+      where: { role: 'ADMIN' },
+      select: { id: true },
+    })
+
+    await prisma.notification.createMany({
+      data: admins.map(admin => ({
+        userId: admin.id,
+        title: 'Permintaan Booking Baru',
+        message: `${booking.user.name || 'User'} ingin booking ${cattle.name} (${cattle.code}) - qty: ${quantity}`,
         type: 'BOOKING_REQUEST',
-        data: JSON.stringify({
-          bookingId: booking.id,
-          cattleId: cattle.id,
-          userId,
-        }),
-      },
+        data: JSON.stringify({ bookingId: booking.id, cattleId }),
+      })),
     })
 
-    return NextResponse.json({
-      success: true,
-      message: 'Booking berhasil dibuat',
-      booking,
-    })
+    return NextResponse.json({ success: true, booking })
   } catch (error) {
-    console.error('Booking error:', error)
+    console.error('Create booking error:', error)
     return NextResponse.json({ error: 'Terjadi kesalahan' }, { status: 500 })
   }
 }
