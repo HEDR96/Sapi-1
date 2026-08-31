@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Breadcrumb } from '@/components/shared/Breadcrumb'
@@ -12,6 +12,7 @@ import { WeightHistoryTab } from './WeightHistoryTab'
 import { HealthHistoryTab } from './HealthHistoryTab'
 import { FeedHistoryTab } from './FeedHistoryTab'
 import { MediaTab } from './MediaTab'
+import { CommentSection } from './CommentSection'
 import { formatCurrency, formatWeight, formatHeight, formatDate, formatADG } from '@/lib/utils/formatters'
 import { calculateWeightStats, estimateTargetCompletion } from '@/lib/utils/calculations'
 import { MessageCircle, Share2, ChevronLeft, ChevronRight, X, Check } from 'lucide-react'
@@ -27,6 +28,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('summary')
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>()
 
   const weightData = cattle.weights?.map((w) => ({
     id: w.id,
@@ -71,6 +73,13 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
   const prevImage = () => {
     setLightboxIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1))
   }
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setCurrentUserId(data?.user?.id))
+      .catch(() => {})
+  }, [])
 
   const tabs = [
     { key: 'summary', label: 'Ringkasan' },
@@ -305,6 +314,12 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
                   <MediaTab media={cattle.media || []} />
                 )}
               </div>
+
+              <CommentSection
+                cattleId={cattle.id}
+                cattleCode={cattle.code}
+                currentUserId={currentUserId}
+              />
             </div>
           </div>
         </div>

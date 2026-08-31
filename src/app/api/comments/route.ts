@@ -46,9 +46,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Komentar 3-1000 karakter' }, { status: 400 })
     }
 
+    const userId = user.userId || (user as any).id || ''
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID tidak ditemukan' }, { status: 400 })
+    }
+
     const comment = await prisma.comment.create({
       data: {
-        userId: user.userId || '',
+        userId,
         cattleId,
         content,
       },
@@ -86,7 +91,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Check ownership
-    if (comment.userId !== user.userId) {
+    const currentUserId = user.userId || (user as any).id || ''
+    if (comment.userId !== currentUserId) {
       return NextResponse.json({ error: 'Tidak diizinkan' }, { status: 403 })
     }
 
