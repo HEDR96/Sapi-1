@@ -1,33 +1,60 @@
 'use client'
 
+import { useState } from 'react'
 import { CattleWithRelations } from '@/types'
 import { SelectedCattleDetail } from './SelectedCattleDetail'
-import { DetailTabs } from '@/components/cattle/DetailTabs'
+import { TrackingTabs } from './TrackingTabs'
+import { CompareModal } from './CompareModal'
 
 interface PantauPerkembanganSectionProps {
   cattle: CattleWithRelations | null
+  allCattle?: CattleWithRelations[]
 }
 
-export function PantauPerkembanganSection({ cattle }: PantauPerkembanganSectionProps) {
-  return (
-    <section className="py-12 bg-[hsl(var(--cream2))]">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[hsl(var(--forest))]">
-            Pantau Perkembangan Sapi Anda 🐂
-          </h2>
-          <p className="text-[hsl(var(--forest))/60] mt-2">
-            {cattle ? `${cattle.name} - ${cattle.code}` : 'Pilih sapi dari katalog untuk melihat detail perkembangan'}
-          </p>
-        </div>
+export function PantauPerkembanganSection({ cattle, allCattle = [] }: PantauPerkembanganSectionProps) {
+  const [compareModalOpen, setCompareModalOpen] = useState(false)
+  const [selectedForCompare, setSelectedForCompare] = useState<CattleWithRelations[]>([])
 
-        {/* Detail Panel */}
-        <div className="grid lg:grid-cols-[320px_1fr] gap-6">
-          <SelectedCattleDetail cattle={cattle} />
-          <DetailTabs cattle={cattle} />
+  const handleOpenCompare = () => {
+    setSelectedForCompare(cattle ? [cattle] : [])
+    setCompareModalOpen(true)
+  }
+
+  return (
+    <section className="tracking-section reveal mx-auto max-w-[1400px] px-4 pb-3 sm:px-5 lg:px-8">
+      <div className="tracking-shell rounded-lg border border-[hsl(var(--line))] bg-white shadow-card">
+        <div className="grid lg:grid-cols-[220px_1fr] lg:items-start">
+          {/* Left Sidebar - Cattle Detail with QR */}
+          <aside className="tracking-aside border-b border-[hsl(var(--line))] p-2.5 lg:border-b-0 lg:border-r">
+            <SelectedCattleDetail
+              cattle={cattle}
+              onCompare={handleOpenCompare}
+            />
+          </aside>
+
+          {/* Right Main - Tabs */}
+          <div className="tracking-main p-2.5">
+            <TrackingTabs cattle={cattle} />
+          </div>
         </div>
       </div>
+
+      {/* Compare Modal */}
+      <CompareModal
+        isOpen={compareModalOpen}
+        onClose={() => setCompareModalOpen(false)}
+        selectedCattle={selectedForCompare}
+        allCattle={allCattle}
+        onSelectCattle={(c) => {
+          setSelectedForCompare(prev => {
+            if (prev.find(x => x.id === c.id)) {
+              return prev.filter(x => x.id !== c.id)
+            }
+            if (prev.length >= 3) return prev
+            return [...prev, c]
+          })
+        }}
+      />
     </section>
   )
 }

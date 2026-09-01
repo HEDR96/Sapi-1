@@ -69,7 +69,8 @@ export default function HomePage() {
   return (
     <div ref={pageRef} className="mx-auto my-2 max-w-[1500px] overflow-hidden border border-black/30 bg-[hsl(var(--cream2))] shadow-2xl">
       <HeroSection />
-
+      <JourneySection />
+      <TrustRow />
       {/* KATALOG - Combined Swiper/Grid with Toggle */}
       <CatalogSection
         cattle={cattle}
@@ -78,11 +79,9 @@ export default function HomePage() {
       />
 
       {/* PANTAU PERKEMBANGAN - Below Katalog */}
-      <PantauPerkembanganSection cattle={selectedCattle} />
+      <PantauPerkembanganSection cattle={selectedCattle} allCattle={fullCattleData} />
 
       <RecentComments />
-      <JourneySection />
-      <TrustRow />
       <CTASection />
     </div>
   )

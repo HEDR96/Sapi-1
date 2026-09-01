@@ -73,7 +73,8 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 # Create app directories
-RUN mkdir -p /app/public /app/.next/static /app/prisma
+RUN mkdir -p /app/public /app/.next/static /app/prisma /app/data && \
+    chmod 777 /app/data
 
 # Copy built app
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

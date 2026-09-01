@@ -51,8 +51,8 @@ services:
     # Database setup: prisma db push only (no seed - run manually)
     command: >
       sh -c "
-        echo 'Creating data directory...' &&
         mkdir -p /app/data &&
+        chmod 777 /app/data &&
         echo 'Running database setup...' &&
         prisma db push --skip-generate &&
         echo 'Starting application...' &&

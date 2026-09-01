@@ -1,98 +1,139 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
-import { formatCurrency, formatWeight } from '@/lib/utils/formatters'
-import { StatusBadge } from '@/components/catalog/CattleStatusBadge'
+import { QRCodeSVG } from 'qrcode.react'
 import { CattleWithRelations } from '@/types'
+import { StatusBadge } from '@/components/catalog/CattleStatusBadge'
+import { formatWeight, formatCurrency, formatDate } from '@/lib/utils/formatters'
+import { ScanLine, Columns3 } from 'lucide-react'
 
 interface SelectedCattleDetailProps {
   cattle: CattleWithRelations | null
+  onCompare?: () => void
 }
 
-export function SelectedCattleDetail({ cattle }: SelectedCattleDetailProps) {
+export function SelectedCattleDetail({ cattle, onCompare }: SelectedCattleDetailProps) {
   if (!cattle) {
     return (
-      <div className="h-full rounded-xl border border-dashed border-[hsl(var(--line))] bg-[hsl(var(--cream))]/50 flex flex-col items-center justify-center p-6 text-center">
-        <div className="text-5xl mb-3">🐂</div>
-        <h3 className="text-lg font-semibold text-[hsl(var(--forest))]">
+      <div className="h-full rounded-xl border border-dashed border-[hsl(var(--line))] bg-[hsl(var(--cream))]/50 flex flex-col items-center justify-center p-4 text-center min-h-[300px]">
+        <div className="text-4xl mb-2">🐂</div>
+        <h3 className="text-sm font-semibold text-[hsl(var(--forest))]">
           Pilih Sapi
         </h3>
-        <p className="text-sm text-[hsl(var(--forest))/60] mt-1">
-          Pilih sapi dari katalog di atas untuk melihat detail perkembangan
+        <p className="text-xs text-[hsl(var(--forest))/60] mt-1">
+          Pilih sapi dari katalog untuk melihat detail perkembangan
         </p>
       </div>
     )
   }
 
   const lastWeight = cattle.weights?.[0]?.weight
-  const weightProgress = cattle.targetWeight && lastWeight
-    ? Math.min(100, (lastWeight / cattle.targetWeight) * 100)
+  const firstWeight = cattle.weights?.[cattle.weights.length - 1]?.weight
+  const weightGain = lastWeight && firstWeight ? lastWeight - firstWeight : 0
+  const birthDate = cattle.birthDate ? new Date(cattle.birthDate) : null
+  const ageMonths = birthDate
+    ? Math.floor((Date.now() - birthDate.getTime()) / (1000 * 60 * 60 * 24 * 30))
     : null
 
+  const qrUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/sapi/${cattle.code}`
+    : `/sapi/${cattle.code}`
+
   return (
-    <div className="h-full rounded-xl border border-[hsl(var(--line))] bg-white overflow-hidden">
-      {/* Image */}
-      <div className="relative aspect-[4/3] bg-[hsl(var(--cream))]">
-        {cattle.mainImage ? (
-          <Image src={cattle.mainImage} alt={cattle.name} fill className="object-cover" />
-        ) : (
-          <div className="flex items-center justify-center h-full text-[hsl(var(--forest))/30]">
-            Tidak ada foto
-          </div>
-        )}
-        <div className="absolute top-2 left-2">
-          <StatusBadge status={cattle.status} />
-        </div>
-      </div>
-
-      {/* Info */}
-      <div className="p-4">
-        <h3 className="text-lg font-bold text-[hsl(var(--forest))]">{cattle.name}</h3>
-        <p className="text-xs text-[hsl(var(--forest))/60]">{cattle.code} • {cattle.breed}</p>
-
-        <div className="mt-4 space-y-3">
-          <div>
-            <span className="text-xs text-[hsl(var(--forest))/60]">Harga</span>
-            <p className="text-lg font-bold text-[hsl(var(--forest))]">
-              {formatCurrency(Number(cattle.price))}
-            </p>
-          </div>
-
-          <div>
-            <span className="text-xs text-[hsl(var(--forest))/60]">Bobot Terakhir</span>
-            <p className="text-xl font-bold text-[hsl(var(--forest))]">
-              {formatWeight(lastWeight || null)}
-            </p>
-          </div>
-
-          {cattle.targetWeight && (
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span className="text-[hsl(var(--forest))/60]">Target</span>
-                <span className="font-medium text-[hsl(var(--forest))]">
-                  {formatWeight(cattle.targetWeight)}
-                </span>
+    <div className="space-y-2">
+      {/* Cattle Info Card */}
+      <div className="rounded-md border border-[hsl(var(--line))] bg-[hsl(var(--cream))]/70 p-2">
+        <div className="grid grid-cols-[64px_1fr] gap-2">
+          {/* Photo */}
+          <div className="h-14 rounded bg-cover bg-center relative">
+            {cattle.mainImage ? (
+              <Image src={cattle.mainImage} alt={cattle.name} fill className="object-cover rounded" />
+            ) : (
+              <div className="flex items-center justify-center h-full bg-[hsl(var(--cream))] rounded text-[hsl(var(--forest))/30] text-xs">
+                N/A
               </div>
-              <div className="h-2 bg-[hsl(var(--cream))] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[hsl(var(--forest))] rounded-full transition-all"
-                  style={{ width: `${weightProgress || 0}%` }}
+            )}
+          </div>
+
+          {/* Info */}
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[9px] font-bold text-[hsl(var(--forest))]">{cattle.name}</span>
+              <StatusBadge status={cattle.status} />
+            </div>
+            <div className="mt-1.5 space-y-1 text-[7px] leading-4 text-[hsl(var(--forest))/70]">
+              <div>Kode Sapi: {cattle.code}</div>
+              <div>Jenis Sapi: {cattle.breed}</div>
+              {birthDate && (
+                <div>Tanggal Lahir: {formatDate(birthDate)}</div>
+              )}
+              {firstWeight && (
+                <div>Berat Awal: {formatWeight(firstWeight)}</div>
+              )}
+              <div>Lokasi: Kandang Utama</div>
+            </div>
+          </div>
+        </div>
+
+        {/* QR Code Section */}
+        <div className="mt-2.5 rounded-lg border border-[hsl(var(--line))] bg-white p-2.5 shadow-sm">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <div className="text-[9px] font-bold text-[hsl(var(--forest))]">QR Detail Sapi</div>
+              <div className="mt-1 max-w-[170px] text-[7px] leading-4 text-[hsl(var(--forest))/60]">
+                Scan QR untuk membuka halaman detail sapi ini secara langsung.
+              </div>
+            </div>
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[hsl(var(--cream))] text-[hsl(var(--forest))/80]">
+              <ScanLine className="h-3.5 w-3.5" />
+            </span>
+          </div>
+
+          <div className="mt-2.5 grid grid-cols-[76px_minmax(0,1fr)] items-start gap-2.5">
+            {/* QR Code */}
+            <div className="flex justify-start">
+              <div className="aspect-square h-[76px] w-[76px] shrink-0 rounded border border-[hsl(var(--line))] bg-white p-1.5 flex items-center justify-center">
+                <QRCodeSVG
+                  value={qrUrl}
+                  size={64}
+                  level="H"
+                  bgColor="#ffffff"
+                  fgColor="#111111"
                 />
               </div>
-              <p className="text-xs text-[hsl(var(--forest))/60] mt-1">
-                {weightProgress?.toFixed(0)}% tercapai
-              </p>
             </div>
-          )}
-        </div>
 
-        <Link
-          href={`/sapi/${cattle.code}`}
-          className="mt-4 block w-full text-center bg-[hsl(var(--forest))] text-white py-2 rounded-lg font-semibold hover:bg-[hsl(var(--forest2))] transition-colors"
-        >
-          Lihat Detail Lengkap
-        </Link>
+            <div className="min-w-0">
+              <div className="grid gap-1 text-[7px] leading-4 text-[hsl(var(--forest))/60]">
+                <div className="flex items-start gap-1.5">
+                  <span className="mt-0.5 text-[hsl(var(--olive))]">✓</span>
+                  <span>Masuk ke profil sapi sesuai kode QR.</span>
+                </div>
+                <div className="flex items-start gap-1.5">
+                  <span className="mt-0.5 text-[hsl(var(--olive))]">✓</span>
+                  <span>Lihat timbang, kesehatan, pakan, dan dokumentasi.</span>
+                </div>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                <a
+                  href={`/sapi/${cattle.code}`}
+                  className="w-full rounded-md bg-[hsl(var(--forest))] px-2.5 py-2 text-[8px] font-bold text-white text-center block"
+                >
+                  Lihat Detail Lengkap
+                </a>
+                {onCompare && (
+                  <button
+                    onClick={onCompare}
+                    className="flex-1 rounded-md border border-[hsl(var(--line))] bg-white px-2.5 py-2 text-[8px] font-semibold text-[hsl(var(--forest))] flex items-center justify-center gap-1"
+                  >
+                    <Columns3 className="h-3 w-3" />
+                    Bandingkan
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
