@@ -44,13 +44,15 @@ services:
       GOOGLE_DRIVE_VIDEO_FOLDER_ID: "${GOOGLE_DRIVE_VIDEO_FOLDER_ID}"
     volumes:
       # Mount data directory for token storage
-      - app_data:/app/data
+      - ./data:/app/data
     depends_on:
       db:
         condition: service_healthy
     # Database setup: prisma db push only (no seed - run manually)
     command: >
       sh -c "
+        echo 'Creating data directory...' &&
+        mkdir -p /app/data &&
         echo 'Running database setup...' &&
         prisma db push --skip-generate &&
         echo 'Starting application...' &&
@@ -59,4 +61,3 @@ services:
 
 volumes:
   postgres_data:
-  app_data:

@@ -7,8 +7,7 @@ import { AuthModal } from '@/components/auth/AuthModal'
 
 const navLinks = [
   { href: '/', label: 'Beranda' },
-  { href: '/#katalog', label: 'Sapi Qurban' },
-  { href: '/#cara-kerja', label: 'Cara Kerja' },
+  { href: '/#katalog', label: 'Katalog' },
   { href: '/#tentang', label: 'Tentang Kami' },
 ]
 

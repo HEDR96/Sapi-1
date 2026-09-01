@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
 import { getCurrentAdmin } from '@/lib/auth/jwt'
 
-// GET /api/admin/feed?cattleId=xxx
+// GET /api/admin/feed?cattleId=xxx&page=1&limit=20
 export async function GET(request: NextRequest) {
   const admin = await getCurrentAdmin()
   if (!admin) {
@@ -11,15 +11,27 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url)
   const cattleId = searchParams.get('cattleId')
+  const page = parseInt(searchParams.get('page') || '1')
+  const limit = parseInt(searchParams.get('limit') || '20')
 
   try {
     const where = cattleId ? { cattleId } : {}
-    const records = await prisma.cattleFeedRecord.findMany({
-      where,
-      include: { cattle: { select: { id: true, code: true, name: true } } },
-      orderBy: { recordDate: 'desc' }
+
+    const [records, total] = await Promise.all([
+      prisma.cattleFeedRecord.findMany({
+        where,
+        include: { cattle: { select: { id: true, code: true, name: true } } },
+        orderBy: { recordDate: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.cattleFeedRecord.count({ where })
+    ])
+
+    return NextResponse.json({
+      records,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
     })
-    return NextResponse.json({ records })
   } catch (error) {
     console.error('Get feed records error:', error)
     return NextResponse.json({ error: 'Terjadi kesalahan' }, { status: 500 })

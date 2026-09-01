@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CattleSelect } from '@/components/admin/CattleSelect'
+import { Pagination } from '@/components/ui/pagination'
 import { formatDate } from '@/lib/utils/formatters'
 import { HEALTH_STATUS_LABELS, HealthStatus } from '@/types'
 
@@ -27,15 +28,22 @@ export default function HealthPage() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ date: '', healthType: '', status: 'SEHAT' as HealthStatus, notes: '' })
   const [saving, setSaving] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
-  useEffect(() => { fetchRecords() }, [selectedCattle])
+  useEffect(() => { fetchRecords() }, [selectedCattle, page])
 
   const fetchRecords = async () => {
     setLoading(true)
-    const url = selectedCattle ? `/api/admin/health?cattleId=${selectedCattle}` : '/api/admin/health'
+    const url = selectedCattle
+      ? `/api/admin/health?cattleId=${selectedCattle}&page=${page}&limit=20`
+      : `/api/admin/health?page=${page}&limit=20`
     const res = await fetch(url)
     const data = await res.json()
     setRecords(data.records || [])
+    if (data.pagination) {
+      setTotalPages(data.pagination.totalPages)
+    }
     setLoading(false)
   }
 
@@ -146,6 +154,11 @@ export default function HealthPage() {
                   </div>
                 </div>
               ))}
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
             </div>
           )}
         </CardContent>

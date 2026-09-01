@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CattleSelect } from '@/components/admin/CattleSelect'
+import { Pagination } from '@/components/ui/pagination'
 import { formatDate, formatWeight } from '@/lib/utils/formatters'
 
 interface WeightRecord {
@@ -24,19 +25,24 @@ export default function WeightPage() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ weight: '', date: '', notes: '' })
   const [saving, setSaving] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   useEffect(() => {
     fetchRecords()
-  }, [selectedCattle])
+  }, [selectedCattle, page])
 
   const fetchRecords = async () => {
     setLoading(true)
     const url = selectedCattle
-      ? `/api/admin/weights?cattleId=${selectedCattle}`
-      : '/api/admin/weights'
+      ? `/api/admin/weights?cattleId=${selectedCattle}&page=${page}&limit=20`
+      : `/api/admin/weights?page=${page}&limit=20`
     const res = await fetch(url)
     const data = await res.json()
     setRecords(data.weights || [])
+    if (data.pagination) {
+      setTotalPages(data.pagination.totalPages)
+    }
     setLoading(false)
   }
 
@@ -170,6 +176,11 @@ export default function WeightPage() {
                   </div>
                 </div>
               ))}
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
             </div>
           )}
         </CardContent>

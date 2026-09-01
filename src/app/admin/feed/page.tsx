@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CattleSelect } from '@/components/admin/CattleSelect'
+import { Pagination } from '@/components/ui/pagination'
 import { formatDate } from '@/lib/utils/formatters'
 
 interface FeedRecord {
@@ -26,15 +27,22 @@ export default function FeedPage() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ date: '', feedType: '', amount: '', frequency: '', notes: '' })
   const [saving, setSaving] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
-  useEffect(() => { fetchRecords() }, [selectedCattle])
+  useEffect(() => { fetchRecords() }, [selectedCattle, page])
 
   const fetchRecords = async () => {
     setLoading(true)
-    const url = selectedCattle ? `/api/admin/feed?cattleId=${selectedCattle}` : '/api/admin/feed'
+    const url = selectedCattle
+      ? `/api/admin/feed?cattleId=${selectedCattle}&page=${page}&limit=20`
+      : `/api/admin/feed?page=${page}&limit=20`
     const res = await fetch(url)
     const data = await res.json()
     setRecords(data.records || [])
+    if (data.pagination) {
+      setTotalPages(data.pagination.totalPages)
+    }
     setLoading(false)
   }
 
@@ -130,6 +138,11 @@ export default function FeedPage() {
                   </Button>
                 </div>
               ))}
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
             </div>
           )}
         </CardContent>

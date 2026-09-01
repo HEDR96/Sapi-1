@@ -43,7 +43,19 @@ export async function GET() {
       include: {
         weights: {
           orderBy: { measurementDate: 'desc' },
-          take: 1,
+          take: 20,
+        },
+        healthRecords: {
+          orderBy: { recordDate: 'desc' },
+          take: 10,
+        },
+        feedRecords: {
+          orderBy: { recordDate: 'desc' },
+          take: 10,
+        },
+        media: {
+          orderBy: { createdAt: 'desc' },
+          take: 20,
         },
       },
     })

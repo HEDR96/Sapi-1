@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CattleSelect } from '@/components/admin/CattleSelect'
+import { Pagination } from '@/components/ui/pagination'
 
 interface MediaItem {
   id: string
@@ -24,15 +25,22 @@ export default function MediaPage() {
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
-  useEffect(() => { fetchMedia() }, [selectedCattle])
+  useEffect(() => { fetchMedia() }, [selectedCattle, page])
 
   const fetchMedia = async () => {
     setLoading(true)
-    const url = selectedCattle ? `/api/admin/media?cattleId=${selectedCattle}` : '/api/admin/media'
+    const url = selectedCattle
+      ? `/api/admin/media?cattleId=${selectedCattle}&page=${page}&limit=20`
+      : `/api/admin/media?page=${page}&limit=20`
     const res = await fetch(url)
     const data = await res.json()
     setMedia(data.media || [])
+    if (data.pagination) {
+      setTotalPages(data.pagination.totalPages)
+    }
     setLoading(false)
   }
 
@@ -114,6 +122,11 @@ export default function MediaPage() {
                   </div>
                 </div>
               ))}
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
             </div>
           )}
         </CardContent>

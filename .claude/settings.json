@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit -m 'fix: Show RecentComments section even when empty *)",
+      "Bash(docker-compose exec *)"
+    ]
+  }
+}

@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { formatCurrency, formatWeight } from '@/lib/utils/formatters'
 import { Status } from '@/types'
 
@@ -19,7 +20,7 @@ interface CatalogSwiperCardProps {
 }
 
 export function CatalogSwiperCard({
-  code, name, breed, status, price, lastWeight, mainImage, quantity = 1,
+  id, code, name, breed, status, price, lastWeight, mainImage, quantity = 1,
   isSelected = false, onClick
 }: CatalogSwiperCardProps) {
   const isSold = status === 'SOLD'
@@ -28,10 +29,9 @@ export function CatalogSwiperCard({
 
   return (
     <article
-      onClick={onClick}
       className={`
         flex-shrink-0 w-[200px] sm:w-[280px] rounded-lg border bg-white shadow-card
-        transition-all duration-200 cursor-pointer
+        transition-all duration-200
         ${isSelected
           ? 'border-[hsl(var(--forest))] ring-2 ring-[hsl(var(--forest))]'
           : 'border-[hsl(var(--line))] hover:border-[hsl(var(--forest))]'}
@@ -39,7 +39,10 @@ export function CatalogSwiperCard({
       `}
     >
       {/* Image Container */}
-      <div className="relative aspect-[4/3] overflow-hidden rounded-t-lg">
+      <div
+        onClick={onClick}
+        className="relative aspect-[4/3] overflow-hidden rounded-t-lg cursor-pointer"
+      >
         {mainImage ? (
           <>
             <Image src={mainImage} alt={name} fill className="object-cover" sizes="280px" />
@@ -75,6 +78,12 @@ export function CatalogSwiperCard({
         <div className="mt-2 text-[13px] font-extrabold text-[hsl(var(--forest))]">
           {formatCurrency(price)}
         </div>
+        <Link
+          href={`/sapi/${code}`}
+          className="mt-3 block w-full rounded-md border border-[hsl(var(--forest))] bg-white px-3 py-1.5 text-center text-[10px] font-semibold text-[hsl(var(--forest))] hover:bg-[hsl(var(--forest))] hover:text-white transition-colors"
+        >
+          Lihat Detail
+        </Link>
       </div>
     </article>
   )
