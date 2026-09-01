@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "cattle-storage",
+  "private_key_id": "2a58578204a8563738bdc44f9709a767fc5a2b41",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDerZUJOYI6NyIl\ndeYA6piy/CFxQYjaIkzrdzSiEDwxD1lGsI7Ysea/7yR4+VB+qfHdvj/tiQbhdf92\nsth0UY0gyIF25Wp5xn91zSNZd62LfZRkIjOrK+AgR6yVSBLCnqrKaZppy1q2/Qze\n3PvDzkE488l8GFmm1LsBztx/K9whZ5P/A5YIkm+tnniUGkxesgygRe4mZfF1dkbl\ndpoXbelhmscbHj0m8M0TFOw2scYfQF0vTGTVPGsZqxQv2AwbjJ3CSJH3apkL3FRP\nyQQfAOPaO5TuObk33Z/u/ZXf7frDm5Hdnj8ljmLpyOFimLlMAlAn/S0OiN4lq20O\n9p2uo/iLAgMBAAECggEABzMnmXfBjS5RLVLlj+wF6eubDTVoPl1TjV16Vy8dMxzi\n7xUwWTNPWa9ax4qQHrhR+LB5Eq4Wid2t1+GqfABTBtdU0EpUqgFQB7gNR4xGETeL\nP72XXBZ8Fa8blmwRJzfIH+lQM9F+amI+M0qD3W3iz/uZ7ShAZdOFBGby3C3H3VCT\nmNTeO9LikNoUcb5fzba27w34ywp0n49dFW6NgJqAxyrmJYLjDo1cN1gfTIcN6eG4\nCldrDryKjNvoebR28kDymTC+1aul3OAZ7/brtuCBotIFz1cGAGnRkppnD/WBrale\n10wkjiecWAlKxVD0GATKzHX+H5dQ8Ifl/pCAH96diQKBgQDvx1OSVBB8pAUR8Z1J\n0gWunbnspedAjXw9D0c/HanzerhTC8bV09ENaV+D67qBtMlfpuaahSu5hdZA0RyK\nRnlad3/o6eiYF9oQ1+TKConVcbbLtgvHH9Jc+3dX5+M0wYDH7eulxUwf6bSlCd/d\nf6SVAx+LeTS+NOn/Fz6Ay1xbzwKBgQDtvhhEYGiIJqMHsrLyWaDP16uOXemmZMbb\neDzF/vWwWqlFf3NdAK4XxTZ6NxwurXBa6bdpKVVHsrQqhaQcoEsYghL030ypTSwW\nRtvt/jWDrU1B3dUbmbJYho4iny0/pTHNmc1v5tKxOSVqD4skaNTAq7eBQY2RKNTw\nBqPao2bahQKBgGvRSE3rCQLSygjYiS5xhuaOu9SigQqw1CWsog/Kaeo2y31kNUNf\nHIiYUj/ClrnOLiKZrOXcbd3dRYsdvGSc7eJ1C4oS6+jACOk7+v+yn2nf2R9eu4sN\nTw1Kcc6QUcUeIadE34pJ3kIXV4hCmWxDAiGTJvMTTFke9/0hWZSWXPBXAoGACULj\nfR5oVA11QmKCuBAnxJD5POWJqZK5cGlBrNDez0zo1S0+2DujjIeBNMea0HKvMstx\n+qXCjbV3cUSdfQP9iOngRSvBt8Kq2f9Op/nEKeoBXXR/zcByAyLSvKSIxbbwtrqs\nFxTd1kuMmpIacIOo7gyCbIWaNzJpASSxE15ULmUCgYBR45kY242tgLIiqYy52CCj\nNfqyVNztkuTRG/gIZwfi8+hiVVo6l7pk3n3ks/N8nTOFAQdvWOsc3iCDaKRX5SbF\nGsA8FOB9dzguOTtBE/UPK8ji9+gUgwxxz5+df1liXXPU23jyQfdR2a8p4Y7BZ4mt\nGAx0rh17eeF1GqYxp8UE1A==\n-----END PRIVATE KEY-----\n",
+  "client_email": "cattle-uploader@cattle-storage.iam.gserviceaccount.com",
+  "client_id": "115051808006187801934",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cattle-uploader%40cattle-storage.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
