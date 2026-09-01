@@ -62,13 +62,37 @@ export function CatalogSwiperCard({
         {mainImage ? (
           <>
             <Image src={getDirectImageUrl(mainImage)} alt={name} fill className="object-cover" sizes="280px" />
-            {(isSold || isBooked) && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <span className={`rounded-full px-3 py-1 text-xs font-bold ${
-                  isSold ? 'bg-red-600 text-white' : 'bg-amber-500 text-white'
-                }`}>
-                  {isSold ? 'TERJUAL' : 'DIBOOKING'}
-                </span>
+            {/* Sold Watermark & Badge */}
+            {isSold && (
+              <>
+                {/* Badge di pojok kiri atas */}
+                <div className="absolute left-2 top-2 z-20">
+                  <div className="flex items-center gap-1.5 rounded-full bg-[#FADCE0] px-2.5 py-1 shadow-sm">
+                    <div className="h-2 w-2 rounded-full bg-red-600"></div>
+                    <span className="text-[9px] font-bold uppercase tracking-wide text-red-700">SOLD</span>
+                  </div>
+                </div>
+                {/* Watermark diagonal di tengah */}
+                <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+                  <div className="relative">
+                    <div className="absolute inset-0 border-2 border-white/60 rounded-lg transform rotate-[-25deg]"></div>
+                    <span className="relative block transform rotate-[-25deg] text-4xl font-extrabold uppercase tracking-widest text-white drop-shadow-[2px_2px_4px_rgba(0,0,0,0.5)]" style={{
+                      WebkitTextStroke: '2px white',
+                      WebkitTextFillColor: 'transparent',
+                      textShadow: '0 0 8px rgba(0,0,0,0.3)'
+                    }}>
+                      SOLD
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
+            {isBooked && (
+              <div className="absolute left-2 top-2 z-20">
+                <div className="flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1 shadow-sm">
+                  <div className="h-2 w-2 rounded-full bg-amber-500"></div>
+                  <span className="text-[9px] font-bold uppercase tracking-wide text-amber-700">BOOKING</span>
+                </div>
               </div>
             )}
           </>
@@ -77,12 +101,8 @@ export function CatalogSwiperCard({
             <span className="text-[10px] text-[hsl(var(--forest))/50]">Tidak Ada Foto</span>
           </div>
         )}
-        {/* Status Badge */}
-        <div className="absolute left-2 top-2">
-          <StatusBadge status={status} />
-        </div>
-        {/* Progress Score Badge */}
-        {lastWeight && (
+        {/* Progress Score Badge - hanya untuk yang tidak sold/booked */}
+        {lastWeight && !isSold && !isBooked && (
           <div className="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[7px] font-bold text-[hsl(var(--forest))] shadow-sm">
             85%
           </div>

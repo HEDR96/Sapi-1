@@ -9,7 +9,7 @@ interface AuthModalProps {
   onClose: () => void
 }
 
-type AuthView = 'login' | 'register' | 'verify'
+type AuthView = 'login' | 'register' | 'verify' | 'resend'
 
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [view, setView] = useState<AuthView>('login')
@@ -37,6 +37,13 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       const data = await res.json()
 
       if (!res.ok) {
+        // If user is unverified, redirect to resend view
+        if (data.unverified) {
+          setEmail(formData.get('email') as string)
+          setView('resend')
+          setError('')
+          return
+        }
         setError(data.error || 'Login gagal')
         return
       }
@@ -87,6 +94,34 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setLoading(false)
   }
 
+  const handleResend = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/auth/resend-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.get('email') }),
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'Gagal mengirim kode')
+        return
+      }
+
+      setEmail(formData.get('email') as string)
+      setView('verify')
+    } catch {
+      setError('Terjadi kesalahan')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
@@ -96,6 +131,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             {view === 'login' && 'Masuk'}
             {view === 'register' && 'Daftar Akun Baru'}
             {view === 'verify' && 'Verifikasi Email'}
+            {view === 'resend' && 'Kirim Ulang Kode'}
           </h2>
           <button onClick={onClose} className="p-2 hover:bg-[hsl(var(--cream))] rounded-full transition-colors">
             <X className="h-5 w-5 text-[hsl(var(--forest))]" />
@@ -146,6 +182,16 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   className="text-[hsl(var(--forest))] font-semibold hover:underline"
                 >
                   Daftar sekarang
+                </button>
+              </p>
+              <p className="text-center text-sm text-[hsl(var(--forest))/60]">
+                Belum terima kode verifikasi?{' '}
+                <button
+                  type="button"
+                  onClick={() => { setView('resend'); resetForm(); }}
+                  className="text-[hsl(var(--forest))] font-semibold hover:underline"
+                >
+                  Kirim ulang
                 </button>
               </p>
             </form>
@@ -212,6 +258,40 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               }}
               onBack={() => { setView('login'); resetForm(); }}
             />
+          )}
+
+          {view === 'resend' && (
+            <form onSubmit={handleResend} className="space-y-4">
+              <p className="text-sm text-[hsl(var(--forest))/70] mb-4">
+                Masukkan email Anda untuk menerima kode verifikasi baru.
+              </p>
+              <div>
+                <label className="block text-sm font-medium text-[hsl(var(--forest))]">Email</label>
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  className="mt-1 w-full rounded-lg border border-[hsl(var(--line))] px-3 py-2.5 focus:ring-2 focus:ring-[hsl(var(--forest))] focus:border-transparent transition-all"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-[hsl(var(--forest))] text-white py-2.5 rounded-lg font-semibold hover:bg-[hsl(var(--forest2))] disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+              >
+                {loading && <Loader2 className="h-5 w-5 animate-spin" />}
+                Kirim Kode
+              </button>
+              <p className="text-center text-sm text-[hsl(var(--forest))/60]">
+                <button
+                  type="button"
+                  onClick={() => { setView('login'); resetForm(); }}
+                  className="text-[hsl(var(--forest))] font-semibold hover:underline"
+                >
+                  Kembali ke login
+                </button>
+              </p>
+            </form>
           )}
         </div>
       </div>

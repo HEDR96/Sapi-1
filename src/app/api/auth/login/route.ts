@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     // Check if email is verified
     if (!user.emailVerified) {
       return NextResponse.json(
-        { error: 'Email belum diverifikasi. Silakan cek email untuk kode verifikasi.' },
+        { error: 'Email belum diverifikasi. Silakan verifikasi email terlebih dahulu.', unverified: true },
         { status: 403 }
       )
     }

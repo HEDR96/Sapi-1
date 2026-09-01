@@ -153,12 +153,14 @@ export function NotificationDropdown({
 }
 
 // Hook for managing notifications
-export function useNotifications() {
+// `enabled` controls whether it fetches at all — pass false when user isn't logged in.
+export function useNotifications(enabled: boolean = true) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
 
   const fetchUnreadCount = async () => {
+    if (!enabled) return
     try {
       const res = await fetch('/api/notifications/unread-count')
       const data = await res.json()
@@ -169,6 +171,7 @@ export function useNotifications() {
   }
 
   const fetchNotifications = async () => {
+    if (!enabled) return
     setIsLoading(true)
     try {
       const res = await fetch('/api/notifications?limit=10')
@@ -182,6 +185,7 @@ export function useNotifications() {
   }
 
   const markAsRead = async (id: string) => {
+    if (!enabled) return
     try {
       await fetch('/api/notifications', {
         method: 'PATCH',
@@ -198,6 +202,7 @@ export function useNotifications() {
   }
 
   const markAllAsRead = async () => {
+    if (!enabled) return
     try {
       await fetch('/api/notifications', {
         method: 'PATCH',
@@ -212,9 +217,11 @@ export function useNotifications() {
   }
 
   useEffect(() => {
-    fetchUnreadCount()
-    fetchNotifications()
-  }, [])
+    if (enabled) {
+      fetchUnreadCount()
+      fetchNotifications()
+    }
+  }, [enabled])
 
   return {
     notifications,

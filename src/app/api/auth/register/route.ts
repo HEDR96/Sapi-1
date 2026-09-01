@@ -39,10 +39,17 @@ export async function POST(request: NextRequest) {
 
     const existingUser = await prisma.user.findUnique({ where: { email } })
     if (existingUser) {
-      return NextResponse.json(
-        { error: 'Email sudah terdaftar' },
-        { status: 400 }
-      )
+      // Check if email is already verified
+      if (existingUser.emailVerified) {
+        return NextResponse.json(
+          { error: 'Email sudah terdaftar' },
+          { status: 400 }
+        )
+      }
+
+      // If email exists but NOT verified, delete the unverified record
+      // This allows the user to register fresh with a new verification code
+      await prisma.user.delete({ where: { id: existingUser.id } })
     }
 
     // Hash password
@@ -52,17 +59,46 @@ export async function POST(request: NextRequest) {
     const verificationCode = generate6DigitCode()
     const verificationExpiry = new Date(Date.now() + 30 * 60 * 1000) // 30 minutes
 
-    // Create user (unverified)
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name: name || null,
-        emailVerified: false,
-        verificationCode,
-        verificationExpiry,
-      },
-    })
+    // Create user (unverified) - wrapped in try/catch for race condition with unique email
+    try {
+      await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          name: name || null,
+          emailVerified: false,
+          verificationCode,
+          verificationExpiry,
+        },
+      })
+    } catch (error: any) {
+      // Handle race condition where another request created the user with same email
+      if (error.code === 'P2002') {
+        const newUser = await prisma.user.findUnique({ where: { email } })
+        if (newUser?.emailVerified) {
+          return NextResponse.json(
+            { error: 'Email sudah terdaftar' },
+            { status: 400 }
+          )
+        }
+        // If unverified, delete and retry (should be rare)
+        if (newUser) {
+          await prisma.user.delete({ where: { id: newUser.id } })
+          await prisma.user.create({
+            data: {
+              email,
+              password: hashedPassword,
+              name: name || null,
+              emailVerified: false,
+              verificationCode,
+              verificationExpiry,
+            },
+          })
+        }
+      } else {
+        throw error
+      }
+    }
 
     // Send verification email
     await sendVerificationEmail(email, verificationCode)

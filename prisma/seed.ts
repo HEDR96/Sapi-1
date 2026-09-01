@@ -35,7 +35,7 @@ async function main() {
     'https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=800',
     'https://images.unsplash.com/photo-1527153857715-3908f2bae5e8?w=800',
     'https://images.unsplash.com/photo-1504222490345-c075b6008014?w=800',
-    'https://images.unsplash.com/photo-1494953103384-89cc5ffb8e57?w=800',
+    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
     'https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=800',
     'https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=800',
     'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=800',
