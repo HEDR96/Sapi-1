@@ -60,9 +60,13 @@ export async function GET() {
       },
     })
 
-    const items = cattle.map(({ weights, ...c }) => ({
+    const items = cattle.map(({ weights, healthRecords, feedRecords, media, ...c }) => ({
       ...c,
       lastWeight: weights[0]?.weight || null,
+      weights,
+      healthRecords,
+      feedRecords,
+      media,
     }))
 
     return NextResponse.json({ items, total: items.length })

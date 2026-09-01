@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
 import { getCurrentAdmin } from '@/lib/auth/jwt'
-import { uploadToGoogleDrive, deleteFromGoogleDrive, isAuthorized, validateGoogleDriveConfig } from '@/lib/storage/google-drive-oauth'
+import { uploadToGoogleDrive, deleteFromGoogleDrive, validateGoogleDriveConfig } from '@/lib/storage/google-drive-oauth'
 
 // GET /api/admin/media?cattleId=xxx&page=1&limit=20
 export async function GET(request: NextRequest) {
@@ -58,14 +58,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if authorized
-    const authorized = await isAuthorized()
-    if (!authorized) {
-      return NextResponse.json(
-        { error: 'Google Drive not authorized. Please authorize at /api/auth/google/init' },
-        { status: 401 }
-      )
-    }
+    // Note: Token refresh happens automatically in uploadToGoogleDrive()
 
     const formData = await request.formData()
     const cattleId = formData.get('cattleId') as string

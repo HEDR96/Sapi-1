@@ -6,7 +6,7 @@
  */
 
 import { google, drive_v3 } from 'googleapis'
-import { loadTokens, saveTokens, hasValidTokens } from './token-store'
+import { loadTokens, saveTokens } from './token-store'
 
 // OAuth 2.0 Scopes - minimal required for upload
 const SCOPES = ['https://www.googleapis.com/auth/drive.file']
@@ -127,17 +127,30 @@ export async function getAuthenticatedDriveClient(): Promise<drive_v3.Drive> {
     expiry_date: tokens.expiry_date,
   })
 
-  // Handle token refresh
-  oauth2Client.on('tokens', async (newTokens) => {
-    console.log('[Google OAuth] Tokens refreshed')
+  // Force token refresh if expired
+  const bufferMs = 5 * 60 * 1000 // 5 minute buffer
+  const isExpired = Date.now() >= tokens.expiry_date - bufferMs
 
-    // Update stored tokens
-    await saveTokens({
-      access_token: newTokens.access_token || tokens.access_token,
-      refresh_token: newTokens.refresh_token || tokens.refresh_token,
-      expiry_date: newTokens.expiry_date || tokens.expiry_date,
-    })
-  })
+  if (isExpired) {
+    console.log('[Google OAuth] Token expired, refreshing...')
+    try {
+      // Manually refresh the token
+      const { credentials } = await oauth2Client.refreshAccessToken()
+      console.log('[Google OAuth] Token refreshed successfully')
+
+      // Save new tokens
+      await saveTokens({
+        access_token: credentials.access_token!,
+        refresh_token: credentials.refresh_token || tokens.refresh_token,
+        expiry_date: credentials.expiry_date || (Date.now() + 3600 * 1000),
+      })
+    } catch (refreshError: any) {
+      console.error('[Google OAuth] Token refresh failed:', refreshError.message)
+      throw new Error(
+        'Token expired and refresh failed. Please re-authorize at /api/auth/google/init'
+      )
+    }
+  }
 
   return google.drive({ version: 'v3', auth: oauth2Client })
 }
@@ -291,11 +304,14 @@ function bufferToStream(buffer: Buffer): NodeJS.ReadableStream {
 }
 
 /**
- * Check if user is authorized (has valid tokens)
+ * Check if user is authorized (has tokens, even if expired - refresh will happen on use)
  */
 export async function isAuthorized(): Promise<boolean> {
   try {
-    return await hasValidTokens()
+    const tokens = await loadTokens()
+    // Return true if we have tokens, even if expired
+    // The actual refresh will happen in getAuthenticatedDriveClient()
+    return tokens !== null
   } catch {
     return false
   }

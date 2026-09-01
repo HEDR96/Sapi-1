@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { uploadToGoogleDrive, validateGoogleDriveConfig, isAuthorized } from '@/lib/storage/google-drive-oauth'
+import { uploadToGoogleDrive, validateGoogleDriveConfig } from '@/lib/storage/google-drive-oauth'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,14 +26,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if authorized
-    const authorized = await isAuthorized()
-    if (!authorized) {
-      return NextResponse.json(
-        { error: 'Google Drive not authorized. Please authorize at /api/auth/google/init' },
-        { status: 401 }
-      )
-    }
+    // Note: Token refresh happens automatically in uploadToGoogleDrive()
+    // If token is expired, it will be refreshed automatically
 
     const formData = await request.formData()
     const file = formData.get('file') as File | null
