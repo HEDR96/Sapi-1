@@ -15,6 +15,7 @@ import { MediaTab } from './MediaTab'
 import { CommentSection } from './CommentSection'
 import { formatCurrency, formatWeight, formatHeight, formatDate, formatADG } from '@/lib/utils/formatters'
 import { calculateWeightStats, estimateTargetCompletion } from '@/lib/utils/calculations'
+import { getDirectImageUrl } from '@/lib/utils/imageUrl'
 import { MessageCircle, Share2, ChevronLeft, ChevronRight, X, Check } from 'lucide-react'
 import { CattleWithRelations } from '@/types'
 import { BookingModal } from './BookingModal'
@@ -132,7 +133,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
                   {allImages[currentImageIndex] ? (
                     <>
                       <Image
-                        src={allImages[currentImageIndex]}
+                        src={getDirectImageUrl(allImages[currentImageIndex])}
                         alt={cattle.name}
                         fill
                         className="object-cover cursor-pointer"
@@ -198,7 +199,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
                             : 'border-transparent hover:border-[hsl(var(--forest))/50'
                         }`}
                       >
-                        <Image src={img} alt="" fill className="object-cover" sizes="64px" />
+                        <Image src={getDirectImageUrl(img)} alt="" fill className="object-cover" sizes="64px" />
                       </button>
                     ))}
                   </div>

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { X, ChevronLeft, ChevronRight, Download, Play, Grid, Maximize2 } from 'lucide-react'
 import { CattleMedia } from '@/types'
+import { getDirectImageUrl } from '@/lib/utils/imageUrl'
 
 interface MediaTabProps {
   media: CattleMedia[]
@@ -119,7 +120,7 @@ export function MediaTab({ media }: MediaTabProps) {
             >
               <div className="relative aspect-square">
                 <Image
-                  src={item.fileUrl}
+                  src={getDirectImageUrl(item.fileUrl)}
                   alt={item.title || 'Dokumentasi'}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -159,7 +160,7 @@ export function MediaTab({ media }: MediaTabProps) {
               {videos.map((item) => (
                 <div key={item.id} className="relative aspect-video rounded-xl overflow-hidden bg-[hsl(var(--cream))]">
                   <Image
-                    src={item.fileUrl}
+                    src={getDirectImageUrl(item.fileUrl)}
                     alt={item.title || 'Video'}
                     fill
                     className="object-cover"
@@ -217,7 +218,7 @@ export function MediaTab({ media }: MediaTabProps) {
           {/* Image */}
           <div className="relative w-full h-full max-w-[90vw] max-h-[85vh] m-4">
             <Image
-              src={images[currentIndex]?.fileUrl || ''}
+              src={getDirectImageUrl(images[currentIndex]?.fileUrl || '')}
               alt=""
               fill
               className="object-contain"

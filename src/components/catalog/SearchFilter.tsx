@@ -116,7 +116,7 @@ export function SearchFilter({ onSearch, initialFilters }: SearchFilterProps) {
             <option value="ALL">Semua Status</option>
             <option value="AVAILABLE">Tersedia</option>
             <option value="SOLD">Terjual</option>
-            <option value="BOOKED">Diboeking</option>
+            <option value="BOOKED">Dibooking</option>
           </select>
         </div>
 

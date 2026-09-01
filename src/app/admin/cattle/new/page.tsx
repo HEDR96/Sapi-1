@@ -140,7 +140,7 @@ export default function NewCattlePage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="AVAILABLE">Tersedia</SelectItem>
-                    <SelectItem value="BOOKED">Diboeking</SelectItem>
+                    <SelectItem value="BOOKED">Dibooking</SelectItem>
                     <SelectItem value="SOLD">Terjual</SelectItem>
                     <SelectItem value="ARCHIVED">Diarchive</SelectItem>
                   </SelectContent>

@@ -2018,7 +2018,7 @@ export function SearchFilter({ onSearch, initialFilters }: SearchFilterProps) {
               <SelectItem value="ALL">Semua Status</SelectItem>
               <SelectItem value="AVAILABLE">Tersedia</SelectItem>
               <SelectItem value="SOLD">Terjual</SelectItem>
-              <SelectItem value="RESERVED">Diboeking</SelectItem>
+              <SelectItem value="RESERVED">Dibooking</SelectItem>
               <SelectItem value="ARCHIVED">Diarchive</SelectItem>
             </SelectContent>
           </Select>

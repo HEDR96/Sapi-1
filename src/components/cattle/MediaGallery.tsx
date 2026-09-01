@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { X, Play } from 'lucide-react'
 import { CattleMedia } from '@/types'
+import { getDirectImageUrl } from '@/lib/utils/imageUrl'
 
 interface MediaGalleryProps {
   media: CattleMedia[]
@@ -37,7 +38,7 @@ export function MediaGallery({ media }: MediaGalleryProps) {
             onClick={() => openLightbox(index)}
             className="relative aspect-square rounded-lg overflow-hidden group"
           >
-            <Image src={item.fileUrl} alt={item.title || 'Media'} fill className="object-cover" />
+            <Image src={getDirectImageUrl(item.fileUrl)} alt={item.title || 'Media'} fill className="object-cover" />
             {item.fileType === 'VIDEO' && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                 <Play className="h-10 w-10 text-white" fill="white" />
@@ -64,14 +65,14 @@ export function MediaGallery({ media }: MediaGalleryProps) {
 
           {media[currentIndex].fileType === 'VIDEO' ? (
             <video
-              src={media[currentIndex].fileUrl}
+              src={getDirectImageUrl(media[currentIndex].fileUrl)}
               controls
               className="max-w-[90vw] max-h-[80vh]"
             />
           ) : (
             <div className="relative w-[80vw] h-[80vh]">
               <Image
-                src={media[currentIndex].fileUrl}
+                src={getDirectImageUrl(media[currentIndex].fileUrl)}
                 alt=""
                 fill
                 className="object-contain"

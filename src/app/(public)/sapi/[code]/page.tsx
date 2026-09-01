@@ -3,6 +3,16 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db/prisma'
 import { CattleProfile } from '@/components/cattle/CattleProfile'
 
+// Helper to convert Google Drive URL to proxy URL
+function getImageUrl(url: string | null): string {
+  if (!url) return ''
+  const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/)
+  if (match) {
+    return `/api/image-proxy?id=${match[1]}`
+  }
+  return url
+}
+
 interface PageProps {
   params: { code: string }
 }
@@ -41,7 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `${cattle.name} - ${cattle.code} | Katalog Sapi`,
       description: cattle.description || `Informasi lengkap sapi ${cattle.name}`,
-      images: cattle.mainImage ? [cattle.mainImage] : [],
+      images: cattle.mainImage ? [getImageUrl(cattle.mainImage)] : [],
     },
   }
 }

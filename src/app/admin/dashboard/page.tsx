@@ -67,7 +67,7 @@ export default function AdminDashboardPage() {
       color: 'bg-rose-100 text-rose-600',
     },
     {
-      title: 'Diboeking',
+      title: 'Dibooking',
       value: stats?.bookedCattle || 0,
       icon: TrendingUp,
       color: 'bg-amber-100 text-amber-600',

@@ -181,7 +181,7 @@ export default function EditCattlePage() {
                   <SelectContent>
                     <SelectItem value="AVAILABLE">Tersedia</SelectItem>
                     <SelectItem value="SOLD">Terjual</SelectItem>
-                    <SelectItem value="BOOKED">Diboeking</SelectItem>
+                    <SelectItem value="BOOKED">Dibooking</SelectItem>
                     <SelectItem value="ARCHIVED">Diarchive</SelectItem>
                   </SelectContent>
                 </Select>

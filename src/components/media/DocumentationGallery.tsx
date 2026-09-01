@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Play, X } from 'lucide-react'
 import { CattleMedia } from '@/types'
 import { cn } from '@/lib/utils/cn'
+import { getDirectImageUrl } from '@/lib/utils/imageUrl'
 
 interface DocumentationGalleryProps {
   media: CattleMedia[]
@@ -38,7 +39,7 @@ export function DocumentationGallery({ media }: DocumentationGalleryProps) {
             className="relative aspect-square overflow-hidden rounded-lg border bg-muted group"
           >
             <Image
-              src={item.fileUrl}
+              src={getDirectImageUrl(item.fileUrl)}
               alt={item.title || 'Documentation'}
               fill
               className="object-cover transition-transform group-hover:scale-105"
@@ -54,7 +55,7 @@ export function DocumentationGallery({ media }: DocumentationGalleryProps) {
             className="relative aspect-square overflow-hidden rounded-lg border bg-muted group"
           >
             <Image
-              src={item.fileUrl}
+              src={getDirectImageUrl(item.fileUrl)}
               alt={item.title || 'Video thumbnail'}
               fill
               className="object-cover opacity-70"
@@ -81,14 +82,14 @@ export function DocumentationGallery({ media }: DocumentationGalleryProps) {
 
           {allMedia[selectedIndex]?.fileType === 'VIDEO' ? (
             <video
-              src={allMedia[selectedIndex]?.fileUrl}
+              src={getDirectImageUrl(allMedia[selectedIndex]?.fileUrl || '')}
               controls
               className="max-h-[80vh] max-w-[80vw]"
             />
           ) : (
             <div className="relative h-[80vh] w-[80vw]">
               <Image
-                src={allMedia[selectedIndex]?.fileUrl || ''}
+                src={getDirectImageUrl(allMedia[selectedIndex]?.fileUrl || '')}
                 alt="Full size image"
                 fill
                 className="object-contain"

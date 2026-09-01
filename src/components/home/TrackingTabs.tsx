@@ -6,6 +6,7 @@ import { formatWeight, formatDate, formatCurrency } from '@/lib/utils/formatters
 import { calculateWeightStats } from '@/lib/utils/calculations'
 import { WeightChart } from './WeightChart'
 import { Sprout, Wheat, Pill, Droplets, TrendingUp } from 'lucide-react'
+import { getDirectImageUrl } from '@/lib/utils/imageUrl'
 
 interface TrackingTabsProps {
   cattle: CattleWithRelations | null
@@ -427,7 +428,7 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
                     className="relative aspect-square rounded-lg overflow-hidden group"
                   >
                     <img
-                      src={item.fileUrl}
+                      src={getDirectImageUrl(item.fileUrl)}
                       alt={item.title || 'Dokumentasi'}
                       className="w-full h-full object-cover"
                     />
