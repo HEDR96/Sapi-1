@@ -17,7 +17,7 @@ export async function sendVerificationEmail(email: string, code: string) {
   const client = getResendClient()
   try {
     await client.emails.send({
-      from: 'samadyafarm.id <noreply@nusafarm.id>',
+      from: 'samadyafarmadmin@kesug.com <noreply@kesug.com>',
       to: email,
       subject: 'Kode Verifikasi samadyafarm.id',
       html: `

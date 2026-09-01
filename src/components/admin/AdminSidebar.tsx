@@ -30,7 +30,12 @@ const navItems = [
   { href: '/admin/settings', icon: Settings, label: 'Pengaturan' },
 ]
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  isOpen?: boolean
+  onClose?: () => void
+}
+
+export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
   const pathname = usePathname()
   const [pendingBookingsCount, setPendingBookingsCount] = useState(0)
 
@@ -41,16 +46,27 @@ export function AdminSidebar() {
       .catch(() => {})
   }, [])
 
+  // Handle link click - close sidebar on mobile
+  const handleLinkClick = () => {
+    if (onClose && window.innerWidth < 1024) {
+      onClose()
+    }
+  }
+
   return (
     <>
-      {/* Mobile Overlay */}
-      <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" />
-
-      {/* Sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-50 w-60 transform overflow-y-auto bg-white shadow-xl transition-transform lg:static lg:translate-x-0">
+      {/* Sidebar - transform to slide in/out on mobile */}
+      <aside
+        className={`
+          fixed inset-y-0 left-0 z-50 w-60 overflow-y-auto bg-white shadow-xl
+          transition-transform duration-300 ease-in-out
+          lg:static lg:translate-x-0 lg:shadow-none
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
         {/* Header */}
         <div className="flex h-14 items-center justify-between border-b border-[hsl(var(--line))] px-4">
-          <Link href="/admin/dashboard" className="flex items-center gap-2">
+          <Link href="/admin/dashboard" className="flex items-center gap-2" onClick={handleLinkClick}>
             <div className="grid h-8 w-8 place-items-center rounded-full bg-[hsl(var(--forest))]">
               <span className="text-sm font-bold text-white">NF</span>
             </div>
@@ -61,7 +77,11 @@ export function AdminSidebar() {
               <div className="text-[7px] text-[hsl(var(--forest))/60]">ADMIN PANEL</div>
             </div>
           </Link>
-          <button className="lg:hidden" aria-label="Close menu">
+          <button
+            onClick={onClose}
+            className="lg:hidden p-1 rounded hover:bg-gray-100"
+            aria-label="Close menu"
+          >
             <X className="h-5 w-5 text-[hsl(var(--forest))]" />
           </button>
         </div>
@@ -75,6 +95,7 @@ export function AdminSidebar() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    onClick={handleLinkClick}
                     className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-[11px] font-medium transition-colors ${
                       isActive
                         ? 'bg-[hsl(var(--forest))] text-white'
@@ -99,7 +120,8 @@ export function AdminSidebar() {
         <div className="absolute bottom-0 left-0 right-0 border-t border-[hsl(var(--line))] p-3">
           <Link
             href="/"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-[10px] font-medium text-[hsl(var(--forest))/60] hover:bg-[hsl(var(--cream))] hover:text-[hsl(var(--forest))]"
+            onClick={handleLinkClick}
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-[10px] font-medium text-[hsl(var(--forest))/60 hover:bg-[hsl(var(--cream))] hover:text-[hsl(var(--forest))]"
           >
             ← Kembali ke Website
           </Link>

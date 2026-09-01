@@ -6,7 +6,11 @@ import { useLogout } from '@/components/auth/LogoutButton'
 import { useState } from 'react'
 import { NotificationDropdown, useNotifications } from './NotificationDropdown'
 
-export function AdminHeader() {
+interface AdminHeaderProps {
+  onMenuClick?: () => void
+}
+
+export function AdminHeader({ onMenuClick }: AdminHeaderProps) {
   const { handleLogout } = useLogout()
   const [isNotificationOpen, setIsNotificationOpen] = useState(false)
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications()
@@ -14,7 +18,11 @@ export function AdminHeader() {
   return (
     <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-[hsl(var(--line))] bg-white px-4">
       <div className="flex items-center gap-3">
-        <button className="lg:hidden" aria-label="Menu">
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden p-1 rounded hover:bg-gray-100"
+          aria-label="Menu"
+        >
           <Menu className="h-5 w-5 text-[hsl(var(--forest))]" />
         </button>
         <Link href="/admin/dashboard" className="flex items-center gap-2">

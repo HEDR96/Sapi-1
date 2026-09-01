@@ -12,6 +12,7 @@ export default function AdminLayout({
 }) {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     async function checkAuth() {
@@ -39,9 +40,18 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen flex">
-      <AdminSidebar />
-      <div className="flex-1 flex flex-col">
-        <AdminHeader />
+      <AdminSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      <div className="flex-1 flex flex-col min-w-0">
+        <AdminHeader onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 p-6 bg-muted/30">{children}</main>
       </div>
     </div>
