@@ -2,7 +2,7 @@ import { differenceInDays, addDays } from 'date-fns'
 
 export interface WeightData {
   weight: number
-  measurementDate: Date
+  measurementDate: Date | string
 }
 
 export interface WeightCalculation {
@@ -18,6 +18,14 @@ export interface TargetEstimation {
   estimatedDays: number | null
   estimatedDate: Date | null
   progressPercentage: number
+}
+
+// Helper function to parse date from string or Date object
+function toDate(date: Date | string): Date {
+  if (typeof date === 'string') {
+    return new Date(date)
+  }
+  return date
 }
 
 /**
@@ -36,15 +44,15 @@ export function calculateWeightStats(weights: WeightData[]): WeightCalculation {
     }
   }
 
-  // Sort by measurement date (ascending)
+  // Sort by measurement date (ascending) - handle both string and Date
   const sortedWeights = [...weights].sort(
-    (a, b) => a.measurementDate.getTime() - b.measurementDate.getTime()
+    (a, b) => toDate(a.measurementDate).getTime() - toDate(b.measurementDate).getTime()
   )
 
   const initialWeight = sortedWeights[0].weight
   const lastWeight = sortedWeights[sortedWeights.length - 1].weight
-  const firstDate = sortedWeights[0].measurementDate
-  const lastDate = sortedWeights[sortedWeights.length - 1].measurementDate
+  const firstDate = toDate(sortedWeights[0].measurementDate)
+  const lastDate = toDate(sortedWeights[sortedWeights.length - 1].measurementDate)
 
   const daysDiff = differenceInDays(lastDate, firstDate)
   const weightGain = lastWeight - initialWeight

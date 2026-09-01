@@ -53,7 +53,7 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
   const media = cattle.media || []
   const weightStats = calculateWeightStats(weights)
 
-  // Sort weights by date ascending for calculations
+  // Sort weights by date ascending for calculations - handle both string and Date
   const sortedWeights = [...weights].sort(
     (a, b) => new Date(a.measurementDate).getTime() - new Date(b.measurementDate).getTime()
   )

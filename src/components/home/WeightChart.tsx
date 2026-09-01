@@ -9,7 +9,7 @@ interface WeightChartProps {
 }
 
 export function WeightChart({ weights, height = 138 }: WeightChartProps) {
-  // Sort weights by date ascending for chart
+  // Sort weights by date ascending for chart - handle both string and Date
   const sorted = [...weights]
     .sort((a, b) => new Date(a.measurementDate).getTime() - new Date(b.measurementDate).getTime())
     .slice(0, 10)

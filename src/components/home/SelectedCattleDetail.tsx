@@ -29,7 +29,7 @@ export function SelectedCattleDetail({ cattle, onCompare, isComparing = false }:
     )
   }
 
-  // Sort weights by date ascending
+  // Sort weights by date ascending - handle both string and Date
   const sortedWeights = [...(cattle.weights || [])].sort(
     (a, b) => new Date(a.measurementDate).getTime() - new Date(b.measurementDate).getTime()
   )
