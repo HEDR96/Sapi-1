@@ -7,6 +7,7 @@ import { CattleWithRelations } from '@/types'
 import { StatusBadge } from '@/components/catalog/CattleStatusBadge'
 import { formatWeight, formatCurrency, formatDate } from '@/lib/utils/formatters'
 import { calculateWeightStats } from '@/lib/utils/calculations'
+import { getDirectImageUrl } from '@/lib/utils/imageUrl'
 
 interface CompareModalProps {
   isOpen: boolean
@@ -132,7 +133,7 @@ export function CompareModal({
                     <div className="aspect-video rounded-lg overflow-hidden bg-[hsl(var(--cream))] mb-2 relative">
                       {cattle.mainImage ? (
                         <Image
-                          src={cattle.mainImage}
+                          src={getDirectImageUrl(cattle.mainImage)}
                           alt={cattle.name}
                           fill
                           className="object-cover object-top"
@@ -210,7 +211,7 @@ export function CompareModal({
                               <div className="mt-2 h-32 rounded-lg overflow-hidden relative bg-[hsl(var(--cream))]">
                                 {cattle.mainImage ? (
                                   <Image
-                                    src={cattle.mainImage}
+                                    src={getDirectImageUrl(cattle.mainImage)}
                                     alt={cattle.name}
                                     fill
                                     className="object-cover object-top"

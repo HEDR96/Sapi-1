@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react'
 import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react'
+import { getDirectImageUrl } from '@/lib/utils/imageUrl'
 
 interface ImageUploaderProps {
   value?: string
@@ -122,13 +123,19 @@ export function ImageUploader({
 
   // Show preview if has value
   if (value) {
+    const imageUrl = getDirectImageUrl(value)
+
     return (
       <div className="space-y-2">
         <div className="relative w-full h-48 rounded-lg overflow-hidden border border-[hsl(var(--line))] bg-[hsl(var(--cream))]">
           <img
-            src={value}
+            src={imageUrl}
             alt="Preview"
             className="w-full h-full object-contain"
+            onError={(e) => {
+              // Fallback to original URL if conversion fails
+              e.currentTarget.src = value
+            }}
           />
           <button
             type="button"

@@ -6,6 +6,7 @@ import { Columns3, Check } from 'lucide-react'
 import { formatCurrency, formatWeight } from '@/lib/utils/formatters'
 import { Status } from '@/types'
 import { StatusBadge } from './CattleStatusBadge'
+import { getDirectImageUrl } from '@/lib/utils/imageUrl'
 
 interface CatalogSwiperCardProps {
   id: string
@@ -60,7 +61,7 @@ export function CatalogSwiperCard({
       >
         {mainImage ? (
           <>
-            <Image src={mainImage} alt={name} fill className="object-cover" sizes="280px" />
+            <Image src={getDirectImageUrl(mainImage)} alt={name} fill className="object-cover" sizes="280px" />
             {(isSold || isBooked) && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                 <span className={`rounded-full px-3 py-1 text-xs font-bold ${

@@ -5,6 +5,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import { CattleWithRelations } from '@/types'
 import { StatusBadge } from '@/components/catalog/CattleStatusBadge'
 import { formatWeight, formatCurrency, formatDate } from '@/lib/utils/formatters'
+import { getDirectImageUrl } from '@/lib/utils/imageUrl'
 import { ScanLine, Columns3, Check } from 'lucide-react'
 
 interface SelectedCattleDetailProps {
@@ -48,7 +49,7 @@ export function SelectedCattleDetail({ cattle, onCompare, isComparing = false }:
           {/* Photo */}
           <div className="h-14 rounded bg-cover bg-center relative">
             {cattle.mainImage ? (
-              <Image src={cattle.mainImage} alt={cattle.name} fill className="object-cover rounded" />
+              <Image src={getDirectImageUrl(cattle.mainImage)} alt={cattle.name} fill className="object-cover rounded" />
             ) : (
               <div className="flex items-center justify-center h-full bg-[hsl(var(--cream))] rounded text-[hsl(var(--forest))/30] text-xs">
                 N/A

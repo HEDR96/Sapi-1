@@ -4,6 +4,7 @@ import { Columns3, Check } from 'lucide-react'
 import { Status } from '@/types'
 import { StatusBadge } from './CattleStatusBadge'
 import { formatCurrency, formatWeight } from '@/lib/utils/formatters'
+import { getDirectImageUrl } from '@/lib/utils/imageUrl'
 
 interface CattleCardProps {
   id: string
@@ -54,7 +55,7 @@ export function CattleCard({
         {mainImage ? (
           <>
             <Image
-              src={mainImage}
+              src={getDirectImageUrl(mainImage)}
               alt={name}
               fill
               className={`object-cover transition-transform duration-300 ${
