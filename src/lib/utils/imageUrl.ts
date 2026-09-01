@@ -5,8 +5,7 @@
  * - https://drive.google.com/file/d/FILE_ID/view
  * - https://drive.google.com/open?id=FILE_ID
  *
- * Will be converted to:
- * - https://drive.google.com/uc?export=view&id=FILE_ID
+ * Will be converted to a proxy URL that handles CORS
  */
 export function getDirectImageUrl(url: string | null | undefined): string {
   if (!url) return ''
@@ -22,8 +21,8 @@ export function getDirectImageUrl(url: string | null | undefined): string {
     const match = url.match(pattern)
     if (match) {
       const fileId = match[1]
-      // Use uc URL for direct image access
-      return `https://drive.google.com/uc?export=view&id=${fileId}`
+      // Return the file ID - the image proxy will handle fetching
+      return `/api/image-proxy?id=${fileId}`
     }
   }
 
