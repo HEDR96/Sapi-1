@@ -28,11 +28,13 @@ export function RecentComments() {
   }, [])
 
   if (loading) {
-    return <div className="h-40 animate-pulse bg-[hsl(var(--cream))] rounded-lg" />
-  }
-
-  if (comments.length === 0) {
-    return null // Don't show section if no comments
+    return (
+      <section className="py-8">
+        <div className="container mx-auto px-4">
+          <div className="h-40 animate-pulse bg-[hsl(var(--cream))] rounded-lg" />
+        </div>
+      </section>
+    )
   }
 
   return (
@@ -43,38 +45,47 @@ export function RecentComments() {
         </h2>
 
         <div className="grid gap-3">
-          {comments.map((comment) => (
-            <Link
-              key={comment.id}
-              href={`/sapi/${comment.cattle.code}`}
-              className="block p-4 bg-white rounded-lg border border-[hsl(var(--line))] hover:border-[hsl(var(--forest))] transition-colors"
-            >
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-[hsl(var(--cream))] rounded-full">
-                  <MessageCircle className="h-4 w-4 text-[hsl(var(--forest))]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-[hsl(var(--forest))]">
-                      {comment.user.name || 'User'}
-                    </span>
-                    <span className="text-xs text-[hsl(var(--forest))/60]">
-                      tentang
-                    </span>
-                    <span className="text-xs font-medium text-[hsl(var(--forest))]">
-                      {comment.cattle.name} ({comment.cattle.code})
-                    </span>
+          {comments.length > 0 ? (
+            comments.map((comment) => (
+              <Link
+                key={comment.id}
+                href={`/sapi/${comment.cattle.code}`}
+                className="block p-4 bg-white rounded-lg border border-[hsl(var(--line))] hover:border-[hsl(var(--forest))] transition-colors"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-[hsl(var(--cream))] rounded-full">
+                    <MessageCircle className="h-4 w-4 text-[hsl(var(--forest))]" />
                   </div>
-                  <p className="text-sm text-[hsl(var(--forest))/80] line-clamp-2">
-                    {comment.content}
-                  </p>
-                  <p className="text-xs text-[hsl(var(--forest))/50] mt-2">
-                    {formatRelativeTime(comment.createdAt)}
-                  </p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-[hsl(var(--forest))]">
+                        {comment.user.name || 'User'}
+                      </span>
+                      <span className="text-xs text-[hsl(var(--forest))/60]">
+                        tentang
+                      </span>
+                      <span className="text-xs font-medium text-[hsl(var(--forest))]">
+                        {comment.cattle.name} ({comment.cattle.code})
+                      </span>
+                    </div>
+                    <p className="text-sm text-[hsl(var(--forest))/80] line-clamp-2">
+                      {comment.content}
+                    </p>
+                    <p className="text-xs text-[hsl(var(--forest))/50] mt-2">
+                      {formatRelativeTime(comment.createdAt)}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))
+          ) : (
+            <div className="text-center py-8 bg-white rounded-lg border border-[hsl(var(--line))]">
+              <div className="text-4xl mb-2">💬</div>
+              <p className="text-[hsl(var(--forest))/70]">
+                Belum ada komentar. Jadilah yang pertama!
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </section>
