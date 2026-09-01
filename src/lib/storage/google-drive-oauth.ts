@@ -155,7 +155,7 @@ export async function uploadToGoogleDrive(
   fileName: string,
   mimeType: string,
   folder: 'image' | 'video' = 'image'
-): Promise<{ fileId: string; webViewLink: string; webContentLink: string }> {
+): Promise<{ fileId: string; webViewLink: string; webContentLink: string; thumbnailLink: string; directUrl: string }> {
   const drive = await getAuthenticatedDriveClient()
   const folderId = DRIVE_FOLDERS[folder]
 
@@ -191,12 +191,13 @@ export async function uploadToGoogleDrive(
     const response = await drive.files.create({
       requestBody: fileMetadata,
       media,
-      fields: 'id, name, webViewLink, webContentLink, mimeType',
+      fields: 'id, name, webViewLink, webContentLink, mimeType, thumbnailLink',
     })
 
     const fileId = response.data.id!
     const webViewLink = response.data.webViewLink || ''
     const webContentLink = response.data.webContentLink || ''
+    const thumbnailLink = response.data.thumbnailLink || ''
 
     console.log('[Google Drive OAuth] File created:', {
       fileId,
@@ -211,10 +212,15 @@ export async function uploadToGoogleDrive(
       webViewLink,
     })
 
+    // Generate direct download URL for images
+    const directUrl = `https://drive.google.com/uc?export=view&id=${fileId}`
+
     return {
       fileId,
       webViewLink,
       webContentLink,
+      thumbnailLink,
+      directUrl,
     }
   } catch (error: any) {
     console.error('[Google Drive OAuth] Upload failed:', {

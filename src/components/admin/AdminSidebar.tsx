@@ -13,11 +13,13 @@ import {
   Users,
   Settings,
   Calendar,
+  Eye,
   X,
 } from 'lucide-react'
 
 const navItems = [
   { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/admin/visitors', icon: Eye, label: 'Pengunjung' },
   { href: '/admin/cattle', icon: Beef, label: 'Manajemen Sapi' },
   { href: '/admin/weight', icon: Scale, label: 'Riwayat Timbang' },
   { href: '/admin/health', icon: Heart, label: 'Riwayat Kesehatan' },

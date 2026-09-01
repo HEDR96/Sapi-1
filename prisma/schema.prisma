@@ -222,3 +222,29 @@ model Notification {
   @@index([userId])
   @@index([isRead])
 }
+
+model Visitor {
+  id        String   @id @default(cuid())
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  page      String
+  referrer  String?
+  country   String?
+  city      String?
+  device    String?  // desktop, mobile, tablet
+  browser   String?
+  os        String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([page])
+  @@index([createdAt])
+}
+
+model DailyStats {
+  id          String   @id @default(cuid())
+  date        DateTime @unique @map("date")
+  pageViews   Int      @default(0) @map("page_views")
+  uniqueVisitors Int   @default(0) @map("unique_visitors")
+  cattleViews Int      @default(0) @map("cattle_views")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+}

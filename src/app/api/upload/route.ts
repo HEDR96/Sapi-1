@@ -101,13 +101,16 @@ export async function POST(request: NextRequest) {
 
     console.log('[Upload API] Success:', result)
 
-    // Return the webViewLink as the URL for display
-    const url = result.webViewLink || result.webContentLink
+    // Use direct image URL format for public access
+    // Format: https://drive.google.com/uc?export=view&id=FILE_ID
+    const directUrl = result.directUrl || `https://drive.google.com/uc?export=view&id=${result.fileId}`
 
     return NextResponse.json({
       success: true,
-      url,
+      url: directUrl,
       fileId: result.fileId,
+      webViewLink: result.webViewLink,
+      thumbnailUrl: result.thumbnailLink,
     })
   } catch (error: any) {
     console.error('[Upload API] Error:', {
