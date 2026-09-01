@@ -9,16 +9,20 @@ import { CatalogSection } from '@/components/catalog/CatalogSection'
 import { PantauPerkembanganSection } from '@/components/home/PantauPerkembanganSection'
 import { RecentComments } from '@/components/home/RecentComments'
 import { CattleWithLatestWeight, CattleWithRelations } from '@/types'
+import { Columns3, X } from 'lucide-react'
+import { CompareModalWrapper } from '@/components/home/CompareModalWrapper'
 
 export default function HomePage() {
   const [cattle, setCattle] = useState<CattleWithLatestWeight[]>([])
   const [fullCattleData, setFullCattleData] = useState<CattleWithRelations[]>([])
   const [selectedCattle, setSelectedCattle] = useState<CattleWithRelations | null>(null)
+  const [comparingCattle, setComparingCattle] = useState<CattleWithRelations[]>([])
+  const [compareModalOpen, setCompareModalOpen] = useState(false)
   const pageRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Fetch cattle data
-    fetch('/api/admin/cattle?status=AVAILABLE&limit=20')
+    fetch('/api/admin/cattle?status=AVAILABLE&limit=50')
       .then(res => res.json())
       .then(data => {
         // API returns { items: [...], total: number } directly
@@ -66,6 +70,31 @@ export default function HomePage() {
     setSelectedCattle(full)
   }
 
+  // Handler for compare selection
+  const handleCompareSelect = (cattle: CattleWithRelations) => {
+    setComparingCattle(prev => {
+      const exists = prev.find(x => x.id === cattle.id)
+      if (exists) {
+        return prev.filter(x => x.id !== cattle.id)
+      }
+      if (prev.length >= 3) {
+        return prev
+      }
+      return [...prev, cattle]
+    })
+  }
+
+  // Open compare modal
+  const handleOpenCompare = () => {
+    // Initialize with current comparing cattle or selected cattle
+    if (comparingCattle.length > 0) {
+      setComparingCattle(prev => prev)
+    } else if (selectedCattle) {
+      setComparingCattle([selectedCattle])
+    }
+    setCompareModalOpen(true)
+  }
+
   return (
     <div ref={pageRef} className="mx-auto my-2 max-w-[1500px] overflow-hidden border border-black/30 bg-[hsl(var(--cream2))] shadow-2xl">
       <HeroSection />
@@ -76,13 +105,114 @@ export default function HomePage() {
         cattle={cattle}
         onSelect={handleSelectCattle}
         selectedId={selectedCattle?.id}
+        allCattle={fullCattleData}
+        onCompareSelect={handleCompareSelect}
+        comparingIds={comparingCattle.map(c => c.id)}
       />
 
+      {/* Compare Drawer */}
+      {comparingCattle.length > 0 && (
+        <CompareDrawer
+          selectedCattle={comparingCattle}
+          onOpenModal={handleOpenCompare}
+          onRemove={handleCompareSelect}
+          onClear={() => setComparingCattle([])}
+        />
+      )}
+
       {/* PANTAU PERKEMBANGAN - Below Katalog */}
-      <PantauPerkembanganSection cattle={selectedCattle} allCattle={fullCattleData} />
+      <PantauPerkembanganSection
+        cattle={selectedCattle}
+        allCattle={fullCattleData}
+        comparingCattle={comparingCattle}
+        onCompareSelect={handleCompareSelect}
+        onOpenCompare={handleOpenCompare}
+      />
 
       <RecentComments />
       <CTASection />
+
+      {/* Compare Modal */}
+      <CompareModalWrapper
+        isOpen={compareModalOpen}
+        onClose={() => setCompareModalOpen(false)}
+        selectedCattle={comparingCattle}
+        allCattle={fullCattleData}
+        onSelectCattle={handleCompareSelect}
+      />
+    </div>
+  )
+}
+
+// Compare Drawer Component
+function CompareDrawer({
+  selectedCattle,
+  onOpenModal,
+  onRemove,
+  onClear
+}: {
+  selectedCattle: CattleWithRelations[]
+  onOpenModal: () => void
+  onRemove: (cattle: CattleWithRelations) => void
+  onClear: () => void
+}) {
+  return (
+    <div
+      id="compareDrawer"
+      className="fixed bottom-3 left-1/2 z-[85] flex items-center gap-3 rounded-2xl border border-[hsl(var(--line))] bg-white p-3 shadow-2xl"
+      style={{ width: 'min(760px, calc(100vw - 24px))', transform: 'translateX(-50%)' }}
+    >
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[hsl(var(--forest))]">
+          <Columns3 className="h-3.5 w-3.5" />
+          Bandingkan Sapi
+        </div>
+        <div className="text-[8px] text-[hsl(var(--forest))/50]">
+          {selectedCattle.length} dari 3 sapi dipilih
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onClear}
+          className="rounded-lg border border-[hsl(var(--line))] px-3 py-2 text-[8px] font-semibold text-[hsl(var(--forest))]"
+        >
+          Kosongkan
+        </button>
+        <button
+          onClick={onOpenModal}
+          disabled={selectedCattle.length < 2}
+          className={`rounded-lg px-3 py-2 text-[8px] font-bold transition-colors ${
+            selectedCattle.length >= 2
+              ? 'bg-[hsl(var(--forest))] text-white'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
+        >
+          Lihat Perbandingan
+        </button>
+      </div>
+      <div className="flex gap-2 overflow-x-auto">
+        {selectedCattle.map(cattle => (
+          <div
+            key={cattle.id}
+            className="flex shrink-0 items-center gap-2 rounded-lg border border-[hsl(var(--line))] bg-[hsl(var(--cream))] px-2 py-1.5"
+          >
+            <div
+              className="h-9 w-9 rounded bg-cover bg-center"
+              style={{ backgroundImage: cattle.mainImage ? `url('${cattle.mainImage}')` : undefined }}
+            />
+            <div>
+              <div className="text-[8px] font-bold text-[hsl(var(--forest))]">{cattle.name}</div>
+              <div className="text-[7px] text-[hsl(var(--forest))/45]">{cattle.code}</div>
+            </div>
+            <button
+              onClick={() => onRemove(cattle)}
+              className="ml-1 grid h-6 w-6 place-items-center rounded-full bg-white text-[hsl(var(--forest))/55 hover:bg-red-100 hover:text-red-500"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

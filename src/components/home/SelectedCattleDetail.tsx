@@ -5,14 +5,15 @@ import { QRCodeSVG } from 'qrcode.react'
 import { CattleWithRelations } from '@/types'
 import { StatusBadge } from '@/components/catalog/CattleStatusBadge'
 import { formatWeight, formatCurrency, formatDate } from '@/lib/utils/formatters'
-import { ScanLine, Columns3 } from 'lucide-react'
+import { ScanLine, Columns3, Check } from 'lucide-react'
 
 interface SelectedCattleDetailProps {
   cattle: CattleWithRelations | null
   onCompare?: () => void
+  isComparing?: boolean
 }
 
-export function SelectedCattleDetail({ cattle, onCompare }: SelectedCattleDetailProps) {
+export function SelectedCattleDetail({ cattle, onCompare, isComparing = false }: SelectedCattleDetailProps) {
   if (!cattle) {
     return (
       <div className="h-full rounded-xl border border-dashed border-[hsl(var(--line))] bg-[hsl(var(--cream))]/50 flex flex-col items-center justify-center p-4 text-center min-h-[300px]">
@@ -27,13 +28,13 @@ export function SelectedCattleDetail({ cattle, onCompare }: SelectedCattleDetail
     )
   }
 
-  const lastWeight = cattle.weights?.[0]?.weight
-  const firstWeight = cattle.weights?.[cattle.weights.length - 1]?.weight
-  const weightGain = lastWeight && firstWeight ? lastWeight - firstWeight : 0
+  // Sort weights by date ascending
+  const sortedWeights = [...(cattle.weights || [])].sort(
+    (a, b) => new Date(a.measurementDate).getTime() - new Date(b.measurementDate).getTime()
+  )
+  const lastWeight = sortedWeights[sortedWeights.length - 1]?.weight
+  const firstWeight = sortedWeights[0]?.weight
   const birthDate = cattle.birthDate ? new Date(cattle.birthDate) : null
-  const ageMonths = birthDate
-    ? Math.floor((Date.now() - birthDate.getTime()) / (1000 * 60 * 60 * 24 * 30))
-    : null
 
   const qrUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/sapi/${cattle.code}`
@@ -124,10 +125,23 @@ export function SelectedCattleDetail({ cattle, onCompare }: SelectedCattleDetail
                 {onCompare && (
                   <button
                     onClick={onCompare}
-                    className="flex-1 rounded-md border border-[hsl(var(--line))] bg-white px-2.5 py-2 text-[8px] font-semibold text-[hsl(var(--forest))] flex items-center justify-center gap-1"
+                    className={`flex-1 rounded-md border px-2.5 py-2 text-[8px] font-semibold flex items-center justify-center gap-1 ${
+                      isComparing
+                        ? 'border-[hsl(var(--forest))] bg-[hsl(var(--forest))] text-white'
+                        : 'border-[hsl(var(--line))] bg-white text-[hsl(var(--forest))]'
+                    }`}
                   >
-                    <Columns3 className="h-3 w-3" />
-                    Bandingkan
+                    {isComparing ? (
+                      <>
+                        <Check className="h-3 w-3" />
+                        Dipilih
+                      </>
+                    ) : (
+                      <>
+                        <Columns3 className="h-3 w-3" />
+                        Bandingkan
+                      </>
+                    )}
                   </button>
                 )}
               </div>

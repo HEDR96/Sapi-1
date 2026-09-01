@@ -3,15 +3,25 @@
 import { useRef, useEffect, useState } from 'react'
 import { CatalogSwiperCard } from './CatalogSwiperCard'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { CattleWithLatestWeight } from '@/types'
+import { CattleWithLatestWeight, CattleWithRelations } from '@/types'
 
 interface CatalogSwiperProps {
   cattle: CattleWithLatestWeight[]
   onSelect: (cattle: CattleWithLatestWeight) => void
   selectedId?: string
+  allCattle?: CattleWithRelations[]
+  onCompareSelect?: (cattle: CattleWithRelations) => void
+  comparingIds?: string[]
 }
 
-export function CatalogSwiper({ cattle, onSelect, selectedId }: CatalogSwiperProps) {
+export function CatalogSwiper({
+  cattle,
+  onSelect,
+  selectedId,
+  allCattle = [],
+  onCompareSelect,
+  comparingIds = []
+}: CatalogSwiperProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [showLeftArrow, setShowLeftArrow] = useState(false)
   const [showRightArrow, setShowRightArrow] = useState(true)
@@ -38,11 +48,18 @@ export function CatalogSwiper({ cattle, onSelect, selectedId }: CatalogSwiperPro
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollRef.current) return
-    const scrollAmount = 300
+    const scrollAmount = 320
     scrollRef.current.scrollBy({
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth'
     })
+  }
+
+  const handleCompare = (cattleItem: CattleWithLatestWeight) => {
+    const fullData = allCattle.find(c => c.id === cattleItem.id)
+    if (fullData && onCompareSelect) {
+      onCompareSelect(fullData)
+    }
   }
 
   if (!cattle || cattle.length === 0) {
@@ -84,7 +101,9 @@ export function CatalogSwiper({ cattle, onSelect, selectedId }: CatalogSwiperPro
             mainImage={c.mainImage}
             quantity={c.quantity}
             isSelected={selectedId === c.id}
+            isComparing={comparingIds.includes(c.id)}
             onClick={() => onSelect(c)}
+            onCompare={() => handleCompare(c)}
           />
         ))}
       </div>

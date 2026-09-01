@@ -125,7 +125,7 @@ export function CompareModal({
                     }`}
                   >
                     {selected && (
-                      <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[hsl(var(--forest))] text-white flex items-center justify-center">
+                      <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[hsl(var(--forest))] text-white flex items-center justify-center z-10">
                         <Check className="h-3.5 w-3.5" />
                       </div>
                     )}
@@ -135,7 +135,7 @@ export function CompareModal({
                           src={cattle.mainImage}
                           alt={cattle.name}
                           fill
-                          className="object-cover"
+                          className="object-cover object-top"
                         />
                       ) : (
                         <div className="flex items-center justify-center h-full text-[hsl(var(--forest))/30] text-xs">
@@ -192,11 +192,8 @@ export function CompareModal({
                       <tr>
                         <th>Parameter</th>
                         {selectedCattle.map((cattle) => {
-                          const lastWeight = cattle.weights?.[0]?.weight
-                          const weightStats = calculateWeightStats(cattle.weights || [])
-
                           return (
-                            <th key={cattle.id}>
+                            <th key={cattle.id} className="min-w-[150px]">
                               <div className="flex items-center justify-between gap-2">
                                 <div>
                                   <div className="text-[12px] text-[hsl(var(--forest))]">{cattle.name}</div>
@@ -209,16 +206,19 @@ export function CompareModal({
                                   <X className="h-3 w-3" />
                                 </button>
                               </div>
-                              <div className="mt-2 h-20 rounded-lg overflow-hidden relative">
+                              {/* Image - Full width per column */}
+                              <div className="mt-2 h-32 rounded-lg overflow-hidden relative bg-[hsl(var(--cream))]">
                                 {cattle.mainImage ? (
                                   <Image
                                     src={cattle.mainImage}
                                     alt={cattle.name}
                                     fill
-                                    className="object-cover"
+                                    className="object-cover object-top"
                                   />
                                 ) : (
-                                  <div className="h-full bg-[hsl(var(--cream))]" />
+                                  <div className="flex items-center justify-center h-full text-[hsl(var(--forest))/30]">
+                                    N/A
+                                  </div>
                                 )}
                               </div>
                             </th>
@@ -227,24 +227,6 @@ export function CompareModal({
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>Foto</td>
-                        {selectedCattle.map((cattle) => (
-                          <td key={cattle.id}>
-                            {cattle.mainImage && (
-                              <div className="h-24 w-full rounded-lg overflow-hidden">
-                                <Image
-                                  src={cattle.mainImage}
-                                  alt={cattle.name}
-                                  width={130}
-                                  height={96}
-                                  className="object-cover w-full h-full"
-                                />
-                              </div>
-                            )}
-                          </td>
-                        ))}
-                      </tr>
                       <tr>
                         <td>Harga</td>
                         {selectedCattle.map((cattle) => (
@@ -272,7 +254,10 @@ export function CompareModal({
                       <tr>
                         <td>Bobot Terakhir</td>
                         {selectedCattle.map((cattle) => {
-                          const lastWeight = cattle.weights?.[0]?.weight
+                          const sortedWeights = [...(cattle.weights || [])].sort(
+                            (a, b) => new Date(b.measurementDate).getTime() - new Date(a.measurementDate).getTime()
+                          )
+                          const lastWeight = sortedWeights[0]?.weight
                           return (
                             <td key={cattle.id}>
                               <strong>{formatWeight(lastWeight || null)}</strong>
@@ -283,15 +268,21 @@ export function CompareModal({
                       <tr>
                         <td>Bobot Awal</td>
                         {selectedCattle.map((cattle) => {
-                          const firstWeight = cattle.weights?.[cattle.weights.length - 1]?.weight
+                          const sortedWeights = [...(cattle.weights || [])].sort(
+                            (a, b) => new Date(a.measurementDate).getTime() - new Date(b.measurementDate).getTime()
+                          )
+                          const firstWeight = sortedWeights[0]?.weight
                           return <td key={cattle.id}>{formatWeight(firstWeight || null)}</td>
                         })}
                       </tr>
                       <tr>
                         <td>Kenaikan</td>
                         {selectedCattle.map((cattle) => {
-                          const lastWeight = cattle.weights?.[0]?.weight
-                          const firstWeight = cattle.weights?.[cattle.weights.length - 1]?.weight
+                          const sortedWeights = [...(cattle.weights || [])].sort(
+                            (a, b) => new Date(a.measurementDate).getTime() - new Date(b.measurementDate).getTime()
+                          )
+                          const lastWeight = sortedWeights[sortedWeights.length - 1]?.weight
+                          const firstWeight = sortedWeights[0]?.weight
                           const gain = lastWeight && firstWeight ? lastWeight - firstWeight : 0
                           return (
                             <td key={cattle.id} className={gain > 0 ? 'text-[hsl(var(--olive))]' : ''}>
@@ -320,7 +311,10 @@ export function CompareModal({
                       <tr>
                         <td>Progress Target</td>
                         {selectedCattle.map((cattle) => {
-                          const lastWeight = cattle.weights?.[0]?.weight
+                          const sortedWeights = [...(cattle.weights || [])].sort(
+                            (a, b) => new Date(b.measurementDate).getTime() - new Date(a.measurementDate).getTime()
+                          )
+                          const lastWeight = sortedWeights[0]?.weight
                           const progress = cattle.targetWeight && lastWeight
                             ? Math.min(100, Math.round((lastWeight / cattle.targetWeight) * 100))
                             : 0
@@ -345,9 +339,11 @@ export function CompareModal({
                           <td key={cattle.id}>
                             <a
                               href={`/sapi/${cattle.code}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
                               className="inline-block w-full rounded-md bg-[hsl(var(--forest))] px-3 py-2 text-[8px] font-bold text-white text-center"
                             >
-                              Lihat Detail {cattle.name}
+                              Lihat Detail
                             </a>
                           </td>
                         ))}

@@ -5,7 +5,7 @@ import { CattleWithRelations } from '@/types'
 import { formatWeight, formatDate, formatCurrency } from '@/lib/utils/formatters'
 import { calculateWeightStats } from '@/lib/utils/calculations'
 import { WeightChart } from './WeightChart'
-import { Sprout, Wheat, Pill, Droplets, ShieldCheck, NotebookTabs } from 'lucide-react'
+import { Sprout, Wheat, Pill, Droplets, TrendingUp } from 'lucide-react'
 
 interface TrackingTabsProps {
   cattle: CattleWithRelations | null
@@ -52,8 +52,13 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
   const media = cattle.media || []
   const weightStats = calculateWeightStats(weights)
 
-  const lastWeight = weights[0]?.weight
-  const firstWeight = weights[weights.length - 1]?.weight
+  // Sort weights by date ascending for calculations
+  const sortedWeights = [...weights].sort(
+    (a, b) => new Date(a.measurementDate).getTime() - new Date(b.measurementDate).getTime()
+  )
+
+  const lastWeight = sortedWeights[sortedWeights.length - 1]?.weight
+  const firstWeight = sortedWeights[0]?.weight
   const totalGain = lastWeight && firstWeight ? lastWeight - firstWeight : 0
   const weightProgress = cattle.targetWeight && lastWeight
     ? Math.min(100, (lastWeight / cattle.targetWeight) * 100)
@@ -95,34 +100,36 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
               <div>
                 <div className="mb-1 text-[9px] font-bold text-[hsl(var(--forest))]">Ringkasan</div>
                 <div className="grid grid-cols-2 gap-1.5 text-[8px]">
-                  <div className="rounded border border-[hsl(var(--line))] p-1.5">
+                  <div className="rounded border border-[hsl(var(--line))] p-1.5 bg-white">
                     <div className="text-[hsl(var(--forest))/55]">Berat Terakhir</div>
                     <div className="font-bold text-[hsl(var(--forest))]">{formatWeight(lastWeight || null)}</div>
                     <div className="text-[8px] text-[hsl(var(--forest))/50]">
-                      {weights[0]?.measurementDate ? formatDate(new Date(weights[0].measurementDate)) : '-'}
+                      {sortedWeights.length > 0
+                        ? formatDate(new Date(sortedWeights[sortedWeights.length - 1].measurementDate))
+                        : '-'}
                     </div>
                   </div>
-                  <div className="rounded border border-[hsl(var(--line))] p-1.5">
+                  <div className="rounded border border-[hsl(var(--line))] p-1.5 bg-white">
                     <div className="text-[hsl(var(--forest))/55]">Kenaikan Total</div>
                     <div className="font-bold text-[hsl(var(--forest))]">{totalGain > 0 ? `+${formatWeight(totalGain)}` : '-'}</div>
                     <div className="text-[8px] text-[hsl(var(--forest))/50]">Sejak Awal</div>
                   </div>
-                  <div className="rounded border border-[hsl(var(--line))] p-1.5">
+                  <div className="rounded border border-[hsl(var(--line))] p-1.5 bg-white">
                     <div className="text-[hsl(var(--forest))/55]">ADG</div>
                     <div className="font-bold text-[hsl(var(--forest))]">{weightStats.adg?.toFixed(2) || '-'} kg/hari</div>
                     <div className="text-[8px] text-[hsl(var(--forest))/50]">Rata-rata</div>
                   </div>
-                  <div className="rounded border border-[hsl(var(--line))] p-1.5">
+                  <div className="rounded border border-[hsl(var(--line))] p-1.5 bg-white">
                     <div className="text-[hsl(var(--forest))/55]">Target Bobot</div>
                     <div className="font-bold text-[hsl(var(--forest))]">{formatWeight(cattle.targetWeight)}</div>
                     <div className="text-[8px] text-[hsl(var(--forest))/50]">H-10idul Adha</div>
                   </div>
-                  <div className="rounded border border-[hsl(var(--line))] p-1.5">
+                  <div className="rounded border border-[hsl(var(--line))] p-1.5 bg-white">
                     <div className="text-[hsl(var(--forest))/55]">Umur</div>
                     <div className="font-bold text-[hsl(var(--forest))]">{ageMonths ? `${ageMonths} bulan` : '-'}</div>
                     <div className="text-[8px] text-[hsl(var(--forest))/50]">Perkiraan</div>
                   </div>
-                  <div className="rounded border border-[hsl(var(--line))] p-1.5">
+                  <div className="rounded border border-[hsl(var(--line))] p-1.5 bg-white">
                     <div className="text-[hsl(var(--forest))/55]">Status</div>
                     <div className="font-bold text-[hsl(var(--forest))]">{latestHealth?.status || 'Sehat'}</div>
                     <div className="text-[8px] text-[hsl(var(--forest))/50]">Aktif & lincah</div>
@@ -136,8 +143,8 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
                   <div className="text-[9px] font-bold text-[hsl(var(--forest))]">Grafik Kenaikan Bobot</div>
                   <span className="rounded border border-[hsl(var(--line))] px-2 py-1 text-[7px] text-[hsl(var(--forest))/60]">Semua</span>
                 </div>
-                <div className="rounded border border-[hsl(var(--line))] p-1.5">
-                  <WeightChart weights={weights} />
+                <div className="rounded border border-[hsl(var(--line))] p-1.5 bg-white">
+                  <WeightChart weights={sortedWeights} />
                 </div>
               </div>
 
@@ -145,12 +152,19 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
               <div>
                 <div className="mb-1 text-[9px] font-bold text-[hsl(var(--forest))]">Riwayat Timbang</div>
                 <div className="space-y-1 text-[7px] text-[hsl(var(--forest))/70]">
-                  {weights.slice(0, 6).map((w, i) => (
-                    <div key={w.id} className="flex justify-between rounded border border-[hsl(var(--line))] px-2 py-1">
-                      <span>{formatDate(new Date(w.measurementDate))}</span>
-                      <span className="font-medium">{formatWeight(w.weight)}</span>
+                  {sortedWeights.length > 0 ? (
+                    sortedWeights.slice(-6).map((w) => (
+                      <div key={w.id} className="flex justify-between rounded border border-[hsl(var(--line))] px-2 py-1 bg-white">
+                        <span>{formatDate(new Date(w.measurementDate))}</span>
+                        <span className="font-medium">{formatWeight(w.weight)}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="rounded border border-[hsl(var(--line))] p-3 text-center bg-white">
+                      <div className="text-3xl mb-1">📋</div>
+                      <div className="text-[8px] text-[hsl(var(--forest))/50]">Belum ada riwayat timbang</div>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
 
@@ -159,7 +173,7 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
                 <div className="mb-1 text-[9px] font-bold text-[hsl(var(--forest))]">Riwayat Kesehatan</div>
                 <div className="space-y-1.5 text-[7px] leading-4 text-[hsl(var(--forest))/70]">
                   {healthRecords.slice(0, 3).map((record) => (
-                    <div key={record.id} className="rounded border border-[hsl(var(--line))] p-2">
+                    <div key={record.id} className="rounded border border-[hsl(var(--line))] p-2 bg-white">
                       <div className="font-semibold text-[hsl(var(--forest))]">
                         {formatDate(new Date(record.recordDate))}
                       </div>
@@ -167,8 +181,9 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
                     </div>
                   ))}
                   {healthRecords.length === 0 && (
-                    <div className="rounded border border-[hsl(var(--line))] p-2 text-center">
-                      <div className="text-[hsl(var(--forest))/50]">Belum ada data</div>
+                    <div className="rounded border border-[hsl(var(--line))] p-3 text-center bg-white">
+                      <div className="text-3xl mb-1">🏥</div>
+                      <div className="text-[8px] text-[hsl(var(--forest))/50]">Belum ada riwayat kesehatan</div>
                     </div>
                   )}
                 </div>
@@ -177,28 +192,29 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
               {/* Pakan Summary */}
               <div>
                 <div className="mb-1 text-[9px] font-bold text-[hsl(var(--forest))]">Pakan</div>
-                <div className="space-y-1.5 text-[7px] leading-4 text-[hsl(var(--forest))/70]">
-                  {feedRecords.slice(0, 4).map((record) => (
-                    <div key={record.id} className="rounded border border-[hsl(var(--line))] p-2">
-                      {record.feedType}<br />
-                      <span className="text-[hsl(var(--forest))/50]">{record.frequency}</span>
-                    </div>
-                  ))}
-                  {feedRecords.length === 0 && (
+                <div className="space-y-1 text-[7px] leading-4 text-[hsl(var(--forest))/70]">
+                  {feedRecords.length > 0 ? (
+                    feedRecords.slice(0, 4).map((record) => (
+                      <div key={record.id} className="rounded border border-[hsl(var(--line))] p-2 bg-white">
+                        {record.feedType}<br />
+                        <span className="text-[hsl(var(--forest))/50]">{record.frequency}</span>
+                      </div>
+                    ))
+                  ) : (
                     <>
-                      <div className="rounded border border-[hsl(var(--line))] p-2">
+                      <div className="rounded border border-[hsl(var(--line))] p-2 bg-white">
                         Rumput Gajah<br />
                         <span className="text-[hsl(var(--forest))/50]">2x sehari</span>
                       </div>
-                      <div className="rounded border border-[hsl(var(--line))] p-2">
+                      <div className="rounded border border-[hsl(var(--line))] p-2 bg-white">
                         Konsentrat<br />
                         <span className="text-[hsl(var(--forest))/50]">2 kg/hari</span>
                       </div>
-                      <div className="rounded border border-[hsl(var(--line))] p-2">
+                      <div className="rounded border border-[hsl(var(--line))] p-2 bg-white">
                         Vitamin & Mineral<br />
                         <span className="text-[hsl(var(--forest))/50]">Rutin</span>
                       </div>
-                      <div className="rounded border border-[hsl(var(--line))] p-2">
+                      <div className="rounded border border-[hsl(var(--line))] p-2 bg-white">
                         Air Bersih<br />
                         <span className="text-[hsl(var(--forest))/50]">Ad libitum</span>
                       </div>
@@ -213,74 +229,83 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
         {/* TIMBANG TAB */}
         {activeTab === 'timbang' && (
           <div className="grid gap-2.5 md:grid-cols-[1fr_.9fr]">
-            <div className="rounded border border-[hsl(var(--line))] p-2.5">
+            <div className="rounded border border-[hsl(var(--line))] p-2.5 bg-white">
               <div className="mb-2 text-[11px] font-bold text-[hsl(var(--forest))]">Data Timbangan</div>
               <div className="space-y-2 text-[9px]">
-                {/* Group by month */}
-                {Object.entries(
-                  weights.reduce((acc, w) => {
-                    const date = new Date(w.measurementDate)
-                    const monthKey = date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
-                    if (!acc[monthKey]) acc[monthKey] = []
-                    acc[monthKey].push(w)
-                    return acc
-                  }, {} as Record<string, typeof weights>)
-                ).map(([month, monthWeights]) => (
-                  <div key={month}>
-                    <div className="font-semibold text-[hsl(var(--forest))]">{month}</div>
-                    <div className="mt-1 space-y-1.5 text-[hsl(var(--forest))/70]">
-                      {monthWeights.map((w) => (
-                        <div key={w.id} className="flex justify-between rounded border border-[hsl(var(--line))] px-3 py-2">
-                          <span>{formatDate(new Date(w.measurementDate))}</span>
-                          <span className="font-bold">{formatWeight(w.weight)}</span>
-                        </div>
-                      ))}
+                {sortedWeights.length > 0 ? (
+                  // Group by month
+                  Object.entries(
+                    sortedWeights.reduce((acc, w) => {
+                      const date = new Date(w.measurementDate)
+                      const monthKey = date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
+                      if (!acc[monthKey]) acc[monthKey] = []
+                      acc[monthKey].push(w)
+                      return acc
+                    }, {} as Record<string, typeof sortedWeights>)
+                  ).map(([month, monthWeights]) => (
+                    <div key={month}>
+                      <div className="font-semibold text-[hsl(var(--forest))]">{month}</div>
+                      <div className="mt-1 space-y-1.5 text-[hsl(var(--forest))/70]">
+                        {monthWeights.map((w) => (
+                          <div key={w.id} className="flex justify-between rounded border border-[hsl(var(--line))] px-3 py-2">
+                            <span>{formatDate(new Date(w.measurementDate))}</span>
+                            <span className="font-bold">{formatWeight(w.weight)}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
-                {weights.length === 0 && (
-                  <div className="text-center py-4 text-[hsl(var(--forest))/50]">
-                    Belum ada data penimbangan
+                  ))
+                ) : (
+                  <div className="rounded border border-dashed border-[hsl(var(--line))] p-6 text-center">
+                    <div className="text-4xl mb-2">📋</div>
+                    <div className="text-[11px] font-semibold text-[hsl(var(--forest))]">Belum ada Riwayat Timbang</div>
+                    <p className="mt-1 text-[9px] text-[hsl(var(--forest))/50]">
+                      Data penimbangan akan muncul setelah sapi ditimbang.
+                    </p>
                   </div>
                 )}
               </div>
             </div>
-            <div className="rounded border border-[hsl(var(--line))] p-2.5">
+            <div className="rounded border border-[hsl(var(--line))] p-2.5 bg-white">
               <div className="mb-2 text-[11px] font-bold text-[hsl(var(--forest))]">Grafik Perkembangan</div>
-              <WeightChart weights={weights} height={200} />
+              <WeightChart weights={sortedWeights} height={200} />
             </div>
           </div>
         )}
 
         {/* KESEHATAN TAB */}
         {activeTab === 'kesehatan' && (
-          <div className="rounded border border-[hsl(var(--line))] p-2.5">
+          <div className="rounded border border-[hsl(var(--line))] p-2.5 bg-white">
             <div className="mb-3 text-[11px] font-bold text-[hsl(var(--forest))]">Riwayat Kesehatan</div>
             <div className="space-y-2">
-              {healthRecords.map((record) => (
-                <div key={record.id} className="rounded border border-[hsl(var(--line))] bg-[hsl(var(--cream2))] p-3 text-[9px]">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="font-semibold text-[hsl(var(--forest))]">
-                      {formatDate(new Date(record.recordDate))}
+              {healthRecords.length > 0 ? (
+                healthRecords.map((record) => (
+                  <div key={record.id} className="rounded border border-[hsl(var(--line))] bg-[hsl(var(--cream2))] p-3 text-[9px]">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="font-semibold text-[hsl(var(--forest))]">
+                        {formatDate(new Date(record.recordDate))}
+                      </div>
+                      <span className={`px-2 py-1 rounded text-[7px] font-medium ${
+                        record.status === 'SEHAT' ? 'bg-green-100 text-green-700' :
+                        record.status === 'SAKIT' ? 'bg-red-100 text-red-700' :
+                        'bg-amber-100 text-amber-700'
+                      }`}>
+                        {record.status}
+                      </span>
                     </div>
-                    <span className={`px-2 py-1 rounded text-[7px] font-medium ${
-                      record.status === 'SEHAT' ? 'bg-green-100 text-green-700' :
-                      record.status === 'SAKIT' ? 'bg-red-100 text-red-700' :
-                      'bg-amber-100 text-amber-700'
-                    }`}>
-                      {record.status}
-                    </span>
+                    <p className="text-[hsl(var(--forest))/70]">{record.healthType}</p>
+                    {record.notes && (
+                      <p className="mt-1 text-[hsl(var(--forest))/60]">{record.notes}</p>
+                    )}
                   </div>
-                  <p className="text-[hsl(var(--forest))/70]">{record.healthType}</p>
-                  {record.notes && (
-                    <p className="mt-1 text-[hsl(var(--forest))/60]">{record.notes}</p>
-                  )}
-                </div>
-              ))}
-              {healthRecords.length === 0 && (
-                <div className="text-center py-8 text-[hsl(var(--forest))/50]">
+                ))
+              ) : (
+                <div className="rounded border border-dashed border-[hsl(var(--line))] p-8 text-center">
                   <div className="text-4xl mb-2">🏥</div>
-                  <p>Belum ada data kesehatan</p>
+                  <div className="text-[11px] font-semibold text-[hsl(var(--forest))]">Belum ada Riwayat Kesehatan</div>
+                  <p className="mt-1 text-[9px] text-[hsl(var(--forest))/50]">
+                    Data kesehatan akan muncul setelah pemeriksaan.
+                  </p>
                 </div>
               )}
             </div>
@@ -289,7 +314,7 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
 
         {/* PAKAN TAB */}
         {activeTab === 'pakan' && (
-          <div className="rounded border border-[hsl(var(--line))] p-2.5">
+          <div className="rounded border border-[hsl(var(--line))] p-2.5 bg-white">
             <div className="mb-3 text-[11px] font-bold text-[hsl(var(--forest))]">Treatment Pakan</div>
             <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
               {feedRecords.length > 0 ? (
@@ -335,7 +360,7 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
                     </div>
                     <div className="text-[hsl(var(--forest))/70]">Untuk pakan utama hijauan.</div>
                   </div>
-                  <div className="rounded border border-[hsl(var(--line))] p-2.5 text-[9px]">
+                  <div className="rounded border border-[hsl(var(--line))] p-3 text-[9px]">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="grid h-9 w-9 place-items-center rounded-lg bg-[hsl(var(--cream))] text-[hsl(var(--forest))]">
                         <Wheat className="h-4 w-4" />
@@ -347,7 +372,7 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
                     </div>
                     <div className="text-[hsl(var(--forest))/70]">Untuk menjaga pertumbuhan bobot.</div>
                   </div>
-                  <div className="rounded border border-[hsl(var(--line))] p-2.5 text-[9px]">
+                  <div className="rounded border border-[hsl(var(--line))] p-3 text-[9px]">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="grid h-9 w-9 place-items-center rounded-lg bg-[hsl(var(--cream))] text-[hsl(var(--forest))]">
                         <Pill className="h-4 w-4" />
@@ -359,7 +384,7 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
                     </div>
                     <div className="text-[hsl(var(--forest))/70]">Diberikan rutin sesuai kebutuhan.</div>
                   </div>
-                  <div className="rounded border border-[hsl(var(--line))] p-2.5 text-[9px]">
+                  <div className="rounded border border-[hsl(var(--line))] p-3 text-[9px]">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="grid h-9 w-9 place-items-center rounded-lg bg-[hsl(var(--cream))] text-[hsl(var(--forest))]">
                         <Droplets className="h-4 w-4" />
@@ -384,7 +409,7 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
 
         {/* DOKUMENTASI TAB */}
         {activeTab === 'dokumentasi' && (
-          <div className="rounded border border-[hsl(var(--line))] p-3">
+          <div className="rounded border border-[hsl(var(--line))] p-3 bg-white">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <div className="text-[11px] font-bold text-[hsl(var(--forest))]">Dokumentasi Foto & Video</div>
@@ -422,9 +447,12 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-[hsl(var(--forest))/50]">
+              <div className="rounded border border-dashed border-[hsl(var(--line))] p-8 text-center">
                 <div className="text-4xl mb-2">📷</div>
-                <p>Belum ada dokumentasi</p>
+                <div className="text-[11px] font-semibold text-[hsl(var(--forest))]">Belum ada Dokumentasi</div>
+                <p className="mt-1 text-[9px] text-[hsl(var(--forest))/50]">
+                  Dokumentasi foto dan video akan muncul setelah ada yang diupload.
+                </p>
               </div>
             )}
           </div>

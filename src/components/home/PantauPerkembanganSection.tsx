@@ -9,16 +9,48 @@ import { CompareModal } from './CompareModal'
 interface PantauPerkembanganSectionProps {
   cattle: CattleWithRelations | null
   allCattle?: CattleWithRelations[]
+  comparingCattle?: CattleWithRelations[]
+  onCompareSelect?: (cattle: CattleWithRelations) => void
+  onOpenCompare?: () => void
 }
 
-export function PantauPerkembanganSection({ cattle, allCattle = [] }: PantauPerkembanganSectionProps) {
+export function PantauPerkembanganSection({
+  cattle,
+  allCattle = [],
+  comparingCattle = [],
+  onCompareSelect,
+  onOpenCompare
+}: PantauPerkembanganSectionProps) {
   const [compareModalOpen, setCompareModalOpen] = useState(false)
   const [selectedForCompare, setSelectedForCompare] = useState<CattleWithRelations[]>([])
 
   const handleOpenCompare = () => {
-    setSelectedForCompare(cattle ? [cattle] : [])
+    // Start with current cattle if selected, otherwise use comparing cattle
+    const initial = cattle ? [cattle] : comparingCattle.slice(0, 3)
+    setSelectedForCompare(initial)
     setCompareModalOpen(true)
   }
+
+  const handleSelectCattle = (c: CattleWithRelations) => {
+    if (onCompareSelect) {
+      onCompareSelect(c)
+    } else {
+      setSelectedForCompare(prev => {
+        if (prev.find(x => x.id === c.id)) {
+          return prev.filter(x => x.id !== c.id)
+        }
+        if (prev.length >= 3) return prev
+        return [...prev, c]
+      })
+    }
+  }
+
+  // Use external handler if provided, otherwise use internal
+  const handleClose = () => {
+    setCompareModalOpen(false)
+  }
+
+  const activeComparingCattle = onCompareSelect ? comparingCattle : selectedForCompare
 
   return (
     <section className="tracking-section reveal mx-auto max-w-[1400px] px-4 pb-3 sm:px-5 lg:px-8">
@@ -28,7 +60,8 @@ export function PantauPerkembanganSection({ cattle, allCattle = [] }: PantauPerk
           <aside className="tracking-aside border-b border-[hsl(var(--line))] p-2.5 lg:border-b-0 lg:border-r">
             <SelectedCattleDetail
               cattle={cattle}
-              onCompare={handleOpenCompare}
+              onCompare={onOpenCompare || handleOpenCompare}
+              isComparing={cattle ? comparingCattle.some(c => c.id === cattle.id) : false}
             />
           </aside>
 
@@ -42,18 +75,10 @@ export function PantauPerkembanganSection({ cattle, allCattle = [] }: PantauPerk
       {/* Compare Modal */}
       <CompareModal
         isOpen={compareModalOpen}
-        onClose={() => setCompareModalOpen(false)}
-        selectedCattle={selectedForCompare}
+        onClose={handleClose}
+        selectedCattle={activeComparingCattle}
         allCattle={allCattle}
-        onSelectCattle={(c) => {
-          setSelectedForCompare(prev => {
-            if (prev.find(x => x.id === c.id)) {
-              return prev.filter(x => x.id !== c.id)
-            }
-            if (prev.length >= 3) return prev
-            return [...prev, c]
-          })
-        }}
+        onSelectCattle={handleSelectCattle}
       />
     </section>
   )
