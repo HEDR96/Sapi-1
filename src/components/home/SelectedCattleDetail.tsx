@@ -18,14 +18,14 @@ export function SelectedCattleDetail({ cattle, onCompare, isComparing = false }:
   if (!cattle) {
     return (
       <div className="h-full rounded-xl border border-dashed border-[hsl(var(--line))] bg-[hsl(var(--cream))]/50 flex flex-col items-center justify-center p-4 text-center min-h-[300px]">
-        <div className="text-4xl mb-2">🐂</div>
-        <h3 className="text-sm font-semibold text-[hsl(var(--forest))]">
-          Pilih Sapi
-        </h3>
-        <p className="text-xs text-[hsl(var(--forest))/60] mt-1">
-          Pilih sapi dari katalog untuk melihat detail perkembangan
-        </p>
-      </div>
+  <Image src="/images/cow-seeklogo.png" alt="" width={64} height={64} className="mb-2 opacity-60" />
+  <h3 className="text-sm font-semibold text-[hsl(var(--forest))]">
+    Pilih Sapi
+  </h3>
+  <p className="text-xs text-[hsl(var(--forest))/60] mt-1">
+    Pilih sapi dari katalog untuk melihat detail perkembangan
+  </p>
+</div>
     )
   }
 

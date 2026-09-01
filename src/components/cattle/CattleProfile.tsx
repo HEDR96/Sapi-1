@@ -32,6 +32,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
   const [lightboxIndex, setLightboxIndex] = useState(0)
   const [currentUserId, setCurrentUserId] = useState<string | undefined>()
   const [showBookingModal, setShowBookingModal] = useState(false)
+  const [mobileView, setMobileView] = useState<'gallery' | 'details'>('gallery')
 
   const weightData = cattle.weights?.map((w) => ({
     id: w.id,
@@ -51,8 +52,6 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
   ]
 
   const isAvailable = cattle.status === 'AVAILABLE'
-  const isBooked = cattle.status === 'BOOKED'
-  const isSold = cattle.status === 'SOLD'
 
   // Collect all images
   const allImages = [
@@ -86,10 +85,10 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
 
   const tabs = [
     { key: 'summary', label: 'Ringkasan' },
-    { key: 'weights', label: 'Riwayat Timbang' },
+    { key: 'weights', label: 'Timbang' },
     { key: 'health', label: 'Kesehatan' },
     { key: 'feed', label: 'Pakan' },
-    { key: 'media', label: 'Dokumentasi' },
+    { key: 'media', label: 'Media' },
   ] as const
 
   const handleShare = async () => {
@@ -118,14 +117,238 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
 
   return (
     <div className="mx-auto my-2 max-w-[1500px] overflow-hidden border border-black/30 bg-[hsl(var(--cream2))] shadow-2xl">
-      <div className="container py-6">
+      <div className="px-3 py-4 sm:px-4 sm:py-6">
         <Breadcrumb items={breadcrumbItems} />
 
+        {/* Mobile View Toggle */}
+        <div className="flex lg:hidden mt-4 mb-2">
+          <div className="flex w-full rounded-lg border border-[hsl(var(--line))] bg-white p-1">
+            <button
+              onClick={() => setMobileView('gallery')}
+              className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold transition-colors ${
+                mobileView === 'gallery'
+                  ? 'bg-[hsl(var(--forest))] text-white'
+                  : 'text-[hsl(var(--forest))/70]'
+              }`}
+            >
+              Galeri Foto
+            </button>
+            <button
+              onClick={() => setMobileView('details')}
+              className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold transition-colors ${
+                mobileView === 'details'
+                  ? 'bg-[hsl(var(--forest))] text-white'
+                  : 'text-[hsl(var(--forest))/70]'
+              }`}
+            >
+              Detail Sapi
+            </button>
+          </div>
+        </div>
+
         {/* Main Content Card */}
-        <div className="mt-6 rounded-lg border border-[hsl(var(--line))] bg-white shadow-card">
-          <div className="grid lg:grid-cols-[360px_1fr]">
+        <div className="mt-4 rounded-lg border border-[hsl(var(--line))] bg-white shadow-card">
+          {/* Mobile Gallery View */}
+          <div className={`lg:hidden ${mobileView === 'gallery' ? 'block' : 'hidden'}`}>
+            {/* Mobile Image Gallery */}
+            <div className="p-4">
+              {/* Main Image */}
+              <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-[hsl(var(--cream))]">
+                {allImages[currentImageIndex] ? (
+                  <>
+                    <Image
+                      src={getDirectImageUrl(allImages[currentImageIndex])}
+                      alt={cattle.name}
+                      fill
+                      className="object-cover cursor-pointer"
+                      onClick={() => openLightbox(currentImageIndex)}
+                      sizes="(max-width: 1024px) 100vw, 360px"
+                    />
+                    {allImages.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1))}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors shadow-md"
+                        >
+                          <ChevronLeft className="h-4 w-4 text-[hsl(var(--forest))]" />
+                        </button>
+                        <button
+                          onClick={() => setCurrentImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1))}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors shadow-md"
+                        >
+                          <ChevronRight className="h-4 w-4 text-[hsl(var(--forest))]" />
+                        </button>
+                      </>
+                    )}
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] text-white font-medium">
+                      {currentImageIndex + 1} / {allImages.length}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-[hsl(var(--forest))/50]">
+                    Tidak ada foto
+                  </div>
+                )}
+              </div>
+
+              {/* Thumbnail Strip */}
+              {allImages.length > 1 && (
+                <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+                  {allImages.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentImageIndex(idx)}
+                      className={`relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
+                        idx === currentImageIndex
+                          ? 'border-[hsl(var(--forest))]'
+                          : 'border-transparent'
+                      }`}
+                    >
+                      <Image src={getDirectImageUrl(img)} alt="" fill className="object-cover" sizes="56px" />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Quick Info on Mobile */}
+              <div className="mt-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <h1 className="text-xl font-bold text-[hsl(var(--forest))]">{cattle.name}</h1>
+                  <StatusBadge status={cattle.status} />
+                </div>
+                <p className="text-[11px] text-[hsl(var(--forest))/55] mb-2">{cattle.code}</p>
+                <p className="text-lg font-extrabold text-[hsl(var(--forest))]">
+                  {formatCurrency(Number(cattle.price))}
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <a
+                  href={`https://wa.me/6281234567890?text=Halo,%20saya%20tertarik%20dengan%20sapi%20${cattle.name}%20(${cattle.code})`}
+                  className="flex items-center justify-center gap-2 rounded-lg bg-[hsl(var(--forest))] px-3 py-3 text-xs font-semibold text-white hover:bg-[hsl(var(--forest2))] transition-colors"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  WhatsApp
+                </a>
+                <button
+                  onClick={handleShare}
+                  className="flex items-center justify-center gap-2 rounded-lg border border-[hsl(var(--line))] bg-white px-3 py-3 text-xs font-semibold text-[hsl(var(--forest))] hover:bg-[hsl(var(--cream))] transition-colors"
+                >
+                  <Share2 className="h-4 w-4" />
+                  Bagikan
+                </button>
+              </div>
+
+              {isAvailable && (
+                <button
+                  onClick={handleBookingClick}
+                  className="mt-2 w-full flex items-center justify-center gap-2 rounded-lg bg-[hsl(var(--gold))] px-3 py-3 text-xs font-semibold text-[hsl(var(--forest))] hover:bg-[hsl(var(--gold))/90] transition-colors"
+                >
+                  <Check className="h-4 w-4" />
+                  Booking Sekarang
+                </button>
+              )}
+
+              {/* Quick Details */}
+              <div className="mt-4 rounded-xl border border-[hsl(var(--line))] bg-[hsl(var(--cream2))] p-3">
+                <dl className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div className="flex justify-between"><dt className="text-[hsl(var(--forest))/55]">Jenis</dt><dd className="font-semibold text-[hsl(var(--forest))]">{cattle.breed}</dd></div>
+                  <div className="flex justify-between"><dt className="text-[hsl(var(--forest))/55]">Bobot</dt><dd className="font-semibold text-[hsl(var(--forest))]">{formatWeight(weightStats.lastWeight)}</dd></div>
+                  <div className="flex justify-between"><dt className="text-[hsl(var(--forest))/55]">ADG</dt><dd className="font-semibold text-[hsl(var(--forest))]">{formatADG(weightStats.adg ?? 0)}</dd></div>
+                  <div className="flex justify-between"><dt className="text-[hsl(var(--forest))/55]">Target</dt><dd className="font-semibold text-[hsl(var(--forest))]">{formatWeight(cattle.targetWeight)}</dd></div>
+                </dl>
+              </div>
+
+              <button
+                onClick={() => setMobileView('details')}
+                className="mt-3 w-full rounded-lg bg-[hsl(var(--forest))] px-4 py-2.5 text-xs font-semibold text-white"
+              >
+                Lihat Detail Lengkap →
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Details View */}
+          <div className={`lg:hidden ${mobileView === 'details' ? 'block' : 'hidden'}`}>
+            <div className="p-4">
+              {/* Back Button & Header */}
+              <div className="mb-4">
+                <button
+                  onClick={() => setMobileView('gallery')}
+                  className="flex items-center gap-1 text-xs text-[hsl(var(--forest))/70] mb-2 hover:text-[hsl(var(--forest))]"
+                >
+                  ← Kembali ke Galeri
+                </button>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-bold text-[hsl(var(--forest))]">{cattle.name}</h1>
+                  <StatusBadge status={cattle.status} />
+                </div>
+                <p className="text-[11px] text-[hsl(var(--forest))/55]">{cattle.code}</p>
+              </div>
+
+              {/* Quick Stats */}
+              {weightStats.lastWeight > 0 && (
+                <div className="mb-4">
+                  <CattleStats
+                    lastWeight={weightStats.lastWeight}
+                    adg={weightStats.adg}
+                    targetWeight={cattle.targetWeight || null}
+                    progressPercentage={targetEstimation?.progressPercentage || 0}
+                  />
+                </div>
+              )}
+
+              {/* Mobile Tabs */}
+              <div className="border-b border-[hsl(var(--line))] -mx-4 px-4">
+                <div className="scroll-thin flex gap-1 overflow-x-auto pb-1">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.key}
+                      onClick={() => setActiveTab(tab.key)}
+                      className={`whitespace-nowrap rounded-t-md px-3 py-2 text-[10px] font-semibold transition-colors ${
+                        activeTab === tab.key
+                          ? 'bg-[hsl(var(--forest))] text-white'
+                          : 'text-[hsl(var(--forest))/70] hover:bg-[hsl(var(--cream))]'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tab Content */}
+              <div className="pt-4">
+                {activeTab === 'summary' && (
+                  <SummaryTab weightStats={weightStats} targetEstimation={targetEstimation} cattle={cattle} />
+                )}
+                {activeTab === 'weights' && (
+                  <WeightHistoryTab weights={cattle.weights || []} />
+                )}
+                {activeTab === 'health' && (
+                  <HealthHistoryTab records={cattle.healthRecords || []} />
+                )}
+                {activeTab === 'feed' && (
+                  <FeedHistoryTab records={cattle.feedRecords || []} />
+                )}
+                {activeTab === 'media' && (
+                  <MediaTab media={cattle.media || []} />
+                )}
+              </div>
+
+              <CommentSection
+                cattleId={cattle.id}
+                cattleCode={cattle.code}
+                currentUserId={currentUserId}
+              />
+            </div>
+          </div>
+
+          {/* Desktop Layout - Side by Side */}
+          <div className="hidden lg:grid lg:grid-cols-[340px_1fr]">
             {/* Left Sidebar - Photo & Info */}
-            <aside className="border-b border-[hsl(var(--line))] p-4 lg:border-b-0 lg:border-r">
+            <aside className="border-b lg:border-b-0 lg:border-r border-[hsl(var(--line))] p-5">
               {/* Image Gallery with Pagination */}
               <div className="space-y-3">
                 {/* Main Image */}
@@ -138,9 +361,8 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
                         fill
                         className="object-cover cursor-pointer"
                         onClick={() => openLightbox(currentImageIndex)}
-                        sizes="(max-width: 1024px) 100vw, 360px"
+                        sizes="340px"
                       />
-                      {/* Navigation Arrows */}
                       {allImages.length > 1 && (
                         <>
                           <button
@@ -157,7 +379,6 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
                           </button>
                         </>
                       )}
-                      {/* Image Counter */}
                       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-[10px] text-white font-medium">
                         {currentImageIndex + 1} / {allImages.length}
                       </div>
@@ -193,13 +414,13 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
                       <button
                         key={idx}
                         onClick={() => setCurrentImageIndex(idx)}
-                        className={`relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
+                        className={`relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
                           idx === currentImageIndex
                             ? 'border-[hsl(var(--forest))]'
                             : 'border-transparent hover:border-[hsl(var(--forest))/50'
                         }`}
                       >
-                        <Image src={getDirectImageUrl(img)} alt="" fill className="object-cover" sizes="64px" />
+                        <Image src={getDirectImageUrl(img)} alt="" fill className="object-cover" sizes="56px" />
                       </button>
                     ))}
                   </div>
@@ -207,10 +428,10 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
               </div>
 
               {/* Price & Details */}
-              <div className="mt-4 rounded-xl border border-[hsl(var(--line))] bg-white p-4">
+              <div className="mt-5 rounded-xl border border-[hsl(var(--line))] bg-white p-4">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[11px] font-semibold text-[hsl(var(--forest))/55]">Harga</span>
-                  <strong className="text-[20px] font-extrabold text-[hsl(var(--forest))]">
+                  <strong className="text-xl font-extrabold text-[hsl(var(--forest))]">
                     {formatCurrency(Number(cattle.price))}
                   </strong>
                 </div>
@@ -248,7 +469,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
                   <Share2 className="h-4 w-4" />
                   Bagikan
                 </button>
-                {(isAvailable) && (
+                {isAvailable && (
                   <button
                     onClick={handleBookingClick}
                     className="col-span-2 flex items-center justify-center gap-2 rounded-lg bg-[hsl(var(--gold))] px-3 py-3 text-[12px] font-semibold text-[hsl(var(--forest))] hover:bg-[hsl(var(--gold))/90] transition-colors"
@@ -261,11 +482,11 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
             </aside>
 
             {/* Main Content */}
-            <div className="p-4">
+            <div className="p-5">
               {/* Header */}
               <div className="mb-4">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <h1 className="text-[30px] font-bold text-[hsl(var(--forest))]">{cattle.name}</h1>
+                  <h1 className="text-2xl sm:text-[30px] font-bold text-[hsl(var(--forest))]">{cattle.name}</h1>
                   <StatusBadge status={cattle.status} />
                 </div>
                 <p className="text-[12px] text-[hsl(var(--forest))/55]">{cattle.code}</p>
@@ -339,43 +560,43 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
         </div>
 
         {/* QR Code Section */}
-        <div className="mt-4">
+        <div className="mt-4 hidden lg:block">
           <QRCodeCard code={cattle.code} name={cattle.name} />
         </div>
       </div>
 
       {/* Image Lightbox */}
       {lightboxOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 p-4">
           <button
             onClick={closeLightbox}
             className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 z-10"
           >
-            <X className="h-6 w-6" />
+            <X className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
 
           <button
             onClick={prevImage}
-            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20"
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 sm:p-3 text-white hover:bg-white/20"
           >
-            <ChevronLeft className="h-8 w-8" />
+            <ChevronLeft className="h-6 w-6 sm:h-8 sm:w-8" />
           </button>
 
-          <div className="relative h-[80vh] w-[80vw] max-w-5xl">
+          <div className="relative h-[60vh] sm:h-[80vh] w-full max-w-3xl sm:max-w-5xl">
             <Image
               src={allImages[lightboxIndex]}
               alt={`${cattle.name} - Image ${lightboxIndex + 1}`}
               fill
               className="object-contain"
-              sizes="80vw"
+              sizes="(max-width: 768px) 100vw, 80vw"
             />
           </div>
 
           <button
             onClick={nextImage}
-            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20"
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 sm:p-3 text-white hover:bg-white/20"
           >
-            <ChevronRight className="h-8 w-8" />
+            <ChevronRight className="h-6 w-6 sm:h-8 sm:w-8" />
           </button>
 
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
@@ -383,14 +604,14 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
               <button
                 key={idx}
                 onClick={() => setLightboxIndex(idx)}
-                className={`h-2.5 w-2.5 rounded-full transition-all ${
-                  idx === lightboxIndex ? 'bg-white w-6' : 'bg-white/50'
+                className={`h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full transition-all ${
+                  idx === lightboxIndex ? 'bg-white w-5 sm:w-6' : 'bg-white/50'
                 }`}
               />
             ))}
           </div>
 
-          <div className="absolute bottom-4 right-4 text-white text-[12px]">
+          <div className="absolute bottom-4 right-4 text-white text-[10px] sm:text-[12px]">
             {lightboxIndex + 1} / {allImages.length}
           </div>
         </div>

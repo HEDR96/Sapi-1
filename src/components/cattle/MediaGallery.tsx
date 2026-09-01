@@ -17,7 +17,7 @@ export function MediaGallery({ media }: MediaGalleryProps) {
   if (!media || media.length === 0) {
     return (
       <div className="text-center py-8 text-[hsl(var(--forest))/50]">
-        <div className="text-4xl mb-2">📷</div>
+        <div className="text-4xl mb-2"></div>
         <p>Belum ada dokumentasi</p>
       </div>
     )

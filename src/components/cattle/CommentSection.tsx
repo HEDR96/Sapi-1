@@ -153,7 +153,7 @@ export function CommentSection({ cattleId, cattleCode, currentUserId }: CommentS
         </div>
       ) : comments.length === 0 ? (
         <div className="text-center py-8 text-[hsl(var(--forest))/50]">
-          <div className="text-4xl mb-2">💬</div>
+          <div className="text-4xl mb-2"></div>
           <p className="text-sm">Belum ada komentar. Jadilah yang pertama!</p>
         </div>
       ) : (

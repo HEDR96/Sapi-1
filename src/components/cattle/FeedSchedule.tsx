@@ -20,7 +20,9 @@ export function FeedSchedule({ records }: FeedScheduleProps) {
   if (!records || records.length === 0) {
     return (
       <div className="text-center py-8 text-[hsl(var(--forest))/50]">
-        <div className="text-4xl mb-2">🌿</div>
+        <div className="text-4xl mb-2 flex justify-center">
+  <img src="/images/10274305501591055829.svg" alt="feed" className="w-10 h-10 opacity-60" />
+</div>
         <p>Belum ada data pakan</p>
       </div>
     )

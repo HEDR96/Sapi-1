@@ -80,7 +80,7 @@ export function RecentComments() {
             ))
           ) : (
             <div className="text-center py-8 bg-white rounded-lg border border-[hsl(var(--line))]">
-              <div className="text-4xl mb-2">💬</div>
+              <div className="text-4xl mb-2"></div>
               <p className="text-[hsl(var(--forest))/70]">
                 Belum ada komentar. Jadilah yang pertama!
               </p>
