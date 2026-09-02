@@ -60,7 +60,6 @@ export default function KatalogPage() {
         <div className="mx-auto max-w-[1500px] px-4 py-8 sm:px-6 lg:px-8">
           <Breadcrumb
             items={[{ label: 'Beranda', href: '/' }, { label: 'Katalog' }]}
-            lightMode
           />
           <h1 className="mt-4 text-2xl sm:text-3xl font-bold">Katalog Sapi</h1>
           <p className="mt-2 text-white/70">
