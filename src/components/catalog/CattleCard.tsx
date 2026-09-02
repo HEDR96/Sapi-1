@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Columns3, Check } from 'lucide-react'
+import { Columns3, Check, Film } from 'lucide-react'
 import { Status } from '@/types'
 import { StatusBadge } from './CattleStatusBadge'
 import { formatCurrency, formatWeight } from '@/lib/utils/formatters'
-import { getDirectImageUrl } from '@/lib/utils/imageUrl'
+import { getDirectImageUrl, isVideoUrl } from '@/lib/utils/imageUrl'
 
 interface CattleCardProps {
   id: string
@@ -52,7 +52,7 @@ export function CattleCard({
     >
       {/* Image Container */}
       <div className="relative aspect-[4/3] overflow-hidden rounded-t-lg">
-        {mainImage ? (
+        {mainImage && !isVideoUrl(mainImage) ? (
           <>
             <Image
               src={getDirectImageUrl(mainImage)}
@@ -97,6 +97,13 @@ export function CattleCard({
               </div>
             )}
           </>
+        ) : mainImage && isVideoUrl(mainImage) ? (
+          <div className="flex h-full items-center justify-center bg-gradient-to-br from-[hsl(var(--forest))/20] to-[hsl(var(--forest))/40]">
+            <div className="flex flex-col items-center gap-1">
+              <Film className="h-8 w-8 text-[hsl(var(--forest))/50]" />
+              <span className="text-[9px] text-[hsl(var(--forest))/60]">Video</span>
+            </div>
+          </div>
         ) : (
           <div className="flex h-full items-center justify-center bg-[hsl(var(--cream))]">
             <span className="text-[10px] text-[hsl(var(--forest))/50]">Tidak Ada Foto</span>

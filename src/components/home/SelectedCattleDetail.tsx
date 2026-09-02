@@ -5,8 +5,8 @@ import { QRCodeSVG } from 'qrcode.react'
 import { CattleWithRelations } from '@/types'
 import { StatusBadge } from '@/components/catalog/CattleStatusBadge'
 import { formatWeight, formatCurrency, formatDate } from '@/lib/utils/formatters'
-import { getDirectImageUrl } from '@/lib/utils/imageUrl'
-import { ScanLine, Columns3, Check } from 'lucide-react'
+import { getDirectImageUrl, isVideoUrl } from '@/lib/utils/imageUrl'
+import { ScanLine, Columns3, Check, Film } from 'lucide-react'
 
 interface SelectedCattleDetailProps {
   cattle: CattleWithRelations | null
@@ -48,8 +48,12 @@ export function SelectedCattleDetail({ cattle, onCompare, isComparing = false }:
         <div className="grid grid-cols-[64px_1fr] gap-2">
           {/* Photo */}
           <div className="h-14 rounded bg-cover bg-center relative">
-            {cattle.mainImage ? (
+            {cattle.mainImage && !isVideoUrl(cattle.mainImage) ? (
               <Image src={getDirectImageUrl(cattle.mainImage)} alt={cattle.name} fill className="object-cover rounded" />
+            ) : cattle.mainImage && isVideoUrl(cattle.mainImage) ? (
+              <div className="flex items-center justify-center h-full bg-gradient-to-br from-[hsl(var(--forest))/20] to-[hsl(var(--forest))/40] rounded">
+                <Film className="h-6 w-6 text-[hsl(var(--forest))/50]" />
+              </div>
             ) : (
               <div className="flex items-center justify-center h-full bg-[hsl(var(--cream))] rounded text-[hsl(var(--forest))/30] text-xs">
                 N/A

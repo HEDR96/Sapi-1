@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { CattleMedia } from '@/types'
+import { isVideoUrl } from '@/lib/utils/imageUrl'
 
 interface CattleGalleryProps {
   mainImage: string | null
@@ -18,7 +19,12 @@ export function CattleGallery({ mainImage, media }: CattleGalleryProps) {
     ...media
       .filter((m) => m.fileType === 'IMAGE')
       .map((m) => m.fileUrl),
-  ].filter(Boolean) as string[]
+  ].filter((url): url is string => {
+    if (!url) return false
+    // Skip video stream URLs
+    if (isVideoUrl(url)) return false
+    return true
+  })
 
   if (allImages.length === 0) {
     return (

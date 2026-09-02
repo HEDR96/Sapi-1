@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { X, Columns3, Check } from 'lucide-react'
+import { X, Columns3, Check, Film } from 'lucide-react'
 import { CattleWithRelations } from '@/types'
 import { StatusBadge } from '@/components/catalog/CattleStatusBadge'
 import { formatWeight, formatCurrency, formatDate } from '@/lib/utils/formatters'
 import { calculateWeightStats } from '@/lib/utils/calculations'
-import { getDirectImageUrl } from '@/lib/utils/imageUrl'
+import { getDirectImageUrl, isVideoUrl } from '@/lib/utils/imageUrl'
 
 interface CompareModalProps {
   isOpen: boolean
@@ -131,13 +131,17 @@ export function CompareModal({
                       </div>
                     )}
                     <div className="aspect-video rounded-lg overflow-hidden bg-[hsl(var(--cream))] mb-2 relative">
-                      {cattle.mainImage ? (
+                      {cattle.mainImage && !isVideoUrl(cattle.mainImage) ? (
                         <Image
                           src={getDirectImageUrl(cattle.mainImage)}
                           alt={cattle.name}
                           fill
                           className="object-cover object-top"
                         />
+                      ) : cattle.mainImage && isVideoUrl(cattle.mainImage) ? (
+                        <div className="flex items-center justify-center h-full bg-gradient-to-br from-[hsl(var(--forest))/20] to-[hsl(var(--forest))/40]">
+                          <Film className="h-8 w-8 text-[hsl(var(--forest))/50]" />
+                        </div>
                       ) : (
                         <div className="flex items-center justify-center h-full text-[hsl(var(--forest))/30] text-xs">
                           N/A
@@ -209,13 +213,17 @@ export function CompareModal({
                               </div>
                               {/* Image - Full width per column */}
                               <div className="mt-2 h-32 rounded-lg overflow-hidden relative bg-[hsl(var(--cream))]">
-                                {cattle.mainImage ? (
+                                {cattle.mainImage && !isVideoUrl(cattle.mainImage) ? (
                                   <Image
                                     src={getDirectImageUrl(cattle.mainImage)}
                                     alt={cattle.name}
                                     fill
                                     className="object-cover object-top"
                                   />
+                                ) : cattle.mainImage && isVideoUrl(cattle.mainImage) ? (
+                                  <div className="flex items-center justify-center h-full bg-gradient-to-br from-[hsl(var(--forest))/20] to-[hsl(var(--forest))/40]">
+                                    <Film className="h-6 w-6 text-[hsl(var(--forest))/50]" />
+                                  </div>
                                 ) : (
                                   <div className="flex items-center justify-center h-full text-[hsl(var(--forest))/30]">
                                     N/A

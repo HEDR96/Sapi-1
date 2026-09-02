@@ -53,11 +53,16 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
 
   const isAvailable = cattle.status === 'AVAILABLE'
 
-  // Collect all images
+  // Collect all images (excluding video URLs from mainImage)
   const allImages = [
     cattle.mainImage,
     ...(cattle.media?.filter(m => m.fileType === 'IMAGE').map(m => m.fileUrl) || [])
-  ].filter(Boolean) as string[]
+  ].filter((url): url is string => {
+    if (!url) return false
+    // Skip video stream URLs - they should be handled as videos, not images
+    if (url.includes('/api/stream?') || url.includes('mimeType=video')) return false
+    return true
+  })
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 

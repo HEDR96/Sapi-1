@@ -1,4 +1,12 @@
 /**
+ * Check if a URL is a video stream URL
+ */
+export function isVideoUrl(url: string | null | undefined): boolean {
+  if (!url) return false
+  return url.includes('/api/stream?') || url.includes('mimeType=video')
+}
+
+/**
  * Convert Google Drive URL to direct image URL
  *
  * Google Drive URLs like:
@@ -9,6 +17,9 @@
  */
 export function getDirectImageUrl(url: string | null | undefined): string {
   if (!url) return ''
+
+  // Don't process video URLs as images
+  if (isVideoUrl(url)) return ''
 
   // If already a proxy URL, return as is
   if (url.startsWith('/api/')) return url
