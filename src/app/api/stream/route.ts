@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
             { fileId, alt: 'media' },
             { responseType: 'stream' }
           )
-          const stream = fullResponse.data as ReadableStream
+          const stream = fullResponse.data as unknown as ReadableStream
           return new Response(stream, {
             headers: {
               'Content-Type': mimeType,
