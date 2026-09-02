@@ -75,11 +75,11 @@ export async function POST(request: NextRequest) {
 
     // Create booking and notification in a transaction
     const booking = await prisma.$transaction(async (tx) => {
-      // Create booking
+      // Create booking - connect to existing cattle and user records
       const newBooking = await tx.booking.create({
         data: {
-          cattleId,
-          userId,
+          cattle: { connect: { id: cattleId } },
+          user: { connect: { id: userId } },
           quantity,
           notes: notes || null,
           status: 'PENDING',
