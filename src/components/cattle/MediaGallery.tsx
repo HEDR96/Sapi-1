@@ -17,7 +17,7 @@ export function MediaGallery({ media }: MediaGalleryProps) {
   if (!media || media.length === 0) {
     return (
       <div className="text-center py-8 text-[hsl(var(--forest))/50]">
-        <img src="/images/21249315961639312271.svg" alt="Sapi" className="w-14 h-14 mx-auto mb-2 opacity-50" />
+        <img src="/images/9448047941553668332.svg" alt="Sapi" className="w-14 h-14 mx-auto mb-2 opacity-50" />
         <p>Belum ada dokumentasi</p>
       </div>
     )

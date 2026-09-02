@@ -153,7 +153,7 @@ export function CommentSection({ cattleId, cattleCode, currentUserId }: CommentS
         </div>
       ) : comments.length === 0 ? (
         <div className="text-center py-8 text-[hsl(var(--forest))/50]">
-          <img src="/images/21249315961639312271.svg" alt="Sapi" className="w-14 h-14 mx-auto mb-2 opacity-50" />
+          <img src="/images/8377642891595601833.svg" alt="Sapi" className="w-14 h-14 mx-auto mb-2 opacity-50" />
           <p className="text-sm">Belum ada komentar. Jadilah yang pertama!</p>
         </div>
       ) : (

@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { X, ChevronLeft, ChevronRight, Download, Play, Grid, Maximize2 } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight, Download, Play, Grid, Maximize2, Film } from 'lucide-react'
 import { CattleMedia } from '@/types'
-import { getDirectImageUrl } from '@/lib/utils/imageUrl'
+import { getDirectImageUrl, getVideoUrl } from '@/lib/utils/imageUrl'
 
 interface MediaTabProps {
   media: CattleMedia[]
@@ -12,6 +12,7 @@ interface MediaTabProps {
 
 export function MediaTab({ media }: MediaTabProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [lightboxType, setLightboxType] = useState<'image' | 'video'>('image')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid')
 
@@ -34,6 +35,13 @@ export function MediaTab({ media }: MediaTabProps) {
   const videos = media.filter(m => m.fileType.includes('video'))
 
   const openLightbox = (index: number) => {
+    setLightboxType('image')
+    setCurrentIndex(index)
+    setLightboxOpen(true)
+  }
+
+  const openVideoLightbox = (index: number) => {
+    setLightboxType('video')
     setCurrentIndex(index)
     setLightboxOpen(true)
   }
@@ -157,16 +165,18 @@ export function MediaTab({ media }: MediaTabProps) {
           <div className="mt-6">
             <h4 className="text-sm font-semibold text-[hsl(var(--forest))] mb-3">Video</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {videos.map((item) => (
-                <div key={item.id} className="relative aspect-video rounded-xl overflow-hidden bg-[hsl(var(--cream))]">
-                  <Image
-                    src={getDirectImageUrl(item.fileUrl)}
-                    alt={item.title || 'Video'}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                    <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+              {videos.map((item, index) => (
+                <button
+                  key={item.id}
+                  onClick={() => openVideoLightbox(index)}
+                  className="relative aspect-video rounded-xl overflow-hidden bg-[hsl(var(--cream))] group cursor-pointer"
+                >
+                  {/* Placeholder video thumbnail */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--forest))/20] to-[hsl(var(--forest))/40] flex items-center justify-center">
+                    <Film className="h-10 w-10 text-[hsl(var(--forest))/50]" />
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+                    <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Play className="h-6 w-6 text-[hsl(var(--forest))] fill-current ml-1" />
                     </div>
                   </div>
@@ -175,7 +185,7 @@ export function MediaTab({ media }: MediaTabProps) {
                       <span className="text-white text-xs font-medium">{item.title}</span>
                     </div>
                   )}
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -197,64 +207,84 @@ export function MediaTab({ media }: MediaTabProps) {
             <X className="h-6 w-6" />
           </button>
 
-          {/* Navigation */}
-          {images.length > 1 && (
+          {/* Image Lightbox */}
+          {lightboxType === 'image' && images.length > 0 && (
             <>
-              <button
-                onClick={goToPrevious}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-white hover:bg-white/20 rounded-full transition-colors"
-              >
-                <ChevronLeft className="h-8 w-8" />
-              </button>
-              <button
-                onClick={goToNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-white hover:bg-white/20 rounded-full transition-colors"
-              >
-                <ChevronRight className="h-8 w-8" />
-              </button>
+              {/* Navigation */}
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={goToPrevious}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-white hover:bg-white/20 rounded-full transition-colors"
+                  >
+                    <ChevronLeft className="h-8 w-8" />
+                  </button>
+                  <button
+                    onClick={goToNext}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-white hover:bg-white/20 rounded-full transition-colors"
+                  >
+                    <ChevronRight className="h-8 w-8" />
+                  </button>
+                </>
+              )}
+
+              {/* Image */}
+              <div className="relative w-full h-full max-w-[90vw] max-h-[85vh] m-4">
+                <Image
+                  src={getDirectImageUrl(images[currentIndex]?.fileUrl || '')}
+                  alt=""
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+
+              {/* Footer */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4">
+                <span className="text-white text-sm">
+                  {currentIndex + 1} / {images.length}
+                </span>
+                <button
+                  onClick={() => downloadImage(
+                    images[currentIndex]?.fileUrl || '',
+                    `${images[currentIndex]?.title || 'dokumentasi'}-${currentIndex + 1}.jpg`
+                  )}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white text-sm transition-colors"
+                >
+                  <Download className="h-4 w-4" />
+                  Download
+                </button>
+              </div>
+
+              {/* Dots */}
+              {images.length > 1 && (
+                <div className="absolute bottom-4 right-4 flex gap-2">
+                  {images.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentIndex(idx)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        idx === currentIndex ? 'bg-white' : 'bg-white/40 hover:bg-white/60'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
             </>
           )}
 
-          {/* Image */}
-          <div className="relative w-full h-full max-w-[90vw] max-h-[85vh] m-4">
-            <Image
-              src={getDirectImageUrl(images[currentIndex]?.fileUrl || '')}
-              alt=""
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
-
-          {/* Footer */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4">
-            <span className="text-white text-sm">
-              {currentIndex + 1} / {images.length}
-            </span>
-            <button
-              onClick={() => downloadImage(
-                images[currentIndex]?.fileUrl || '',
-                `${images[currentIndex]?.title || 'dokumentasi'}-${currentIndex + 1}.jpg`
+          {/* Video Lightbox */}
+          {lightboxType === 'video' && videos.length > 0 && (
+            <div className="relative w-full max-w-[90vw] max-h-[85vh] m-4">
+              <video
+                src={getVideoUrl(videos[currentIndex]?.fileUrl || '')}
+                controls
+                autoPlay
+                className="max-w-full max-h-[85vh] rounded-lg"
+              />
+              {videos[currentIndex]?.title && (
+                <p className="text-white text-center mt-4 text-sm">{videos[currentIndex].title}</p>
               )}
-              className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white text-sm transition-colors"
-            >
-              <Download className="h-4 w-4" />
-              Download
-            </button>
-          </div>
-
-          {/* Dots */}
-          {images.length > 1 && (
-            <div className="absolute bottom-4 right-4 flex gap-2">
-              {images.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentIndex(idx)}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    idx === currentIndex ? 'bg-white' : 'bg-white/40 hover:bg-white/60'
-                  }`}
-                />
-              ))}
             </div>
           )}
         </div>
