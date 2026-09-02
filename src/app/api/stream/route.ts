@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
         const contentRange = `bytes ${start}-${end}/${fileSize}`
         const contentLength = end - start + 1
 
-        const stream = rangeResponse.body as ReadableStream
+        const stream = rangeResponse.body as unknown as ReadableStream
 
         return new Response(stream, {
           status: 206,
@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
       { responseType: 'stream' }
     )
 
-    const stream = response.data as ReadableStream
+    const stream = response.data as unknown as ReadableStream
 
     return new Response(stream, {
       headers: {
