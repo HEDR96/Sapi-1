@@ -115,7 +115,7 @@ export function VideoUploader({
 
       // Read output file
       const data = await ffmpeg.readFile(outputName)
-      const blob = new Blob([data], { type: 'video/mp4' })
+      const blob = new Blob([data as BlobPart], { type: 'video/mp4' })
       const outputFile = new File([blob], file.name.replace(/\.[^.]+$/, '.mp4'), { type: 'video/mp4' })
 
       // Cleanup
