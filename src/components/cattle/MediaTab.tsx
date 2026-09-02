@@ -30,9 +30,9 @@ export function MediaTab({ media }: MediaTabProps) {
     )
   }
 
-  // Separate images and videos
-  const images = media.filter(m => !m.fileType.includes('video'))
-  const videos = media.filter(m => m.fileType.includes('video'))
+  // Separate images and videos - use toUpperCase for case-insensitive comparison
+  const images = media.filter(m => !m.fileType.toUpperCase().includes('VIDEO'))
+  const videos = media.filter(m => m.fileType.toUpperCase().includes('VIDEO'))
 
   const openLightbox = (index: number) => {
     setLightboxType('image')
@@ -47,11 +47,19 @@ export function MediaTab({ media }: MediaTabProps) {
   }
 
   const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
+    if (lightboxType === 'image') {
+      setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
+    } else {
+      setCurrentIndex((prev) => (prev === 0 ? videos.length - 1 : prev - 1))
+    }
   }
 
   const goToNext = () => {
-    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+    if (lightboxType === 'image') {
+      setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+    } else {
+      setCurrentIndex((prev) => (prev === videos.length - 1 ? 0 : prev + 1))
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -175,6 +183,10 @@ export function MediaTab({ media }: MediaTabProps) {
                   <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--forest))/20] to-[hsl(var(--forest))/40] flex items-center justify-center">
                     <Film className="h-10 w-10 text-[hsl(var(--forest))/50]" />
                   </div>
+                  {/* Video badge */}
+                  <div className="absolute top-2 left-2 px-2 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded">
+                    VIDEO
+                  </div>
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
                     <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Play className="h-6 w-6 text-[hsl(var(--forest))] fill-current ml-1" />
@@ -275,17 +287,59 @@ export function MediaTab({ media }: MediaTabProps) {
 
           {/* Video Lightbox */}
           {lightboxType === 'video' && videos.length > 0 && (
-            <div className="relative w-full max-w-[90vw] max-h-[85vh] m-4">
-              <video
-                src={getVideoUrl(videos[currentIndex]?.fileUrl || '')}
-                controls
-                autoPlay
-                className="max-w-full max-h-[85vh] rounded-lg"
-              />
-              {videos[currentIndex]?.title && (
-                <p className="text-white text-center mt-4 text-sm">{videos[currentIndex].title}</p>
+            <>
+              {/* Navigation for videos */}
+              {videos.length > 1 && (
+                <>
+                  <button
+                    onClick={goToPrevious}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-white hover:bg-white/20 rounded-full transition-colors"
+                  >
+                    <ChevronLeft className="h-8 w-8" />
+                  </button>
+                  <button
+                    onClick={goToNext}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-white hover:bg-white/20 rounded-full transition-colors"
+                  >
+                    <ChevronRight className="h-8 w-8" />
+                  </button>
+                </>
               )}
-            </div>
+
+              {/* Video Player */}
+              <div className="relative w-full max-w-[90vw] max-h-[85vh] m-4">
+                <video
+                  key={videos[currentIndex]?.id} // Force reload on video change
+                  src={getVideoUrl(videos[currentIndex]?.fileUrl || '')}
+                  controls
+                  autoPlay
+                  className="max-w-full max-h-[85vh] rounded-lg"
+                />
+                {videos[currentIndex]?.title && (
+                  <p className="text-white text-center mt-4 text-sm">{videos[currentIndex].title}</p>
+                )}
+              </div>
+
+              {/* Counter */}
+              <div className="absolute bottom-4 right-4 text-white text-sm">
+                {currentIndex + 1} / {videos.length}
+              </div>
+
+              {/* Dots for video navigation */}
+              {videos.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                  {videos.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentIndex(idx)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        idx === currentIndex ? 'bg-white' : 'bg-white/40 hover:bg-white/60'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

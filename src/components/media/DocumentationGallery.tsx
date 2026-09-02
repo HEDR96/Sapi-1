@@ -14,8 +14,8 @@ interface DocumentationGalleryProps {
 export function DocumentationGallery({ media }: DocumentationGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
-  const imageMedia = media.filter((m) => m.fileType === 'IMAGE')
-  const videoMedia = media.filter((m) => m.fileType === 'VIDEO')
+  const imageMedia = media.filter((m) => m.fileType.toUpperCase() === 'IMAGE')
+  const videoMedia = media.filter((m) => m.fileType.toUpperCase() === 'VIDEO')
 
   if (imageMedia.length === 0 && videoMedia.length === 0) {
     return (
@@ -80,7 +80,7 @@ export function DocumentationGallery({ media }: DocumentationGalleryProps) {
             <X className="h-6 w-6" />
           </button>
 
-          {allMedia[selectedIndex]?.fileType === 'VIDEO' ? (
+          {allMedia[selectedIndex]?.fileType.toUpperCase() === 'VIDEO' ? (
             <video
               src={getVideoUrl(allMedia[selectedIndex]?.fileUrl || '')}
               controls

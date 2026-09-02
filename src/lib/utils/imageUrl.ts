@@ -3,7 +3,8 @@
  */
 export function isVideoUrl(url: string | null | undefined): boolean {
   if (!url) return false
-  return url.includes('/api/stream?') || url.includes('mimeType=video')
+  const lowerUrl = url.toLowerCase()
+  return lowerUrl.includes('/api/stream?') || lowerUrl.includes('mimetype=video')
 }
 
 /**

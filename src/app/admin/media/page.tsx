@@ -128,7 +128,7 @@ export default function MediaPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {media.map((m) => (
                 <div key={m.id} className="relative aspect-square rounded-lg overflow-hidden bg-muted">
-                  {m.fileType === 'VIDEO' ? (
+                  {m.fileType.toUpperCase() === 'VIDEO' ? (
                     <video src={getVideoUrl(m.fileUrl)} className="w-full h-full object-cover" />
                   ) : (
                     <Image src={m.fileUrl} alt={m.title || ''} fill className="object-cover" />

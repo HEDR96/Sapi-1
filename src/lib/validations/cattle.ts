@@ -12,7 +12,7 @@ export const CattleQuerySchema = z.object({
   maxWeight: z.coerce.number().optional(),
 })
 
-export const CreateCattleSchema = z.object({
+const CattleCreateSchema = z.object({
   code: z.string().min(1).max(20),
   name: z.string().min(1).max(100),
   breed: z.string().min(1).max(50),
@@ -25,4 +25,4 @@ export const CreateCattleSchema = z.object({
   mainImage: z.string().optional(),
 })
 
-export const UpdateCattleSchema = CreateCattleSchema.partial()
+export const UpdateCattleSchema = CattleCreateSchema.partial()

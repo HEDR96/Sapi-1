@@ -18,7 +18,7 @@ export function verifyToken(token: string): JWTPayload | null {
   }
 }
 
-export async function getTokenFromCookies(): Promise<string | null> {
+async function getTokenFromCookies(): Promise<string | null> {
   const cookieStore = await cookies()
   // Check both cookie names for backward compatibility
   const token = cookieStore.get('auth_token')?.value || cookieStore.get('admin_token')?.value

@@ -39,7 +39,7 @@ export function MediaGallery({ media }: MediaGalleryProps) {
             className="relative aspect-square rounded-lg overflow-hidden group"
           >
             <Image src={getDirectImageUrl(item.fileUrl)} alt={item.title || 'Media'} fill className="object-cover" />
-            {item.fileType === 'VIDEO' && (
+            {item.fileType.toUpperCase() === 'VIDEO' && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                 <Play className="h-10 w-10 text-white" fill="white" />
               </div>
@@ -63,7 +63,7 @@ export function MediaGallery({ media }: MediaGalleryProps) {
             <X className="h-6 w-6" />
           </button>
 
-          {media[currentIndex].fileType === 'VIDEO' ? (
+          {media[currentIndex].fileType.toUpperCase() === 'VIDEO' ? (
             <video
               src={getVideoUrl(media[currentIndex].fileUrl)}
               controls

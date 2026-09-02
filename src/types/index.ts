@@ -151,13 +151,6 @@ export interface CattleWithLatestWeight {
 }
 
 // Constants
-export const STATUS_LABELS: Record<Status, string> = {
-  AVAILABLE: 'TERSEDIA',
-  SOLD: 'TERJUAL',
-  BOOKED: 'DIBOOKING',
-  ARCHIVED: 'DIARCHIVE',
-}
-
 export const HEALTH_STATUS_LABELS: Record<HealthStatus, string> = {
   SEHAT: 'Sehat',
   DALAM_PERAWATAN: 'Dalam Perawatan',
@@ -165,5 +158,3 @@ export const HEALTH_STATUS_LABELS: Record<HealthStatus, string> = {
   SAKIT: 'Sakit',
   SEMBUH: 'Sembuh',
 }
-
-export const BREED_OPTIONS = ['Limousin', 'Simental', 'Brahman', 'Angus', 'Lainnya']

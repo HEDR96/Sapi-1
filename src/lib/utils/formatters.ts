@@ -2,8 +2,6 @@ import {
   format,
   formatDistanceToNow,
   parseISO,
-  differenceInDays,
-  addDays,
 } from 'date-fns'
 import { id } from 'date-fns/locale'
 
@@ -28,16 +26,6 @@ export function formatCurrency(amount: number | string): string {
 export function formatWeight(weight: number | null | undefined): string {
   if (weight === null || weight === undefined) return '-'
   return `${Number(weight).toFixed(1)} kg`
-}
-
-/**
- * Format weight for chart/calculation with 2 decimal places
- * @example formatWeightPrecise(527.456) -> "527.46"
- */
-export function formatWeightPrecise(weight: number | string | null): string {
-  if (weight === null || weight === undefined) return '0'
-  const num = typeof weight === 'string' ? parseFloat(weight) : weight
-  return num.toFixed(2)
 }
 
 /**
@@ -81,44 +69,10 @@ export function formatRelativeTime(date: Date | string): string {
 }
 
 /**
- * Format code as uppercase
- * @example formatCode("abc123") -> "ABC123"
- */
-export function formatCode(code: string): string {
-  return code.toUpperCase()
-}
-
-/**
  * Format ADG (Average Daily Gain)
  * @example formatADG(1.456) -> "1.5 kg/hari"
  */
 export function formatADG(adg: number): string {
   if (!adg || isNaN(adg)) return '-'
   return `${adg.toFixed(2)} kg/hari`
-}
-
-/**
- * Format percentage
- * @example formatPercentage(85.5) -> "85.5%"
- */
-export function formatPercentage(value: number): string {
-  return `${value.toFixed(1)}%`
-}
-
-/**
- * Format price for display
- * @example formatPriceDisplay(45000000) -> "Rp 45.000.000"
- */
-export function formatPriceDisplay(price: number | string): string {
-  return formatCurrency(price)
-}
-
-/**
- * Generate unique cattle code
- * @example generateCattleCode() -> "NF-26001"
- */
-export function generateCattleCode(): string {
-  const year = new Date().getFullYear()
-  const random = Math.floor(Math.random() * 9000) + 1000
-  return `NF-${year}${random}`
 }

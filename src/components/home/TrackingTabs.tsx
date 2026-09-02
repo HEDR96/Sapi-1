@@ -437,7 +437,7 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
                       alt={item.title || 'Dokumentasi'}
                       className="w-full h-full object-cover"
                     />
-                    {item.fileType === 'VIDEO' && (
+                    {item.fileType.toUpperCase() === 'VIDEO' && (
                       <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                         <div className="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center">
                           <span className="text-[hsl(var(--forest))] text-lg">▶</span>
