@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { CattleWithRelations } from '@/types'
 import { formatWeight, formatDate, formatCurrency } from '@/lib/utils/formatters'
 import { calculateWeightStats } from '@/lib/utils/calculations'
@@ -258,7 +259,11 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
                   ))
                 ) : (
                   <div className="rounded border border-dashed border-[hsl(var(--line))] p-6 text-center">
-                    <div className="text-4xl mb-2">📋</div>
+                    <div className="mb-3 flex justify-center">
+                      <div className="relative w-12 h-12">
+                        <Image src="/images/21249315961639312271.svg" alt="Sapi" fill className="object-contain opacity-40" unoptimized />
+                      </div>
+                    </div>
                     <div className="text-[11px] font-semibold text-[hsl(var(--forest))]">Belum ada Riwayat Timbang</div>
                     <p className="mt-1 text-[9px] text-[hsl(var(--forest))/50]">
                       Data penimbangan akan muncul setelah sapi ditimbang.
@@ -302,7 +307,11 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
                 ))
               ) : (
                 <div className="rounded border border-dashed border-[hsl(var(--line))] p-8 text-center">
-                  <div className="text-4xl mb-2">🏥</div>
+                  <div className="mb-3 flex justify-center">
+                    <div className="relative w-12 h-12">
+                      <Image src="/images/21433058761642998739.svg" alt="Kesehatan" fill className="object-contain opacity-40" unoptimized />
+                    </div>
+                  </div>
                   <div className="text-[11px] font-semibold text-[hsl(var(--forest))]">Belum ada Riwayat Kesehatan</div>
                   <p className="mt-1 text-[9px] text-[hsl(var(--forest))/50]">
                     Data kesehatan akan muncul setelah pemeriksaan.
@@ -449,7 +458,11 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
               </div>
             ) : (
               <div className="rounded border border-dashed border-[hsl(var(--line))] p-8 text-center">
-                <div className="text-4xl mb-2">📷</div>
+                <div className="mb-3 flex justify-center">
+                  <div className="relative w-12 h-12">
+                    <Image src="/images/21249315961639312271.svg" alt="Sapi" fill className="object-contain opacity-40" unoptimized />
+                  </div>
+                </div>
                 <div className="text-[11px] font-semibold text-[hsl(var(--forest))]">Belum ada Dokumentasi</div>
                 <p className="mt-1 text-[9px] text-[hsl(var(--forest))/50]">
                   Dokumentasi foto dan video akan muncul setelah ada yang diupload.

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { formatRelativeTime } from '@/lib/utils/formatters'
 import { MessageCircle, Send, Trash2, Loader2, User } from 'lucide-react'
 
@@ -153,7 +154,11 @@ export function CommentSection({ cattleId, cattleCode, currentUserId }: CommentS
         </div>
       ) : comments.length === 0 ? (
         <div className="text-center py-8 text-[hsl(var(--forest))/50]">
-          <div className="text-4xl mb-2"></div>
+          <div className="mb-2 flex justify-center">
+            <div className="relative w-14 h-14">
+              <Image src="/images/21249315961639312271.svg" alt="Sapi" fill className="object-contain opacity-50" unoptimized />
+            </div>
+          </div>
           <p className="text-sm">Belum ada komentar. Jadilah yang pertama!</p>
         </div>
       ) : (

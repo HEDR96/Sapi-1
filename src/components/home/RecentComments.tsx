@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { formatRelativeTime } from '@/lib/utils/formatters'
 import { MessageCircle } from 'lucide-react'
@@ -80,7 +81,11 @@ export function RecentComments() {
             ))
           ) : (
             <div className="text-center py-8 bg-white rounded-lg border border-[hsl(var(--line))]">
-              <div className="text-4xl mb-2"></div>
+              <div className="mb-2 flex justify-center">
+                <div className="relative w-14 h-14">
+                  <Image src="/images/21249315961639312271.svg" alt="Sapi" fill className="object-contain opacity-50" unoptimized />
+                </div>
+              </div>
               <p className="text-[hsl(var(--forest))/70]">
                 Belum ada komentar. Jadilah yang pertama!
               </p>

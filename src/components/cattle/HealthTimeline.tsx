@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { CattleHealthRecordWithMedia, HealthStatus } from '@/types'
 import { formatDate } from '@/lib/utils/formatters'
 import { HEALTH_STATUS_LABELS } from '@/types'
@@ -20,9 +21,11 @@ export function HealthTimeline({ records }: HealthTimelineProps) {
   if (!records || records.length === 0) {
     return (
       <div className="text-center py-8 text-[hsl(var(--forest))/50]">
-        <div className="text-4xl mb-2 flex justify-center">
-  <img src="/images/21433058761642998739.svg" alt="health" className="w-10 h-10 opacity-60" />
-</div>
+        <div className="mb-2 flex justify-center">
+          <div className="relative w-14 h-14">
+            <Image src="/images/21433058761642998739.svg" alt="Kesehatan" fill className="object-contain opacity-50" unoptimized />
+          </div>
+        </div>
         <p>Belum ada data kesehatan</p>
       </div>
     )
