@@ -82,9 +82,7 @@ export function RecentComments() {
           ) : (
             <div className="text-center py-8 bg-white rounded-lg border border-[hsl(var(--line))]">
               <div className="mb-2 flex justify-center">
-                <div className="relative w-14 h-14">
-                  <Image src="/images/21249315961639312271.svg" alt="Sapi" fill className="object-contain opacity-50" unoptimized />
-                </div>
+                <Image src="/images/cow-seeklogo.png" alt="Sapi" width={56} height={56} className="opacity-50" />
               </div>
               <p className="text-[hsl(var(--forest))/70]">
                 Belum ada komentar. Jadilah yang pertama!

@@ -260,9 +260,7 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
                 ) : (
                   <div className="rounded border border-dashed border-[hsl(var(--line))] p-6 text-center">
                     <div className="mb-3 flex justify-center">
-                      <div className="relative w-12 h-12">
-                        <Image src="/images/21249315961639312271.svg" alt="Sapi" fill className="object-contain opacity-40" unoptimized />
-                      </div>
+                      <Image src="/images/cow-seeklogo.png" alt="Sapi" width={48} height={48} className="opacity-40" />
                     </div>
                     <div className="text-[11px] font-semibold text-[hsl(var(--forest))]">Belum ada Riwayat Timbang</div>
                     <p className="mt-1 text-[9px] text-[hsl(var(--forest))/50]">
@@ -459,9 +457,7 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
             ) : (
               <div className="rounded border border-dashed border-[hsl(var(--line))] p-8 text-center">
                 <div className="mb-3 flex justify-center">
-                  <div className="relative w-12 h-12">
-                    <Image src="/images/21249315961639312271.svg" alt="Sapi" fill className="object-contain opacity-40" unoptimized />
-                  </div>
+                  <Image src="/images/cow-seeklogo.png" alt="Sapi" width={48} height={48} className="opacity-40" />
                 </div>
                 <div className="text-[11px] font-semibold text-[hsl(var(--forest))]">Belum ada Dokumentasi</div>
                 <p className="mt-1 text-[9px] text-[hsl(var(--forest))/50]">
