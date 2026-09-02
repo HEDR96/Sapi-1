@@ -32,7 +32,7 @@ export default function KatalogPage() {
   }
 
   // Get unique breeds for filter
-  const breeds = ['all', ...new Set(cattle.map(c => c.breed).filter(Boolean))]
+  const breeds = ['all', ...Array.from(new Set(cattle.map(c => c.breed).filter(Boolean)))]
   const statuses = [
     { value: 'all', label: 'Semua' },
     { value: 'AVAILABLE', label: 'Tersedia' },
