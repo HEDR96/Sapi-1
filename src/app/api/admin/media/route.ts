@@ -84,7 +84,8 @@ export async function POST(request: NextRequest) {
       const formData = await request.formData()
       cattleId = formData.get('cattleId') as string
       file = formData.get('file') as File | null
-      fileUrl = formData.get('fileUrl') as string | null
+      const formFileUrl = formData.get('fileUrl')
+      fileUrl = typeof formFileUrl === 'string' ? formFileUrl : null
       category = formData.get('category') as string || 'GENERAL'
       title = formData.get('title') as string | null
       description = formData.get('description') as string | null
