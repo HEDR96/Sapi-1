@@ -8,7 +8,7 @@ import { NotificationDropdown, useNotifications } from '@/components/admin/Notif
 
 const navLinks = [
   { href: '/', label: 'Beranda' },
-  { href: '/#katalog', label: 'Katalog' },
+  { href: '/katalog', label: 'Katalog' },
   { href: '/#tentang', label: 'Tentang Kami' },
 ]
 

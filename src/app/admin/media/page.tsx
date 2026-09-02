@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { Plus, Trash2, Image as ImageIcon, Video } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Plus, Trash2, Image as ImageIcon } from 'lucide-react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CattleSelect } from '@/components/admin/CattleSelect'
 import { Pagination } from '@/components/ui/pagination'
+import { VideoUploader } from '@/components/admin/VideoUploader'
+import { ImageUploader } from '@/components/admin/ImageUploader'
 
 interface MediaItem {
   id: string
@@ -22,9 +23,8 @@ export default function MediaPage() {
   const [media, setMedia] = useState<MediaItem[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCattle, setSelectedCattle] = useState('')
-  const [showForm, setShowForm] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const fileRef = useRef<HTMLInputElement>(null)
+  const [showImageForm, setShowImageForm] = useState(false)
+  const [showVideoForm, setShowVideoForm] = useState(false)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
@@ -44,23 +44,26 @@ export default function MediaPage() {
     setLoading(false)
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!selectedCattle || !fileRef.current?.files?.[0]) return
-
-    setSaving(true)
+  const saveMedia = async (url: string, fileType: string) => {
     try {
-      const formData = new FormData()
-      formData.append('cattleId', selectedCattle)
-      formData.append('file', fileRef.current.files[0])
-
-      const res = await fetch('/api/admin/media', { method: 'POST', body: formData })
+      const res = await fetch('/api/admin/media', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cattleId: selectedCattle,
+          fileUrl: url,
+          fileType,
+          title: null,
+        }),
+      })
       if (res.ok) {
-        setShowForm(false)
-        if (fileRef.current) fileRef.current.value = ''
+        setShowImageForm(false)
+        setShowVideoForm(false)
         fetchMedia()
       }
-    } finally { setSaving(false) }
+    } catch (err) {
+      console.error('Failed to save media:', err)
+    }
   }
 
   const handleDelete = async (id: string) => {
@@ -76,24 +79,41 @@ export default function MediaPage() {
           <h1 className="text-2xl font-bold">Dokumentasi</h1>
           <p className="text-muted-foreground">Kelola foto dan video sapi</p>
         </div>
-        <Button onClick={() => setShowForm(!showForm)}><Plus className="h-4 w-4 mr-2" />Upload Media</Button>
+        <div className="flex gap-2">
+          <Button onClick={() => { setShowImageForm(!showImageForm); setShowVideoForm(false) }}>
+            <ImageIcon className="h-4 w-4 mr-2" />Upload Foto
+          </Button>
+          <Button onClick={() => { setShowVideoForm(!showVideoForm); setShowImageForm(false) }}>
+            <Plus className="h-4 w-4 mr-2" />Upload Video
+          </Button>
+        </div>
       </div>
 
-      {showForm && (
+      {showImageForm && (
         <Card>
-          <CardHeader><CardTitle>Upload Media</CardTitle></CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <CattleSelect value={selectedCattle} onChange={setSelectedCattle} />
-              <div>
-                <label className="text-sm font-medium">File (Foto/Video)</label>
-                <input ref={fileRef} type="file" accept="image/*,video/*" className="w-full mt-1" required />
-              </div>
-              <div className="flex gap-2">
-                <Button type="submit" disabled={saving || !selectedCattle}>{saving ? 'Mengupload...' : 'Upload'}</Button>
-                <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Batal</Button>
-              </div>
-            </form>
+          <CardHeader><CardTitle>Upload Foto</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <CattleSelect value={selectedCattle} onChange={setSelectedCattle} />
+            <ImageUploader
+              folder="cattle"
+              maxSize={10}
+              onChange={(url) => saveMedia(url, 'IMAGE')}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {showVideoForm && (
+        <Card>
+          <CardHeader><CardTitle>Upload Video</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <CattleSelect value={selectedCattle} onChange={setSelectedCattle} />
+            <VideoUploader
+              folder="cattle"
+              maxSize={100}
+              maxDuration={180}
+              onUploadComplete={(url) => saveMedia(url, 'VIDEO')}
+            />
           </CardContent>
         </Card>
       )}

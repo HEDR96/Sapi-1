@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/admin/media (multipart/form-data)
+// POST /api/admin/media (multipart/form-data or JSON)
 export async function POST(request: NextRequest) {
   const admin = await getCurrentAdmin()
   if (!admin) {
@@ -60,13 +60,35 @@ export async function POST(request: NextRequest) {
 
     // Note: Token refresh happens automatically in uploadToGoogleDrive()
 
-    const formData = await request.formData()
-    const cattleId = formData.get('cattleId') as string
-    const file = formData.get('file') as File | null
-    const fileUrl = formData.get('fileUrl') as string | null
-    const category = formData.get('category') as string || 'GENERAL'
-    const title = formData.get('title') as string | null
-    const description = formData.get('description') as string | null
+    let cattleId: string
+    let fileUrl: string
+    let fileType: string
+    let category = 'GENERAL'
+    let title: string | null = null
+    let description: string | null = null
+    let file: File | null = null
+
+    const contentType = request.headers.get('content-type') || ''
+
+    if (contentType.includes('application/json')) {
+      // Handle JSON body (for URL-based uploads)
+      const body = await request.json()
+      cattleId = body.cattleId
+      fileUrl = body.fileUrl
+      fileType = body.fileType || 'IMAGE'
+      category = body.category || 'GENERAL'
+      title = body.title || null
+      description = body.description || null
+    } else {
+      // Handle multipart/form-data
+      const formData = await request.formData()
+      cattleId = formData.get('cattleId') as string
+      file = formData.get('file') as File | null
+      fileUrl = formData.get('fileUrl') as string | null
+      category = formData.get('category') as string || 'GENERAL'
+      title = formData.get('title') as string | null
+      description = formData.get('description') as string | null
+    }
 
     if (!cattleId) {
       return NextResponse.json({ error: 'Cattle ID diperlukan' }, { status: 400 })
@@ -74,7 +96,7 @@ export async function POST(request: NextRequest) {
 
     let url = fileUrl || ''
 
-    // Upload file if provided
+    // Upload file if provided (multipart only)
     if (file && file.size > 0) {
       const buffer = Buffer.from(await file.arrayBuffer())
       const isVideo = file.type.startsWith('video/')
@@ -92,6 +114,9 @@ export async function POST(request: NextRequest) {
       // Use webViewLink for display
       url = result.webViewLink || result.webContentLink || ''
 
+      // Detect file type from upload
+      fileType = file.type.startsWith('video/') ? 'VIDEO' : 'IMAGE'
+
       console.log('[Media API] Upload success:', result)
     }
 
@@ -99,14 +124,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File atau URL diperlukan' }, { status: 400 })
     }
 
-    const fileType = url.match(/\.(mp4|webm|mov)$/i) || url.includes('video') ? 'VIDEO' : 'IMAGE'
+    // Detect file type from URL if not already set
+    if (!fileType) {
+      fileType = url.match(/\.(mp4|webm|mov)$/i) || url.includes('video') ? 'VIDEO' : 'IMAGE'
+    }
 
     const media = await prisma.cattleMedia.create({
       data: {
         cattleId,
         category: category as any,
         fileUrl: url,
-        fileType,
+        fileType: fileType as any,
         title,
         description,
       }
