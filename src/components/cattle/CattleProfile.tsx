@@ -24,7 +24,7 @@ interface CattleProfileProps {
   cattle: CattleWithRelations
 }
 
-type TabKey = 'summary' | 'weights' | 'health' | 'feed' | 'Foto/Video'
+type TabKey = 'summary' | 'weights' | 'health' | 'feed' | 'media'
 
 export function CattleProfile({ cattle }: CattleProfileProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('summary')

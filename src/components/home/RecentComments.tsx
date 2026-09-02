@@ -41,7 +41,7 @@ export function RecentComments() {
     <section className="py-8">
       <div className="container mx-auto px-4">
         <h2 className="text-xl font-bold text-[hsl(var(--forest))] mb-4">
-          Komentar Terbaru 💬
+          Komentar Terbaru
         </h2>
 
         <div className="grid gap-3">
