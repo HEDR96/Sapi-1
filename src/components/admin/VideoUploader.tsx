@@ -14,7 +14,7 @@ type UploadStatus = 'idle' | 'compressing' | 'uploading' | 'done' | 'error'
 
 export function VideoUploader({
   onUploadComplete,
-  folder = 'cattle',
+  folder = 'video',
   maxSize = 100, // 100MB after compression
   maxDuration = 180, // 3 minutes
 }: VideoUploaderProps) {

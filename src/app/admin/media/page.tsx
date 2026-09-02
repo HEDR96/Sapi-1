@@ -109,7 +109,7 @@ export default function MediaPage() {
           <CardContent className="space-y-4">
             <CattleSelect value={selectedCattle} onChange={setSelectedCattle} />
             <VideoUploader
-              folder="cattle"
+              folder="video"
               maxSize={100}
               maxDuration={180}
               onUploadComplete={(url) => saveMedia(url, 'VIDEO')}
