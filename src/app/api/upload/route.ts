@@ -134,15 +134,22 @@ export async function POST(request: NextRequest) {
 
     console.log('[Upload API] Success:', result)
 
-    // Use direct image URL format for public access
-    const directUrl = result.directUrl || `https://drive.google.com/uc?export=view&id=${result.fileId}`
+    // For videos, use streaming proxy to bypass CORS/ORB blocking
+    // For images, use direct Google Drive URL
+    let publicUrl: string
+    if (isVideo) {
+      publicUrl = `/api/stream?fileId=${result.fileId}&mimeType=${encodeURIComponent(finalFileType)}`
+    } else {
+      publicUrl = result.directUrl || `https://drive.google.com/uc?export=view&id=${result.fileId}`
+    }
 
     return NextResponse.json({
       success: true,
-      url: directUrl,
+      url: publicUrl,
       fileId: result.fileId,
       webViewLink: result.webViewLink,
       thumbnailUrl: result.thumbnailLink,
+      mimeType: finalFileType,
     })
   } catch (error: any) {
     console.error('[Upload API] Error:', {

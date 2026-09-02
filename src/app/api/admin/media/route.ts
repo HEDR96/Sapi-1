@@ -112,11 +112,17 @@ export async function POST(request: NextRequest) {
 
       const result = await uploadToGoogleDrive(buffer, file.name, file.type, folder)
 
-      // Use webViewLink for display
-      url = result.webViewLink || result.webContentLink || ''
+      // Use streaming proxy URL for videos to bypass CORS/ORB blocking
+      // Use direct URL for images
+      const isVideoFile = file.type.startsWith('video/')
+      if (isVideoFile) {
+        url = `/api/stream?fileId=${result.fileId}&mimeType=${encodeURIComponent(file.type)}`
+      } else {
+        url = result.directUrl || `https://drive.google.com/uc?export=view&id=${result.fileId}`
+      }
 
       // Detect file type from upload
-      fileType = file.type.startsWith('video/') ? 'VIDEO' : 'IMAGE'
+      fileType = isVideoFile ? 'VIDEO' : 'IMAGE'
 
       console.log('[Media API] Upload success:', result)
     }
