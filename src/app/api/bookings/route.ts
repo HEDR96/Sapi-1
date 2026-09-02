@@ -9,8 +9,8 @@ export async function GET() {
     return NextResponse.json({ error: 'Login diperlukan' }, { status: 401 })
   }
 
-  // Both admin and user login set adminId in the token
-  const userId = user.adminId || (user as any).id
+  // User login sets userId, admin login sets adminId (admins can't book)
+  const userId = user.userId || (user as any).id
 
   try {
     const bookings = await prisma.booking.findMany({
@@ -35,8 +35,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Login diperlukan' }, { status: 401 })
   }
 
-  // Both admin and user login set adminId in the token
-  const userId = user.adminId || (user as any).id
+  // User login sets userId, admin login sets adminId (admins can't book)
+  const userId = user.userId || (user as any).id
+
+  // Admins can't make bookings - they have adminId not userId
+  if (!userId) {
+    return NextResponse.json(
+      { error: 'Akun ini tidak dapat membuat booking. Gunakan akun user.' },
+      { status: 403 }
+    )
+  }
 
   try {
     const { cattleId, phone, quantity = 1, notes } = await request.json()
