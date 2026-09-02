@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { CattleFeedRecord } from '@/types'
 import { formatDate } from '@/lib/utils/formatters'
 import { Sprout, Wheat, Pill, Droplets } from 'lucide-react'
@@ -21,11 +20,7 @@ export function FeedSchedule({ records }: FeedScheduleProps) {
   if (!records || records.length === 0) {
     return (
       <div className="text-center py-8 text-[hsl(var(--forest))/50]">
-        <div className="mb-2 flex justify-center">
-          <div className="relative w-14 h-14">
-            <Image src="/images/10274305501591055829.svg" alt="Pakan" fill className="object-contain opacity-50" unoptimized />
-          </div>
-        </div>
+        <img src="/images/10274305501591055829.svg" alt="Pakan" className="w-14 h-14 mx-auto mb-2 opacity-50" />
         <p>Belum ada data pakan</p>
       </div>
     )

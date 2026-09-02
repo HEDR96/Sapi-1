@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { CattleWeightWithMedia } from '@/types'
 import { formatWeight, formatDate } from '@/lib/utils/formatters'
 import { TrendingUp } from 'lucide-react'
@@ -13,9 +12,7 @@ export function WeightHistory({ weights }: WeightHistoryProps) {
   if (!weights || weights.length === 0) {
     return (
       <div className="text-center py-8 text-[hsl(var(--forest))/50]">
-        <div className="mb-2 flex justify-center">
-  <Image src="/images/cow-seeklogo.png" alt="Sapi" width={56} height={56} className="opacity-50" />
-</div>
+        <img src="/images/21249315961639312271.svg" alt="Sapi" className="w-14 h-14 mx-auto mb-2 opacity-50" />
         <p>Belum ada data penimbangan</p>
       </div>
     )

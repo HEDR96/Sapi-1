@@ -130,7 +130,7 @@ export function CatalogSection({
       {/* Content */}
       {filteredCattle.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[hsl(var(--line))] bg-white px-4 py-8 text-center">
-          <div className="text-4xl mb-2">🔍</div>
+          <div className="text-4xl mb-2"></div>
           <p className="text-[11px] font-bold text-[hsl(var(--forest))]">Sapi tidak ditemukan</p>
           <p className="mt-1 text-[9px] text-[hsl(var(--forest))/55]">
             Coba ubah filter atau kata pencarian.

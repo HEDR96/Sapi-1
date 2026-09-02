@@ -18,7 +18,7 @@ export function SelectedCattleDetail({ cattle, onCompare, isComparing = false }:
   if (!cattle) {
     return (
       <div className="h-full rounded-xl border border-dashed border-[hsl(var(--line))] bg-[hsl(var(--cream))]/50 flex flex-col items-center justify-center p-4 text-center min-h-[300px]">
-  <Image src="/images/cow-seeklogo.png" alt="Sapi" width={64} height={64} className="mb-2 opacity-60" />
+  <img src="/images/cow-seeklogo.png" alt="Sapi" className="w-16 h-16 mb-3 opacity-50" />
   <h3 className="text-sm font-semibold text-[hsl(var(--forest))]">
     Pilih Sapi
   </h3>
