@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { Play, X } from 'lucide-react'
 import { CattleMedia } from '@/types'
 import { cn } from '@/lib/utils/cn'
-import { getDirectImageUrl } from '@/lib/utils/imageUrl'
+import { getDirectImageUrl, getVideoUrl } from '@/lib/utils/imageUrl'
 
 interface DocumentationGalleryProps {
   media: CattleMedia[]
@@ -82,7 +82,7 @@ export function DocumentationGallery({ media }: DocumentationGalleryProps) {
 
           {allMedia[selectedIndex]?.fileType === 'VIDEO' ? (
             <video
-              src={getDirectImageUrl(allMedia[selectedIndex]?.fileUrl || '')}
+              src={getVideoUrl(allMedia[selectedIndex]?.fileUrl || '')}
               controls
               className="max-h-[80vh] max-w-[80vw]"
             />

@@ -9,6 +9,7 @@ import { CattleSelect } from '@/components/admin/CattleSelect'
 import { Pagination } from '@/components/ui/pagination'
 import { VideoUploader } from '@/components/admin/VideoUploader'
 import { ImageUploader } from '@/components/admin/ImageUploader'
+import { getVideoUrl } from '@/lib/utils/imageUrl'
 
 interface MediaItem {
   id: string
@@ -128,7 +129,7 @@ export default function MediaPage() {
               {media.map((m) => (
                 <div key={m.id} className="relative aspect-square rounded-lg overflow-hidden bg-muted">
                   {m.fileType === 'VIDEO' ? (
-                    <video src={m.fileUrl} className="w-full h-full object-cover" />
+                    <video src={getVideoUrl(m.fileUrl)} className="w-full h-full object-cover" />
                   ) : (
                     <Image src={m.fileUrl} alt={m.title || ''} fill className="object-cover" />
                   )}

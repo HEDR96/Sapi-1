@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { X, Play } from 'lucide-react'
 import { CattleMedia } from '@/types'
-import { getDirectImageUrl } from '@/lib/utils/imageUrl'
+import { getDirectImageUrl, getVideoUrl } from '@/lib/utils/imageUrl'
 
 interface MediaGalleryProps {
   media: CattleMedia[]
@@ -65,7 +65,7 @@ export function MediaGallery({ media }: MediaGalleryProps) {
 
           {media[currentIndex].fileType === 'VIDEO' ? (
             <video
-              src={getDirectImageUrl(media[currentIndex].fileUrl)}
+              src={getVideoUrl(media[currentIndex].fileUrl)}
               controls
               className="max-w-[90vw] max-h-[80vh]"
             />
