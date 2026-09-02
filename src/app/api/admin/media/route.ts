@@ -61,8 +61,8 @@ export async function POST(request: NextRequest) {
     // Note: Token refresh happens automatically in uploadToGoogleDrive()
 
     let cattleId: string
-    let fileUrl: string
-    let fileType: string
+    let fileUrl: string | null
+    let fileType: string | null
     let category = 'GENERAL'
     let title: string | null = null
     let description: string | null = null
