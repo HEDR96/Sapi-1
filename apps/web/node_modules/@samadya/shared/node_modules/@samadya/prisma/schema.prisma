@@ -1,0 +1,250 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  AVAILABLE
+  SOLD
+  BOOKED
+  ARCHIVED
+}
+
+enum HealthStatus {
+  SEHAT
+  DALAM_PERAWATAN
+  OBSERVASI
+  SAKIT
+  SEMBUH
+}
+
+enum MediaCategory {
+  GENERAL
+  WEIGHT
+  HEALTH
+  OTHER
+}
+
+enum AdminRole {
+  ADMIN
+  STAFF
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Cattle {
+  id           String   @id @default(cuid())
+  code         String   @unique
+  name         String
+  breed        String
+  status       Status   @default(AVAILABLE)
+  birthDate    DateTime @map("birth_date")
+  height       Float?
+  price        Decimal  @db.Decimal(15, 2)
+  targetWeight Float?   @map("target_weight")
+  description  String?  @db.Text
+  mainImage    String?  @map("main_image")
+  quantity     Int      @default(1)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  weights       CattleWeight[]
+  healthRecords CattleHealthRecord[]
+  feedRecords   CattleFeedRecord[]
+  media         CattleMedia[]
+  bookings      Booking[]
+  comments      Comment[]
+
+  @@index([status])
+  @@index([breed])
+}
+
+model CattleWeight {
+  id              String   @id @default(cuid())
+  cattleId        String   @map("cattle_id")
+  cattle          Cattle   @relation(fields: [cattleId], references: [id], onDelete: Cascade)
+  weight          Float
+  measurementDate DateTime @map("measurement_date")
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  media CattleWeightMedia[]
+
+  @@index([cattleId])
+  @@index([measurementDate])
+}
+
+model CattleWeightMedia {
+  id        String       @id @default(cuid())
+  weightId  String       @map("weight_id")
+  weight    CattleWeight @relation(fields: [weightId], references: [id], onDelete: Cascade)
+  fileUrl   String       @map("file_url")
+  fileType  String       @map("file_type")
+  createdAt DateTime     @default(now()) @map("created_at")
+}
+
+model CattleHealthRecord {
+  id         String       @id @default(cuid())
+  cattleId   String       @map("cattle_id")
+  cattle     Cattle       @relation(fields: [cattleId], references: [id], onDelete: Cascade)
+  recordDate DateTime     @map("record_date")
+  healthType String       @map("health_type")
+  status     HealthStatus @default(SEHAT)
+  notes      String?      @db.Text
+  createdAt  DateTime     @default(now()) @map("created_at")
+
+  media CattleHealthMedia[]
+
+  @@index([cattleId])
+}
+
+model CattleHealthMedia {
+  id             String             @id @default(cuid())
+  healthRecordId String             @map("health_record_id")
+  healthRecord   CattleHealthRecord @relation(fields: [healthRecordId], references: [id], onDelete: Cascade)
+  fileUrl        String             @map("file_url")
+  fileType       String             @map("file_type")
+  createdAt      DateTime           @default(now()) @map("created_at")
+}
+
+model CattleFeedRecord {
+  id         String   @id @default(cuid())
+  cattleId   String   @map("cattle_id")
+  cattle     Cattle   @relation(fields: [cattleId], references: [id], onDelete: Cascade)
+  recordDate DateTime @map("record_date")
+  feedType   String   @map("feed_type")
+  amount     String
+  frequency  String
+  notes      String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([cattleId])
+}
+
+model CattleMedia {
+  id          String        @id @default(cuid())
+  cattleId    String        @map("cattle_id")
+  cattle      Cattle        @relation(fields: [cattleId], references: [id], onDelete: Cascade)
+  category    MediaCategory @default(GENERAL)
+  fileUrl     String        @map("file_url")
+  fileType    String        @map("file_type")
+  title       String?
+  description String?
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  @@index([cattleId])
+}
+
+model Admin {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String
+  name     String
+  role     AdminRole @default(STAFF)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String?
+  name          String?
+  role          UserRole  @default(USER)
+  emailVerified Boolean   @default(false)
+  verificationCode String?
+  verificationExpiry DateTime?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  bookings Booking[]
+  comments Comment[]
+
+  @@index([email])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cattleId  String   @map("cattle_id")
+  cattle    Cattle   @relation(fields: [cattleId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([cattleId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  cattleId   String        @map("cattle_id")
+  cattle     Cattle        @relation(fields: [cattleId], references: [id], onDelete: Cascade)
+  userId     String        @map("user_id")
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quantity   Int           @default(1)
+  status     BookingStatus @default(PENDING)
+  notes      String?
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+
+  @@index([cattleId])
+  @@index([userId])
+  @@index([status])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId   String?  @map("user_id")
+  title     String
+  message   String   @db.Text
+  type      String   @default("INFO")
+  isRead    Boolean  @default(false)
+  data      String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model Visitor {
+  id        String   @id @default(cuid())
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  page      String
+  referrer  String?
+  country   String?
+  city      String?
+  device    String?  // desktop, mobile, tablet
+  browser   String?
+  os        String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([page])
+  @@index([createdAt])
+}
+
+model DailyStats {
+  id          String   @id @default(cuid())
+  date        DateTime @unique @map("date")
+  pageViews   Int      @default(0) @map("page_views")
+  uniqueVisitors Int   @default(0) @map("unique_visitors")
+  cattleViews Int      @default(0) @map("cattle_views")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+}

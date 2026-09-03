@@ -1,0 +1,19 @@
+{
+  "extends": "../../packages/shared/tsconfig.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@samadya/shared": ["../../packages/shared"],
+      "@samadya/shared/*": ["../../packages/shared/*"],
+      "@samadya/prisma": ["../../packages/prisma/generated"],
+      "@samadya/prisma/*": ["../../packages/prisma/generated/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}

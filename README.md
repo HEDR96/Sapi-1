@@ -1,300 +1,140 @@
-# 🐄 Cattle Catalog Web Application
+# Samadya Farm - Monorepo Structure
 
-Katalog dan monitoring sapi dengan informasi lengkap, transparan, dan riwayat pertumbuhan yang terdokumentasi.
+## Struktur Proyek
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue?style=flat-square&logo=typescript)
-![Prisma](https://img.shields.io/badge/Prisma-5.22-2D3748?style=flat-square&logo=prisma)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=flat-square&logo=tailwind-css)
+```
+samadyafarm/
+├── apps/
+│   ├── web/           # Public Website (samadyafarm.id)
+│   │   ├── src/
+│   │   │   ├── app/           # Next.js pages
+│   │   │   └── components/   # Public components
+│   │   └── package.json
+│   └── admin/         # Admin Website (admin.samadyafarm.id)
+│       ├── src/
+│       │   ├── app/           # Next.js pages
+│       │   └── components/   # Admin components
+│       └── package.json
+├── packages/
+│   ├── prisma/       # Database Schema
+│   │   ├── schema.prisma
+│   │   ├── generated/  # Generated Prisma Client
+│   │   └── package.json
+│   ├── shared/       # Shared Code
+│   │   ├── types/
+│   │   ├── lib/
+│   │   └── package.json
+│   └── api/          # Shared API Routes
+│       ├── src/
+│       │   └── app/api/
+│       └── package.json
+├── turbo.json
+└── package.json      # Root workspace
+```
 
-## ✨ Fitur
+## Setup
 
-### Public
-- Katalog sapi dengan filter dan search
-- Halaman detail sapi
-- Grafik perkembangan bobot
-- Riwayat kesehatan dan pakan
-- QR Code untuk setiap sapi
-- Responsif (mobile-first)
-
-### Admin
-- Dashboard dengan statistik
-- CRUD sapi lengkap
-- Manajemen data timbang
-- Manajemen kesehatan
-- Manajemen pakan
-- Upload dokumentasi
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js 18+
-- npm atau yarn
-- PostgreSQL database
-
-### 1. Clone & Install
+### 1. Install Dependencies
 
 ```bash
-git clone <repo-url>
-cd cattle-catalog
-npm install
+# Install pnpm if not already installed
+npm install -g pnpm
+
+# Install all dependencies
+pnpm install
 ```
 
-### 2. Setup Environment
+### 2. Generate Prisma Client
 
 ```bash
-cp .env.example .env
+pnpm db:generate
 ```
 
-Edit `.env`:
-```env
-DATABASE_URL="postgresql://user:password@localhost:5432/cattle_catalog"
-JWT_SECRET="generate-a-random-secret-key"
-JWT_EXPIRES_IN="24h"
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-```
-
-### 3. Database Setup
+### 3. Setup Database
 
 ```bash
-# Push schema ke database
-npm run db:push
+# Copy .env to prisma package
+cp .env packages/prisma/.env
 
-# Seed dengan data sample
-npm run db:seed
+# Push schema to database
+pnpm db:push
+
+# Or run migrations
+pnpm db:migrate
 ```
 
-### 4. Run Development Server
+### 4. Run Development
 
 ```bash
-npm run dev
+# Run all apps with turbo
+pnpm dev:all
+
+# Or run individually
+pnpm dev:web     # Public: http://localhost:3000
+pnpm dev:admin   # Admin: http://localhost:3002
+pnpm dev:api     # API: http://localhost:3001
 ```
 
-Buka http://localhost:3000
+## Deployment
 
-### 5. Admin Login
+### Vercel
 
+1. Connect repo to Vercel
+2. Set root directory for each project:
+   - Web App: `apps/web`
+   - Admin App: `apps/admin`
+3. Configure environment variables
+4. Deploy
+
+### Environment Variables
+
+**Web App (.env.local)**
 ```
-Email:    admin@sapikatalog.com
-Password: admin123
+DATABASE_URL=postgresql://...
+NEXT_PUBLIC_APP_URL=https://samadyafarm.id
 ```
 
----
+**Admin App (.env.local)**
+```
+DATABASE_URL=postgresql://...
+NEXT_PUBLIC_APP_URL=https://admin.samadyafarm.id
+```
 
-## 🐳 Docker Setup (Optional)
-
-### Development dengan Docker
+## Commands
 
 ```bash
-# Start containers
-docker-compose up -d
+# Install dependencies
+pnpm install
 
-# Setup database
-docker-compose exec app npx prisma db push
-docker-compose exec app npm run db:seed
+# Build all apps
+pnpm build
 
-# Buka http://localhost:3000
+# Type check
+pnpm typecheck
+
+# Lint
+pnpm lint
+
+# Generate Prisma client
+pnpm db:generate
+
+# Push schema to database
+pnpm db:push
+
+# Run migrations
+pnpm db:migrate
+
+# Open Prisma Studio
+pnpm db:studio
 ```
 
-### Useful Commands
+## Adding Dependencies
 
 ```bash
-# View logs
-docker-compose logs -f
+# Add to specific app
+pnpm --filter @samadya/web add recharts
+pnpm --filter @samadya/admin add recharts
 
-# Stop containers
-docker-compose down
-
-# Stop + hapus data
-docker-compose down -v
-
-# Restart
-docker-compose restart
+# Add to shared package
+pnpm --filter @samadya/shared add lucide-react
 ```
-
----
-
-## 🌐 Deployment ke Vercel
-
-### Prerequisites
-
-1. Akun Vercel (https://vercel.com)
-2. PostgreSQL database
-
-### Step 1: Buat PostgreSQL Database
-
-**Opsi A: Vercel Postgres (Recommended)**
-1. Buka https://vercel.com/dashboard
-2. New Project → Add Integration → Vercel Postgres
-3. Pilih project atau create new database
-4. Copy connection string
-
-**Opsi B: External Database**
-- Supabase
-- Railway
-- Neon
-- Atau PostgreSQL server lain
-
-### Step 2: Deploy ke Vercel
-
-**Opsi A: Via GitHub (Recommended)**
-
-1. Push code ke GitHub repository
-2. Buka https://vercel.com/new
-3. Import repository
-4. Configure environment variables
-
-**Opsi B: Via Vercel CLI**
-
-```bash
-npm i -g vercel
-vercel login
-vercel
-```
-
-### Step 3: Setup Environment Variables di Vercel
-
-Di Vercel Dashboard → Project Settings → Environment Variables:
-
-```env
-# Database
-DATABASE_URL=postgresql://xxx:xxx@aws-xxx.supabase.co:5432/postgres
-
-# JWT (generate random string)
-JWT_SECRET=your-super-secret-random-key-at-least-32-chars
-
-# App URL (ganti dengan domain Vercel Anda)
-NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
-```
-
-### Step 4: Deploy
-
-1. Klik Deploy
-2. Tunggu build selesai
-3. Setup selesai!
-
-### Step 5: Setup Database di Production
-
-Setelah deploy berhasil:
-
-1. Buka Vercel Postgres di dashboard, atau
-2. Gunakan CLI:
-```bash
-vercel env pull .env.production.local
-npm run db:push
-npm run db:seed
-```
-
----
-
-## 📁 Project Structure
-
-```
-cattle-catalog/
-├── src/
-│   ├── app/
-│   │   ├── (public)/          # Public pages
-│   │   │   ├── page.tsx       # Homepage
-│   │   │   └── sapi/[code]/   # Cattle detail
-│   │   ├── admin/             # Admin pages
-│   │   │   ├── dashboard/
-│   │   │   ├── cattle/
-│   │   │   └── login/
-│   │   └── api/               # API routes
-│   │       ├── cattle/
-│   │       └── admin/
-│   ├── components/
-│   │   ├── ui/               # shadcn/ui components
-│   │   ├── catalog/           # Catalog components
-│   │   ├── cattle/           # Cattle detail components
-│   │   └── admin/            # Admin components
-│   ├── lib/
-│   │   ├── auth/             # JWT authentication
-│   │   ├── db/              # Prisma client
-│   │   └── utils/           # Utilities
-│   └── types/               # TypeScript types
-├── prisma/
-│   ├── schema.prisma        # Database schema
-│   └── seed.ts              # Seed data
-├── public/
-│   └── uploads/             # Uploaded files
-├── Dockerfile
-├── docker-compose.yml
-└── package.json
-```
-
----
-
-## 🔧 API Endpoints
-
-### Public API
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/cattle` | List cattle (pagination, filters) |
-| GET | `/api/cattle/[code]` | Get cattle detail |
-
-### Admin API
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/admin/auth/login` | Admin login |
-| POST | `/api/admin/auth/logout` | Admin logout |
-| GET | `/api/admin/cattle` | List all cattle |
-| POST | `/api/admin/cattle` | Create cattle |
-| PUT | `/api/admin/cattle/[id]` | Update cattle |
-| DELETE | `/api/admin/cattle/[id]` | Delete cattle |
-| POST | `/api/admin/cattle/[id]/weights` | Add weight |
-| POST | `/api/admin/cattle/[id]/health` | Add health record |
-| POST | `/api/admin/cattle/[id]/feed` | Add feed record |
-| POST | `/api/admin/cattle/[id]/media` | Upload media |
-
----
-
-## 🗄️ Database Schema
-
-### Tables
-
-- `Cattle` - Data utama sapi
-- `CattleWeight` - Riwayat timbang
-- `CattleWeightMedia` - Media timbang
-- `CattleHealthRecord` - Riwayat kesehatan
-- `CattleHealthMedia` - Media kesehatan
-- `CattleFeedRecord` - Riwayat pakan
-- `CattleMedia` - Dokumentasi umum
-- `Admin` - User admin
-
----
-
-## 🎨 Tech Stack
-
-- **Framework:** Next.js 14 (App Router)
-- **Language:** TypeScript (strict)
-- **Styling:** Tailwind CSS + shadcn/ui
-- **Database:** PostgreSQL
-- **ORM:** Prisma
-- **Auth:** JWT
-- **Charts:** Recharts
-- **QR Code:** qrcode.react
-- **Deployment:** Vercel / Docker
-
----
-
-## 📝 License
-
-MIT License
-
----
-
-## 🤝 Contributing
-
-1. Fork repository
-2. Create feature branch
-3. Commit changes
-4. Push to branch
-5. Open Pull Request
-
----
-
-Made with ❤️ for cattle farmers 🐄

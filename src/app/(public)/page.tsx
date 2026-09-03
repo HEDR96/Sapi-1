@@ -99,6 +99,7 @@ export default function HomePage() {
     <div ref={pageRef} className="mx-auto my-2 max-w-[1500px] overflow-hidden border border-black/30 bg-[hsl(var(--cream2))] shadow-2xl">
       <HeroSection />
       <JourneySection />
+      <TrustRow />
       {/* KATALOG - Combined Swiper/Grid with Toggle */}
       <CatalogSection
         cattle={cattle}
@@ -127,7 +128,7 @@ export default function HomePage() {
         onCompareSelect={handleCompareSelect}
         onOpenCompare={handleOpenCompare}
       />
-      <TrustRow />
+
       <RecentComments />
       <CTASection />
 
