@@ -9,8 +9,6 @@ const nextConfig = {
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
     ],
   },
-  // For monorepo - standalone output for Docker
-  output: 'standalone',
 }
 
 module.exports = nextConfig

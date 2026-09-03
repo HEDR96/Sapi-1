@@ -7,13 +7,30 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@samadya/shared": ["../../packages/shared"],
-      "@samadya/shared/*": ["../../packages/shared/*"],
-      "@samadya/prisma": ["../../packages/prisma/generated"],
-      "@samadya/prisma/*": ["../../packages/prisma/generated/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@samadya/shared": [
+        "../../packages/shared"
+      ],
+      "@samadya/shared/*": [
+        "../../packages/shared/*"
+      ],
+      "@samadya/prisma": [
+        "../../packages/prisma/generated"
+      ],
+      "@samadya/prisma/*": [
+        "../../packages/prisma/generated/*"
+      ]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
