@@ -46,6 +46,61 @@ enum BookingStatus {
   COMPLETED
 }
 
+enum SaleStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model Customer {
+  id                  String   @id @default(cuid())
+  name                String
+  email               String?
+  phone               String?
+  address             String?
+  purchasePercentage  Float?
+  sales               Sale[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Sale {
+  id          String     @id @default(cuid())
+  cattleId    String
+  cattle      Cattle     @relation(fields: [cattleId], references: [id])
+  customerId  String
+  customer    Customer   @relation(fields: [customerId], references: [id])
+  quantity    Int        @default(1)
+  price       Decimal    @db.Decimal(15, 2)
+  margin      Decimal?   @db.Decimal(15, 2)
+  status      SaleStatus @default(PENDING)
+  notes       String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Testimonial {
+  id            String   @id @default(cuid())
+  customerName  String
+  content       String   @db.Text
+  rating        Int      @default(5)
+  isActive      Boolean  @default(true)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+}
+
+model MasterData {
+  id        String   @id @default(cuid())
+  category  String   // JENIS_SAPI, STATUS_SAPI, JENIS_PAKAN
+  key       String
+  value     String
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+
+  @@unique([category, key])
+}
+
 model Cattle {
   id           String   @id @default(cuid())
   code         String   @unique
@@ -59,6 +114,10 @@ model Cattle {
   description  String?  @db.Text
   mainImage    String?  @map("main_image")
   quantity     Int      @default(1)
+  buyPrice     Decimal? @db.Decimal(15, 2)
+  sellPrice    Decimal? @db.Decimal(15, 2)
+  healthCost   Decimal? @db.Decimal(15, 2)
+  feedCost     Decimal? @db.Decimal(15, 2)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
@@ -68,6 +127,8 @@ model Cattle {
   media         CattleMedia[]
   bookings      Booking[]
   comments      Comment[]
+  sales         Sale[]
+  testimonials  Testimonial[]
 
   @@index([status])
   @@index([breed])

@@ -23,6 +23,12 @@ export interface CattleWeightWithMedia {
   media?: CattleWeightMedia[]
 }
 
+// Weight entry for charts
+export interface WeightEntry {
+  date: Date
+  weight: number
+}
+
 // CattleHealthMedia interface
 export interface CattleHealthMedia {
   id: string
@@ -74,8 +80,10 @@ export interface CattleWithRelations {
   code: string
   name: string
   breed: string
+  gender?: string | null
   status: Status
   birthDate: Date
+  age?: number | null
   height: number | null
   price: import('@prisma/client').Prisma.Decimal
   targetWeight: number | null
@@ -84,6 +92,9 @@ export interface CattleWithRelations {
   quantity: number
   createdAt: Date
   updatedAt: Date
+  // Computed fields
+  lastWeight?: number | null
+  avgDailyGain?: number | null
   // Financial fields (to be added)
   buyPrice?: import('@prisma/client').Prisma.Decimal | null
   sellPrice?: import('@prisma/client').Prisma.Decimal | null

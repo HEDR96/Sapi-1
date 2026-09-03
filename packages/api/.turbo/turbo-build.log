@@ -6,17 +6,21 @@ $ next build
  ✓ Compiled successfully
    Linting and checking validity of types ...
    Collecting page data ...
-   Generating static pages (0/2) ...
- ✓ Generating static pages (2/2)
-   Finalizing page optimization ...
-   Collecting build traces ...
+PageNotFoundError: Cannot find module for page: /api/admin/weights
+    at getPagePath (D:\Sapi\node_modules\.pnpm\next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\server\require.js:94:15)
+    at requirePage (D:\Sapi\node_modules\.pnpm\next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\server\require.js:99:22)
+    at D:\Sapi\node_modules\.pnpm\next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\server\load-components.js:103:84
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async loadComponentsImpl (D:\Sapi\node_modules\.pnpm\next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\server\load-components.js:103:26)
+    at async D:\Sapi\node_modules\.pnpm\next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\build\utils.js:1116:32
+    at async Span.traceAsyncFn (D:\Sapi\node_modules\.pnpm\next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\trace\trace.js:154:20) {
+  code: 'ENOENT'
+}
 
-Route (pages)                             Size     First Load JS
-─ ○ /404                                  180 B          80.7 kB
-+ First Load JS shared by all             80.5 kB
-  ├ chunks/framework-bef83a85c94ff7de.js  44.8 kB
-  ├ chunks/main-ada21822a1fb1561.js       34 kB
-  └ other shared chunks (total)           1.63 kB
-
-○  (Static)  prerendered as static content
-
+> Build error occurred
+Error: Failed to collect page data for /api/admin/weights
+    at D:\Sapi\node_modules\.pnpm\next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\build\utils.js:1269:15
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  type: 'Error'
+}
+[ELIFECYCLE] Command failed with exit code 1.

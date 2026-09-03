@@ -6,22 +6,37 @@ $ next build
  ✓ Compiled successfully
    Linting and checking validity of types ...
    Collecting page data ...
-   Generating static pages (0/4) ...
-   Generating static pages (1/4) 
-   Generating static pages (2/4) 
-   Generating static pages (3/4) 
- ✓ Generating static pages (4/4)
+   Generating static pages (0/17) ...
+   Generating static pages (4/17) 
+   Generating static pages (8/17) 
+   Generating static pages (12/17) 
+ ✓ Generating static pages (17/17)
    Finalizing page optimization ...
    Collecting build traces ...
 
 Route (app)                              Size     First Load JS
-┌ ○ /                                    138 B          87.4 kB
-└ ○ /_not-found                          872 B          88.1 kB
-+ First Load JS shared by all            87.2 kB
-  ├ chunks/5b8f0dd8-0b7e1dd47e2a464c.js  53.6 kB
-  ├ chunks/749-39e755d29f953c93.js       31.7 kB
-  └ other shared chunks (total)          1.86 kB
+┌ ○ /                                    142 B          87.6 kB
+├ ○ /_not-found                          142 B          87.6 kB
+├ ○ /bookings                            4 kB            103 kB
+├ ○ /cattle                              3.44 kB         116 kB
+├ ƒ /cattle/[id]                         3.61 kB         143 kB
+├ ○ /cattle/new                          6.45 kB         140 kB
+├ ○ /dashboard                           4.18 kB         107 kB
+├ ○ /feed                                6.97 kB         107 kB
+├ ○ /health                              7.18 kB         108 kB
+├ ○ /login                               4.88 kB         108 kB
+├ ○ /media                               9.77 kB         109 kB
+├ ○ /notifications                       3.49 kB        99.6 kB
+├ ○ /settings                            1.93 kB        96.1 kB
+├ ○ /users                               2.47 kB         107 kB
+├ ○ /visitors                            2.81 kB        90.2 kB
+└ ○ /weight                              6.96 kB         107 kB
++ First Load JS shared by all            87.4 kB
+  ├ chunks/5b8f0dd8-628de61c96dd3fb2.js  53.6 kB
+  ├ chunks/749-1fb07b2d01c11f92.js       31.7 kB
+  └ other shared chunks (total)          2.05 kB
 
 
-○  (Static)  prerendered as static content
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
 

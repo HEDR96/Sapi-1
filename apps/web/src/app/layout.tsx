@@ -1,22 +1,20 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
+'use client'
 
-const inter = Inter({ subsets: ['latin'] })
+import { Navbar } from '../components/layout/Navbar'
+import { Footer } from '../components/layout/Footer'
+import { VisitorTracker } from '../components/layout/VisitorTracker'
 
-export const metadata: Metadata = {
-  title: 'Samadya Farm - Sapi Qurban Pilihan',
-  description: 'Sapi pilihan berkualitas dengan pemantauan transparan untuk qurban Anda',
-}
-
-export default function RootLayout({
+export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="id">
-      <body className={inter.className}>{children}</body>
-    </html>
+    <>
+      <VisitorTracker />
+      <Navbar />
+      <main>{children}</main>
+      <Footer />
+    </>
   )
 }

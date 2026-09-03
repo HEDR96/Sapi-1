@@ -1,6 +1,7 @@
 {
   "extends": "../../packages/shared/tsconfig.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"

@@ -1,0 +1,131 @@
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import {
+  LayoutDashboard,
+  Beef,
+  Scale,
+  Heart,
+  UtensilsCrossed,
+  Image as ImageIcon,
+  Users,
+  Settings,
+  Calendar,
+  Eye,
+  X,
+} from 'lucide-react'
+
+const navItems = [
+  { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/admin/visitors', icon: Eye, label: 'Pengunjung' },
+  { href: '/admin/cattle', icon: Beef, label: 'Manajemen Sapi' },
+  { href: '/admin/weight', icon: Scale, label: 'Riwayat Timbang' },
+  { href: '/admin/health', icon: Heart, label: 'Riwayat Kesehatan' },
+  { href: '/admin/feed', icon: UtensilsCrossed, label: 'Riwayat Pakan' },
+  { href: '/admin/media', icon: ImageIcon, label: 'Dokumentasi' },
+  { href: '/admin/bookings', icon: Calendar, label: 'Booking' },
+  { href: '/admin/users', icon: Users, label: 'Pengguna' },
+  { href: '/admin/settings', icon: Settings, label: 'Pengaturan' },
+]
+
+interface AdminSidebarProps {
+  isOpen?: boolean
+  onClose?: () => void
+}
+
+export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
+  const pathname = usePathname()
+  const [pendingBookingsCount, setPendingBookingsCount] = useState(0)
+
+  useEffect(() => {
+    fetch('/api/admin/bookings?status=PENDING')
+      .then(res => res.json())
+      .then(data => setPendingBookingsCount(data.bookings?.length || 0))
+      .catch(() => {})
+  }, [])
+
+  const handleLinkClick = () => {
+    if (onClose && window.innerWidth < 1024) {
+      onClose()
+    }
+  }
+
+  return (
+    <>
+      {/* Sidebar */}
+      <aside
+        className={`
+          fixed inset-y-0 left-0 z-50 w-60 overflow-y-auto bg-white shadow-xl
+          transition-transform duration-300 ease-in-out
+          lg:static lg:translate-x-0 lg:shadow-none
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
+        {/* Header */}
+        <div className="flex h-14 items-center justify-between border-b border-[hsl(var(--line))] px-4">
+          <Link href="/admin/dashboard" className="flex items-center gap-2" onClick={handleLinkClick}>
+            <div className="grid h-8 w-8 place-items-center rounded-full bg-[hsl(var(--forest))]">
+              <span className="text-sm font-bold text-white">NF</span>
+            </div>
+            <div>
+              <div className="text-[12px] font-extrabold tracking-[.06em] text-[hsl(var(--forest))]">
+                samadyafarm.id
+              </div>
+              <div className="text-[7px] text-[hsl(var(--forest))/60]">ADMIN PANEL</div>
+            </div>
+          </Link>
+          <button
+            onClick={onClose}
+            className="lg:hidden p-1 rounded hover:bg-gray-100"
+            aria-label="Close menu"
+          >
+            <X className="h-5 w-5 text-[hsl(var(--forest))]" />
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="p-3">
+          <ul className="space-y-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    onClick={handleLinkClick}
+                    className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-[11px] font-medium transition-colors ${
+                      isActive
+                        ? 'bg-[hsl(var(--forest))] text-white'
+                        : 'text-[hsl(var(--forest))/70] hover:bg-[hsl(var(--cream))] hover:text-[hsl(var(--forest))]'
+                    }`}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                    {item.href === '/admin/bookings' && pendingBookingsCount > 0 && (
+                      <span className="ml-auto h-5 min-w-[20px] flex items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold px-1.5">
+                        {pendingBookingsCount > 99 ? '99+' : pendingBookingsCount}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
+
+        {/* Footer */}
+        <div className="absolute bottom-0 left-0 right-0 border-t border-[hsl(var(--line))] p-3">
+          <Link
+            href="/"
+            onClick={handleLinkClick}
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-[10px] font-medium text-[hsl(var(--forest))/60 hover:bg-[hsl(var(--cream))] hover:text-[hsl(var(--forest))]"
+          >
+            ← Kembali ke Website
+          </Link>
+        </div>
+      </aside>
+    </>
+  )
+}

@@ -1,4 +1,4 @@
-import { CattleWeightWithMedia } from '../types'
+import { CattleWeightWithMedia } from '@samadya/shared/types'
 
 export function calculateWeightStats(weights: CattleWeightWithMedia[]) {
   if (!weights || weights.length === 0) {
