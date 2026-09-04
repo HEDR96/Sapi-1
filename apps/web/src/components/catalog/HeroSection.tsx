@@ -67,8 +67,8 @@ function AnimatedCounter({ end, suffix, duration = 1200 }: CounterProps) {
 }
 
 const stats = [
-  { value: 2450, suffix: '', label: 'Sapi Terdaftar' },
-  { value: 98, suffix: '%', label: 'Kepuasan %' },
+  { value: 10, suffix: '', label: 'Sapi Terdaftar' },
+  { value: 90, suffix: '%', label: 'Kepuasan %' },
   { value: 24, suffix: '/7', label: 'Jam Monitoring' },
   { value: 100, suffix: '%', label: 'Transparan %' },
 ]
@@ -84,29 +84,6 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSect
   const heroRef = useRef<HTMLElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const isSliderChange = useRef(false)
-  const tagRef = useRef<HTMLDivElement>(null)
-  const [tagOpen, setTagOpen] = useState(false)
-  const [tagSettled, setTagSettled] = useState(false)
-  const tagAnimated = useRef(false)
-
-  useEffect(() => {
-    const el = tagRef.current
-    if (!el || tagAnimated.current) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !tagAnimated.current) {
-            tagAnimated.current = true
-            setTagOpen(true)
-            observer.unobserve(entry.target)
-          }
-        })
-      },
-      { threshold: 0.4 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
 
   // Get available cattle with images
   const displayCattle = cattle.filter(c => c.mainImage)
@@ -165,9 +142,9 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSect
   }, [])
 
   return (
-    <section ref={heroRef} className="reveal mx-auto grid max-w-[1400px] grid-cols-1 items-stretch lg:grid-cols-[1.3fr_1.2fr_.55fr]">
+    <section ref={heroRef} className="reveal mx-auto grid max-w-full grid-cols-1 items-stretch lg:grid-cols-[3.3fr_2.1fr_.9fr]">
       {/* Image Slider */}
-      <div className="hero-photo relative min-h-[220px] sm:min-h-[350px] lg:min-h-[500px] overflow-hidden">
+      <div className="hero-photo relative min-h-[280px] sm:min-h-[400px] lg:min-h-[580px] overflow-hidden">
         {/* Current Image */}
         {currentCattle?.mainImage ? (
           <div
@@ -250,110 +227,104 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSect
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
               <AnimatedCounter end={stat.value} suffix={stat.suffix} />
-              <div className="text-[7px] text-[hsl(var(--forest))/55]">{stat.label}</div>
+              <div className="text-[10px] sm:text-[12px] text-[hsl(var(--forest))/55]">{stat.label}</div>
             </div>
           ))}
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-[9px] text-[hsl(var(--forest))/70] sm:flex sm:flex-wrap sm:gap-4 lg:grid lg:grid-cols-4 lg:gap-3 xl:flex">
+        <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-[10px] text-[hsl(var(--forest))/70] sm:flex sm:flex-wrap sm:gap-4 lg:grid lg:grid-cols-4 lg:gap-3 xl:flex">
           {trustFeatures.map((feature, index) => (
-            <div key={index} className="flex items-center gap-1.5">
-              <feature.icon className="h-3.5 w-3.5 text-[hsl(var(--olive))]" />
+            <div key={index} className="text-[15px] flex items-center gap-1.5">
+              <feature.icon className="h-6 w-6 text-[hsl(var(--olive))]" />
               {feature.text}
             </div>
           ))}
         </div>
       </div>
 
-            {/* Dynamic Tag with Cattle Info */}
-      <div className="relative flex items-end justify-end overflow-hidden bg-[#F4EFE2] px-4 py-6 lg:px-6 lg:pr-3">
-        <div className="tag-leaf" />
-
-        {/* Wooden peg with metal ring, mounted on the hero frame */}
-        <div className="peg-wrap pointer-events-none absolute right-9 top-5 z-20 lg:right-5">
-          <div className="peg-dowel" />
-          <div className="peg-ring" />
+{/* Dynamic Tag Container */}
+      <div className="relative flex items-start justify-end overflow-hidden bg-[#F1EFE2] px-4 pt-0 py-2 lg:px-6 lg:pr-3">
+        {/* 1. GANTUNGAN WOOD/METAL PIN (STATIK DI ATAS CONTAINER) */}
+        <div className="pointer-events-none absolute right-[72px] sm:right-[92px] top-0 z-30 flex flex-col items-center">
+          {/* Base Pin Kayu dengan Lis Gold & Shadow */}
+          <div className="h-3 w-7 rounded-b-md bg-gradient-to-b from-[#5c4328] via-[#7a5c37] to-[#43301b] shadow-md border-x border-b border-[#302111]" />
+          {/* Ring Pengait Kecil */}
+          <div className="-mt-1 h-2 w-2 rounded-full border border-[#8B7355] bg-[#302111]" />
         </div>
 
-        <div ref={tagRef} className="tag-perspective relative mr-2 w-[156px] sm:w-[198px] lg:w-[156px] xl:w-[198px] lg:mr-0">
-          {/* Ground shadow to sell depth / distance from the wall */}
-          <div className="tag-shadow-blob" />
-
-          {/* Twisted jute rope, sags naturally from peg to tag eyelet */}
-          <svg
-            className="rope-svg pointer-events-none absolute -top-16 right-5 z-10 sm:-top-[4.6rem]"
-            width="56"
-            height="78"
-            viewBox="0 0 56 78"
-            fill="none"
-          >
-            {/* main sagging strand (catenary-like curve) */}
-            <path
-              d="M28 3 C 14 22, 40 34, 22 48 C 10 58, 34 62, 27 74"
-              stroke="#7a5c34"
-              strokeWidth="3.4"
-              strokeLinecap="round"
-              fill="none"
-            />
-            {/* twist highlight, offset ticks along the same path */}
-            <path
-              d="M28 3 C 14 22, 40 34, 22 48 C 10 58, 34 62, 27 74"
-              stroke="#e0c48a"
-              strokeWidth="1"
-              strokeDasharray="2.5 3.5"
-              fill="none"
-              opacity="0.85"
-            />
-            {/* knot just above the eyelet */}
-            <ellipse cx="27" cy="70" rx="4.5" ry="3.5" fill="#5f4726" />
-            <ellipse cx="27" cy="70" rx="2.2" ry="1.6" fill="#8a6a3d" />
-          </svg>
-
+        <div className="relative mr-1 lg:mr-0">
+          {/* 2. WRAPPER ANIMASI (TALI LURUS + KERTAS TAG BERGERAK BERSAMAAN) */}
           <div
-            onAnimationEnd={() => setTagSettled(true)}
-            className={`nusa-tag tag-shape relative rounded-[22px] px-4 pb-4 pt-11 ${
-              tagOpen && !tagSettled ? 'tag-fold-open' : ''
-            } ${tagSettled ? 'tag-settled' : ''}`}
+            key={currentCattle?.id || 'default'}
+            className="paper-pull-up relative z-10 flex flex-col items-center pt-2"
           >
-            {/* Metal eyelet the rope threads through */}
-            <div className="tag-eyelet" />
-
-            <div className="text-center text-[10px] font-extrabold tracking-[.02em] text-[hsl(var(--forest))] sm:text-[12px]">
-              samadyafarm.id
-            </div>
-            <div className="text-center text-[6px] font-semibold uppercase tracking-[.16em] text-[hsl(var(--forest))/70] sm:text-[7px]">
-              Sapi Pilihan
-            </div>
-
-            {/* Embossed plate, dot-matrix style like a real livestock tag printer */}
-            <div className="plate plate-embossed mt-2 rounded-[8px] px-2 py-2 text-center font-extrabold leading-none sm:text-[24px] text-[18px]">
-              {currentCattle?.code || 'NF-0001'}
+            {/* TALI RUSTIC LURUS (ESTETIK & ELEGAN) */}
+            <div className="pointer-events-none relative -mb-1 z-20 flex flex-col items-center">
+              <svg width="6" height="32" viewBox="0 0 6 32" fill="none" className="drop-shadow-sm">
+                {/* Tali Utama */}
+                <line x1="3" y1="0" x2="3" y2="32" stroke="#6E5030" strokeWidth="3.5" strokeLinecap="round" />
+                {/* Ulir Tekstur Tali (Rustic Cord) */}
+                <line x1="3" y1="0" x2="3" y2="32" stroke="#A88B63" strokeWidth="1.5" strokeDasharray="3 3" />
+              </svg>
             </div>
 
-            <div className="tag-subtitle mt-2 text-center text-[10px] font-bold uppercase leading-tight text-[hsl(var(--forest))] sm:text-[13px]">
-              {currentCattle?.breed || 'LIMOUSIN'}
-            </div>
-            <div className="tag-subtitle text-center text-[10px] font-bold uppercase leading-tight text-[hsl(var(--forest))] sm:text-[13px]">
-              {currentCattle?.gender === 'FEMALE' ? 'BETINA' : 'JANTAN'}
-            </div>
-
-            <div className="qr-box mx-auto mt-3 aspect-square h-[92px] w-[92px] shrink-0 rounded-[3px] bg-white p-1.5 sm:h-[116px] sm:w-[116px]">
-              {currentCattle ? (
-                <div className="flex h-full items-center justify-center">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`/sapi/${currentCattle.code}`)}`}
-                    alt="QR Code"
-                    className="h-full w-full object-contain"
-                  />
+            {/* KERTAS TAG */}
+            <div
+              className="relative w-[145px] sm:w-[175px] lg:w-[145px] xl:w-[175px] rounded-[20px] bg-gradient-to-b from-[#F7F3E9] via-[#F0EAD8] to-[#E3D9C2] px-3.5 pb-3.5 pt-6 shadow-2xl"
+              style={{
+                boxShadow: '0 12px 30px -8px rgba(40, 30, 15, 0.22)',
+                border: '1.5px solid #D4C9B0'
+              }}
+            >
+              {/* LUBANG METAL EYELET GOLD (TEMPAT TALI MASUK) */}
+              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-30">
+                <div className="relative flex h-5 w-5 items-center justify-center rounded-full border-[2.5px] border-[#9E7B4F] bg-gradient-to-br from-[#D4AF37] via-[#AA7C11] to-[#5B430B] shadow-md">
+                  {/* Lubang Dalam Metal */}
+                  <div className="h-2 w-2 rounded-full bg-[#302111] shadow-inner" />
                 </div>
-              ) : (
-                <div className="flex h-full items-center justify-center text-[6px] text-[hsl(var(--forest))/50] text-center">
-                  QR Code
-                </div>
-              )}
-            </div>
-            <div className="mt-2 text-center text-[7px] font-bold uppercase tracking-[.02em] text-[hsl(var(--forest))/80] sm:text-[9px]">
-              SCAN UNTUK PROFIL SAPI
+              </div>
+
+              {/* Teks Website & Label */}
+              <div className="text-center text-[10px] font-extrabold tracking-[.02em] text-[hsl(var(--forest))] sm:text-[12px] pt-1">
+                samadyafarm.id
+              </div>
+              <div className="text-center text-[6px] font-semibold uppercase tracking-[.16em] text-[hsl(var(--forest))/70] sm:text-[7px]">
+                Sapi Pilihan
+              </div>
+
+              {/* Embossed Plate - Kode Sapi */}
+              <div className="mt-1.5 rounded-[8px] border border-[#D4C9B0] bg-gradient-to-b from-[#FFFFFF] to-[#F4EFE2] px-1.5 py-1.5 text-center font-extrabold leading-none text-[18px] text-[hsl(var(--forest))] sm:text-[22px] shadow-sm">
+                {currentCattle?.code || 'NF-0001'}
+              </div>
+
+              {/* Jenis & Gender */}
+              <div className="mt-2 text-center text-[10px] font-bold uppercase leading-tight text-[hsl(var(--forest))] sm:text-[12px]">
+                {currentCattle?.breed || 'LIMOUSIN'}
+              </div>
+              <div className="text-center text-[10px] font-bold uppercase leading-tight text-[hsl(var(--forest))/80] sm:text-[12px]">
+                {currentCattle?.gender === 'FEMALE' ? 'BETINA' : 'JANTAN'}
+              </div>
+
+              {/* Container QR Code */}
+              <div className="mx-auto mt-2 aspect-square h-[82px] w-[82px] shrink-0 rounded-[6px] border border-[#D4C9B0] bg-white p-1.5 sm:h-[105px] sm:w-[105px] shadow-sm">
+                {currentCattle ? (
+                  <div className="flex h-full items-center justify-center">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`/sapi/${currentCattle.code}`)}`}
+                      alt="QR Code"
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-center text-[6px] text-[hsl(var(--forest))/50]">
+                    QR Code
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-2 text-center text-[7px] font-bold uppercase tracking-[.04em] text-[hsl(var(--forest))/75] sm:text-[9px]">
+                SCAN UNTUK PROFIL
+              </div>
             </div>
           </div>
         </div>

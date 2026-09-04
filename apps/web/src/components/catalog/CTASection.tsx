@@ -40,10 +40,10 @@ export function CTASection() {
 
           {/* Content */}
           <div>
-            <h3 className="text-[22px] font-bold leading-none text-white sm:text-[26px]">
+            <h3 className="text-[22px] font-bold leading-none text-black sm:text-[26px]">
               Temukan Sapi Terbaik Anda Bersama samadyafarm.id
             </h3>
-            <p className="mt-1.5 text-[11px] text-white/80">
+            <p className="mt-1.5 text-[11px] text-black/80">
               Pilih sapi terbaik, pantau perkembangannya, dan beli dengan lebih tenang.
             </p>
           </div>
@@ -58,7 +58,7 @@ export function CTASection() {
             </Link>
             <Link
               href="https://wa.me/6281234567890"
-              className="rounded-md border border-white/25 px-4 py-2.5 text-[11px] font-semibold text-white flex items-center gap-1.5"
+              className="rounded-md border border-black/25 px-4 py-2.5 text-[11px] font-semibold text-black flex items-center gap-1.5"
             >
               <MessageCircle className="h-4 w-4" />
               Konsultasi via WhatsApp

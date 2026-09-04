@@ -37,8 +37,8 @@ export function JourneySection() {
   return (
     <section id="cara-kerja" ref={sectionRef} className="reveal mx-auto max-w-[1400px] px-4 pb-5 pt-4 sm:px-5 lg:px-8 lg:pt-3">
       <div className="text-center">
-        <h2 className="text-[27px] font-bold text-[hsl(var(--forest))] sm:text-[32px] lg:text-[28px]">Perjalanan Qurban yang Transparan</h2>
-        <p className="text-[11px] text-[hsl(var(--forest))/60]">Dari kandgang hingga hari raya, Anda selalu terinformasi.</p>
+        <h2 className="text-[28px] font-bold text-[hsl(var(--forest))] sm:text-[32px] lg:text-[28px]">Perjalanan Qurban yang Transparan</h2>
+        <p className="text-[12px] text-[hsl(var(--forest))/60]">Dari kandang hingga hari raya, Anda selalu terinformasi.</p>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
@@ -48,8 +48,8 @@ export function JourneySection() {
               <step.icon className="h-4 w-4" />
             </span>
             <div>
-              <div className="text-[11px] font-semibold text-[hsl(var(--forest))]">{step.title}</div>
-              <p className="text-[9px] leading-4 text-[hsl(var(--forest))/65]">{step.description}</p>
+              <div className="text-[12px] font-semibold text-[hsl(var(--forest))]">{step.title}</div>
+              <p className="text-[10px] leading-4 text-[hsl(var(--forest))/65]">{step.description}</p>
             </div>
           </div>
         ))}

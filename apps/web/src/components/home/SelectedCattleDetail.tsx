@@ -41,52 +41,68 @@ export function SelectedCattleDetail({ cattle, onCompare, isComparing = false }:
     : `/sapi/${cattle.code}`
 
   return (
-    <div className="space-y-2">
-      {/* Cattle Info Card */}
-      <div className="rounded-md border border-[hsl(var(--line))] bg-[hsl(var(--cream))]/70 p-2">
-        <div className="grid grid-cols-[64px_1fr] gap-2">
-          {/* Photo */}
-          <div className="h-14 rounded bg-cover bg-center relative">
+    <div className="h-full w-full flex flex-col justify-between gap-3">
+      {/* Cattle Info Card - Mengisi area atas sampai bawah */}
+      <div className="rounded-md border border-[hsl(var(--line))] bg-[hsl(var(--cream))]/70 p-3 flex-1 flex flex-col justify-between">
+        <div className="space-y-3">
+          {/* Photo diperbesar dari kiri ke kanan (Full Width 16:9) */}
+          <div className="relative aspect-video w-full overflow-hidden rounded bg-[hsl(var(--cream))] border border-[hsl(var(--line))]">
             {cattle.mainImage && !isVideoUrl(cattle.mainImage) ? (
-              <Image src={getDirectImageUrl(cattle.mainImage)} alt={cattle.name} fill className="object-cover rounded" />
+              <Image src={getDirectImageUrl(cattle.mainImage)} alt={cattle.name} fill className="object-cover" />
             ) : cattle.mainImage && isVideoUrl(cattle.mainImage) ? (
-              <div className="flex items-center justify-center h-full bg-gradient-to-br from-[hsl(var(--forest))/20] to-[hsl(var(--forest))/40] rounded">
-                <Film className="h-6 w-6 text-[hsl(var(--forest))/50]" />
+              <div className="flex items-center justify-center h-full bg-gradient-to-br from-[hsl(var(--forest))/20] to-[hsl(var(--forest))/40]">
+                <Film className="h-8 w-8 text-[hsl(var(--forest))/50]" />
               </div>
             ) : (
-              <div className="flex items-center justify-center h-full bg-[hsl(var(--cream))] rounded text-[hsl(var(--forest))/30] text-xs">
-                N/A
+              <div className="flex items-center justify-center h-full text-[hsl(var(--forest))/30] text-xs">
+                Foto Tidak Tersedia
               </div>
             )}
           </div>
 
-          {/* Info */}
+          {/* Info & Teks di Bawah Gambar */}
           <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[9px] font-bold text-[hsl(var(--forest))]">{cattle.name}</span>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className="text-sm font-bold text-[hsl(var(--forest))]">{cattle.name}</span>
               <CattleStatusBadge status={cattle.status} />
             </div>
-            <div className="mt-1.5 space-y-1 text-[7px] leading-4 text-[hsl(var(--forest))/70]">
-              <div>Kode Sapi: {cattle.code}</div>
-              <div>Jenis Sapi: {cattle.breed}</div>
+
+            <div className="space-y-1 text-xs leading-relaxed text-[hsl(var(--forest))/80] border-t border-[hsl(var(--line))/60] pt-2">
+              <div className="flex justify-between">
+                <span className="text-[hsl(var(--forest))/60]">Kode Sapi:</span>
+                <span className="font-semibold text-[hsl(var(--forest))]">{cattle.code}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[hsl(var(--forest))/60]">Jenis Sapi:</span>
+                <span className="font-semibold text-[hsl(var(--forest))]">{cattle.breed}</span>
+              </div>
               {birthDate && (
-                <div>Tanggal Lahir: {formatDate(birthDate)}</div>
+                <div className="flex justify-between">
+                  <span className="text-[hsl(var(--forest))/60]">Tanggal Lahir:</span>
+                  <span className="font-medium">{formatDate(birthDate)}</span>
+                </div>
               )}
               {firstWeight && (
-                <div>Berat Awal: {formatWeight(firstWeight)}</div>
+                <div className="flex justify-between">
+                  <span className="text-[hsl(var(--forest))/60]">Berat Awal:</span>
+                  <span className="font-medium">{formatWeight(firstWeight)}</span>
+                </div>
               )}
-              <div>Lokasi: Kandang Utama</div>
+              <div className="flex justify-between">
+                <span className="text-[hsl(var(--forest))/60]">Lokasi:</span>
+                <span className="font-medium">Kandang Utama</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* QR Code Section */}
-        <div className="mt-2.5 rounded-lg border border-[hsl(var(--line))] bg-white p-2.5 shadow-sm">
+        {/* QR Code Section (Mendorong bagian tengah yang kosong ke bawah) */}
+        <div className="mt-4 rounded-lg border border-[hsl(var(--line))] bg-white p-3 shadow-sm">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <div className="text-[9px] font-bold text-[hsl(var(--forest))]">QR Detail Sapi</div>
-              <div className="mt-1 max-w-[170px] text-[7px] leading-4 text-[hsl(var(--forest))/60]">
-                Scan QR untuk membuka halaman detail sapi ini secara langsung.
+              <div className="text-xs font-bold text-[hsl(var(--forest))]">QR Detail Sapi</div>
+              <div className="mt-0.5 text-[11px] leading-tight text-[hsl(var(--forest))/60]">
+                Scan QR untuk membuka profil detail.
               </div>
             </div>
             <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[hsl(var(--cream))] text-[hsl(var(--forest))/80]">
@@ -94,7 +110,7 @@ export function SelectedCattleDetail({ cattle, onCompare, isComparing = false }:
             </span>
           </div>
 
-          <div className="mt-2.5 grid grid-cols-[76px_minmax(0,1fr)] items-start gap-2.5">
+          <div className="mt-3 grid grid-cols-[76px_minmax(0,1fr)] items-center gap-3">
             {/* QR Code */}
             <div className="flex justify-start">
               <div className="aspect-square h-[76px] w-[76px] shrink-0 rounded border border-[hsl(var(--line))] bg-white p-1.5 flex items-center justify-center">
@@ -109,27 +125,27 @@ export function SelectedCattleDetail({ cattle, onCompare, isComparing = false }:
             </div>
 
             <div className="min-w-0">
-              <div className="grid gap-1 text-[7px] leading-4 text-[hsl(var(--forest))/60]">
+              <div className="grid gap-1 text-[10px] leading-snug text-[hsl(var(--forest))/70]">
                 <div className="flex items-start gap-1.5">
-                  <span className="mt-0.5 text-[hsl(var(--olive))]">&#10003;</span>
-                  <span>Masuk ke profil sapi sesuai kode QR.</span>
+                  <span className="mt-0.5 text-[hsl(var(--olive))] font-bold">&#10003;</span>
+                  <span>Masuk ke profil sesuai QR.</span>
                 </div>
                 <div className="flex items-start gap-1.5">
-                  <span className="mt-0.5 text-[hsl(var(--olive))]">&#10003;</span>
-                  <span>Lihat timbang, kesehatan, pakan, dan dokumentasi.</span>
+                  <span className="mt-0.5 text-[hsl(var(--olive))] font-bold">&#10003;</span>
+                  <span>Lihat timbang & kesehatan.</span>
                 </div>
               </div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 <a
                   href={`/sapi/${cattle.code}`}
-                  className="w-full rounded-md bg-[hsl(var(--forest))] px-2.5 py-2 text-[8px] font-bold text-white text-center block"
+                  className="w-full rounded-md bg-[hsl(var(--forest))] px-2 py-1.5 text-xs font-bold text-white text-center block transition-colors hover:bg-[hsl(var(--forest))/90]"
                 >
                   Lihat Detail Lengkap
                 </a>
                 {onCompare && (
                   <button
                     onClick={onCompare}
-                    className={`flex-1 rounded-md border px-2.5 py-2 text-[8px] font-semibold flex items-center justify-center gap-1 ${
+                    className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-semibold flex items-center justify-center gap-1 transition-colors ${
                       isComparing
                         ? 'border-[hsl(var(--forest))] bg-[hsl(var(--forest))] text-white'
                         : 'border-[hsl(var(--line))] bg-white text-[hsl(var(--forest))]'
@@ -137,12 +153,12 @@ export function SelectedCattleDetail({ cattle, onCompare, isComparing = false }:
                   >
                     {isComparing ? (
                       <>
-                        <Check className="h-3 w-3" />
+                        <Check className="h-3.5 w-3.5" />
                         Dipilih
                       </>
                     ) : (
                       <>
-                        <Columns3 className="h-3 w-3" />
+                        <Columns3 className="h-3.5 w-3.5" />
                         Bandingkan
                       </>
                     )}
