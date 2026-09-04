@@ -69,7 +69,7 @@ export default function HomePage() {
   }, [])
 
   // Handler when user selects a cow from catalog
-  const handleSelectCattle = (c: CattleWithLatestWeight) => {
+  const handleSelectCattle = (c: CattleWithRelations) => {
     const full = fullCattleData.find(x => x.id === c.id) || null
     setSelectedCattle(full)
   }
@@ -106,6 +106,7 @@ export default function HomePage() {
         selectedCattle={selectedCattle}
         onSelectCattle={handleSelectCattle}
       />
+      <JourneySection />
       {/* KATALOG - Combined Swiper/Grid with Toggle */}
       <CatalogSection
         cattle={cattle}

@@ -149,6 +149,108 @@
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
+.tag-perspective {
+  perspective: 900px;
+}
+
+/* Wooden peg mounted on the hero frame */
+.peg-dowel {
+  width: 9px;
+  height: 20px;
+  border-radius: 3px;
+  background: linear-gradient(115deg, #a5794a 0%, #7d5a35 45%, #5c4126 100%);
+  box-shadow: inset -1px 0 1px rgba(255,255,255,.25), 0 2px 3px rgba(0,0,0,.3);
+}
+.peg-ring {
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  transform: translateX(-50%);
+  border: 1.6px solid #c9c0a8;
+  box-shadow: inset 0 0 2px rgba(0,0,0,.5), 0 1px 2px rgba(0,0,0,.3);
+  background: transparent;
+}
+
+/* Metal eyelet on the tag itself */
+.tag-eyelet {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 30%, #f2ead2, #b8ab84 60%, #7d7256 100%);
+  box-shadow: inset 0 0 0 2.5px #4b4433, 0 1px 2px rgba(0,0,0,.4);
+}
+
+/* Soft blurred shadow so the tag reads as lifted off the wall */
+.tag-shadow-blob {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: -10px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0,0,0,.22), rgba(0,0,0,0) 70%);
+  filter: blur(2px);
+}
+
+/* Embossed plate — printed like a real ear-tag numbering machine */
+.plate-embossed {
+  color: hsl(var(--forest));
+  background: linear-gradient(180deg, #fbf6e9, #f0e6cc);
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.6),
+    0 -1px 0 rgba(0,0,0,.15);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.12), inset 0 -1px 0 rgba(255,255,255,.5);
+  letter-spacing: .03em;
+}
+
+/* Tag opens once — flips up from its bottom edge like a hinged flap, */
+/* with a light overshoot as it settles, then stays still */
+.tag-fold {
+  transform-origin: bottom center;
+  transform: rotateX(-96deg) rotateZ(-3deg) translateY(-4px);
+  opacity: 0;
+  box-shadow: 0 10px 22px rgba(0,0,0,.16);
+  will-change: transform, opacity;
+}
+
+.tag-fold-open {
+  animation: tag-flip-settle 1s cubic-bezier(.3,.7,.4,1) forwards;
+}
+
+@keyframes tag-flip-settle {
+  0%   { transform: rotateX(-96deg) rotateZ(-3deg) translateY(-4px); opacity: 0; }
+  50%  { transform: rotateX(8deg)   rotateZ(3deg)   translateY(0);   opacity: 1; }
+  72%  { transform: rotateX(-3deg)  rotateZ(-1.4deg); }
+  88%  { transform: rotateX(1.2deg) rotateZ(0.6deg); }
+  100% { transform: rotateX(0deg)   rotateZ(0deg); }
+}
+
+/* Only after the open animation finishes does hover get to move it — */
+/* a small tilt that answers the user's action, nothing ambient */
+.tag-settled {
+  transition: transform .35s ease;
+}
+.tag-perspective:hover .tag-settled {
+  transform: rotateZ(-2.5deg) translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag-fold-open {
+    animation: none;
+    transform: rotateX(0deg) rotateZ(0deg);
+    opacity: 1;
+  }
+  .tag-perspective:hover .tag-settled {
+    transform: none;
+  }
+}
 
 /* Stat counter animation */
 @keyframes count-up {
