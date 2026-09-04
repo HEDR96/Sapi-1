@@ -1,102 +1,58 @@
-# Multi-stage Dockerfile for Cattle Catalog
+# ============================================================
+# Multi-stage Dockerfile for Sapi Monorepo
+# ============================================================
 
-# =====================
 # Stage 1: Dependencies
-# =====================
 FROM node:20-alpine AS deps
-
+RUN apk add --no-cache libc6-compat python3 make g++
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json* ./
+# Copy root package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Copy packages package.json files
+COPY packages/prisma/package.json packages/prisma/
+COPY packages/shared/package.json packages/shared/
+
+# Copy apps package.json files
+COPY apps/web/package.json apps/web/
+COPY apps/admin/package.json apps/admin/
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
-# =====================
-# Stage 2: Prisma Generate
-# =====================
-FROM node:20-alpine AS prisma-builder
-
+# Stage 2: Build
+FROM node:20-alpine AS builder
 WORKDIR /app
-
-# Copy lock file and install deps
-COPY package.json package-lock.json* ./
-RUN npm install --legacy-peer-deps
-
-# Copy prisma schema
-COPY prisma/ ./prisma/
-
-# Generate Prisma Client
-RUN npx prisma generate
-
-# =====================
-# Stage 3: Build
-# =====================
-FROM deps AS builder
-
-WORKDIR /app
-
-# Install openssl for Prisma during build
-RUN apk add --no-cache openssl
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy source code
+# Copy entire source code
 COPY . .
 
-# Copy Prisma generated client
-COPY --from=prisma-builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=prisma-builder /app/node_modules/@prisma ./node_modules/@prisma
+# Set environment for build
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Generate Prisma Client (extra safety)
-RUN npx prisma generate
+# Build both apps
+RUN pnpm build
 
-# Build Next.js
-RUN npm run build
-
-# =====================
-# Stage 4: Production Runner
-# =====================
-FROM node:20-alpine AS runner
-
+# Stage 3: Production - Web App
+FROM node:20-alpine AS runner-web
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Install openssl for Prisma and sharp
-RUN apk add --no-cache openssl
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
-
-# Create app directories
-RUN mkdir -p /app/public /app/.next/static /app/prisma /app/data && \
-    chmod 777 /app/data
-
-# Copy built app
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy Prisma schema and generated client
-COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma/
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma/
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma/
-
-# Copy package.json for scripts
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/package-lock.json ./
-
-# Install production dependencies (including sharp)
-RUN npm install --legacy-peer-deps --omit=dev
-
-# Re-install sharp for image optimization (standalone build issue)
-RUN npm install sharp@latest
-
-# Install Prisma CLI and tsx globally for db commands
-RUN npm install -g prisma@5.15.0 tsx@4.10.0
+# Copy built artifacts from builder
+COPY --from=builder /app/apps/web/.next ./apps/web/.next
+COPY --from=builder /app/apps/web/public ./apps/web/public
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/@samadya ./node_modules/@samadya
 
 USER nextjs
 
@@ -104,9 +60,5 @@ EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-ENV NEXT_PUBLIC_APP_URL="http://localhost:3000"
-# Data directory for storing OAuth tokens
-ENV DATA_DIR="/app/data"
 
-# Default command - starts the app
-CMD ["node", "server.js"]
+CMD ["node", "apps/web/server.js"]

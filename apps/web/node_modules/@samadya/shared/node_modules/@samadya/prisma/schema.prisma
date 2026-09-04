@@ -88,6 +88,8 @@ model Testimonial {
   isActive      Boolean  @default(true)
   order         Int      @default(0)
   createdAt     DateTime @default(now())
+  cattleId      String?
+  cattle        Cattle?  @relation(fields: [cattleId], references: [id])
 }
 
 model MasterData {

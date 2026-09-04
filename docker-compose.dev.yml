@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: sapi_dev_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-cattle_catalog}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Web App Development
+  web:
+    image: node:20-alpine
+    container_name: sapi_dev_web
+    restart: unless-stopped
+    working_dir: /app
+    command: sh -c "corepack enable && pnpm install && pnpm --filter @samadya/web dev"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/cattle_catalog
+      JWT_SECRET: dev-secret-key
+      NEXT_PUBLIC_API_URL: http://localhost:3000/api
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/web/node_modules
+      - /app/packages/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Admin App Development
+  admin:
+    image: node:20-alpine
+    container_name: sapi_dev_admin
+    restart: unless-stopped
+    working_dir: /app
+    command: sh -c "corepack enable && pnpm install && pnpm --filter @samadya/admin dev"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/cattle_catalog
+      JWT_SECRET: dev-secret-key
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api
+      NEXT_PUBLIC_APP_URL: http://localhost:3001
+      NODE_ENV: development
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/admin/node_modules
+      - /app/packages/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Mailhog for email testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: sapi_dev_mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  postgres_dev_data:
+
+networks:
+  default:
+    name: sapi_dev_network

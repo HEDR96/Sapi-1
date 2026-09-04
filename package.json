@@ -10,8 +10,7 @@
   "scripts": {
     "dev:web": "pnpm --filter @samadya/web dev",
     "dev:admin": "pnpm --filter @samadya/admin dev",
-    "dev:api": "pnpm --filter @samadya/api dev",
-    "dev:all": "turbo dev",
+    "dev:all": "turbo run dev --filter=@samadya/web --filter=@samadya/admin",
     "build": "turbo build",
     "build:web": "pnpm --filter @samadya/web build",
     "build:admin": "pnpm --filter @samadya/admin build",

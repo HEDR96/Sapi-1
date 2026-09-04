@@ -1,63 +1,112 @@
+version: '3.8'
+
 services:
   # PostgreSQL Database
   db:
-    image: postgres:16-alpine
-    container_name: cattle-db
+    image: postgres:15-alpine
+    container_name: sapi_db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
-      POSTGRES_DB: cattle_catalog
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-cattle_catalog}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d cattle_catalog"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Next.js Application
-  app:
+  # Redis (for caching/sessions if needed)
+  redis:
+    image: redis:7-alpine
+    container_name: sapi_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Web App (Public Website)
+  web:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: cattle-app
+      target: runner-web
+    container_name: sapi_web
     restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-cattle_catalog}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000/api}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
     ports:
       - "3000:3000"
-    env_file:
-      - .env
-    environment:
-      NODE_ENV: production
-      DATABASE_URL: "postgresql://postgres:postgres123@db:5432/cattle_catalog"
-      JWT_SECRET: "cattle-catalog-super-secret-jwt-key-2024"
-      JWT_EXPIRES_IN: "24h"
-      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
-      DATA_DIR: "/app/data"
-      # Google Drive OAuth - loaded from .env via env_file above
-      GOOGLE_OAUTH_CLIENT_ID: "${GOOGLE_OAUTH_CLIENT_ID}"
-      GOOGLE_OAUTH_CLIENT_SECRET: "${GOOGLE_OAUTH_CLIENT_SECRET}"
-      GOOGLE_OAUTH_REDIRECT_URI: "${GOOGLE_OAUTH_REDIRECT_URI}"
-      GOOGLE_DRIVE_IMAGE_FOLDER_ID: "${GOOGLE_DRIVE_IMAGE_FOLDER_ID}"
-      GOOGLE_DRIVE_VIDEO_FOLDER_ID: "${GOOGLE_DRIVE_VIDEO_FOLDER_ID}"
-    volumes:
-      # Mount data directory for token storage
-      - ./data:/app/data
     depends_on:
       db:
         condition: service_healthy
-    # Database setup: prisma db push only (no seed - run manually)
-    command: >
-      sh -c "
-        mkdir -p /app/data &&
-        chmod 777 /app/data &&
-        echo 'Running database setup...' &&
-        prisma db push --skip-generate &&
-        echo 'Starting application...' &&
-        node server.js
-      "
+      redis:
+        condition: service_healthy
+
+  # Admin App
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner-web
+    container_name: sapi_admin
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-cattle_catalog}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001/api}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3001}
+    ports:
+      - "3001:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Development services
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: sapi_mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    profiles:
+      - dev
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: sapi_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@sapikatalog.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - dev
 
 volumes:
   postgres_data:
+  redis_data:
+
+networks:
+  default:
+    name: sapi_network
