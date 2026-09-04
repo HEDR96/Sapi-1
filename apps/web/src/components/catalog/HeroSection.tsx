@@ -311,8 +311,8 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSect
 
           <div
             onAnimationEnd={() => setTagSettled(true)}
-            className={`nusa-tag tag-shape tag-fold relative rounded-[22px] px-4 pb-4 pt-11 ${
-              tagOpen ? 'tag-fold-open' : ''
+            className={`nusa-tag tag-shape relative rounded-[22px] px-4 pb-4 pt-11 ${
+              tagOpen && !tagSettled ? 'tag-fold-open' : ''
             } ${tagSettled ? 'tag-settled' : ''}`}
           >
             {/* Metal eyelet the rope threads through */}
