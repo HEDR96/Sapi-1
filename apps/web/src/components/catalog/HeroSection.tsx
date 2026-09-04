@@ -84,28 +84,29 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSect
   const heroRef = useRef<HTMLElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const isSliderChange = useRef(false)
-  // Tambahan di dalam komponen, dekat heroRef
-const tagRef = useRef<HTMLDivElement>(null)
-const [tagOpen, setTagOpen] = useState(false)
-const [tagSettled, setTagSettled] = useState(false)
+  const tagRef = useRef<HTMLDivElement>(null)
+  const [tagOpen, setTagOpen] = useState(false)
+  const [tagSettled, setTagSettled] = useState(false)
+  const tagAnimated = useRef(false)
 
-useEffect(() => {
-  const el = tagRef.current
-  if (!el) return
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setTagOpen(true)
-          observer.unobserve(entry.target)
-        }
-      })
-    },
-    { threshold: 0.4 }
-  )
-  observer.observe(el)
-  return () => observer.disconnect()
-}, [])
+  useEffect(() => {
+    const el = tagRef.current
+    if (!el || tagAnimated.current) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !tagAnimated.current) {
+            tagAnimated.current = true
+            setTagOpen(true)
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.4 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   // Get available cattle with images
   const displayCattle = cattle.filter(c => c.mainImage)
