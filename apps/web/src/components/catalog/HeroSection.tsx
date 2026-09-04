@@ -1,8 +1,15 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { BadgeCheck, Clock3, ClipboardList, Shield } from 'lucide-react'
+import { BadgeCheck, Clock3, ClipboardList, Shield, ChevronLeft, ChevronRight } from 'lucide-react'
+import { CattleWithRelations } from '@samadya/shared/types'
+
+interface HeroSectionProps {
+  cattle: CattleWithRelations[]
+  selectedCattle: CattleWithRelations | null
+  onSelectCattle: (cattle: CattleWithRelations) => void
+}
 
 interface CounterProps {
   end: number
@@ -73,8 +80,30 @@ const trustFeatures = [
   { icon: Shield, text: 'InsyaAllah Sesuai Syariat' },
 ]
 
-export function HeroSection() {
+export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSectionProps) {
   const heroRef = useRef<HTMLElement>(null)
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  // Get available cattle with images
+  const displayCattle = cattle.filter(c => c.mainImage)
+  const currentCattle = displayCattle[currentIndex] || selectedCattle
+
+  // Update selected cattle when slider changes
+  useEffect(() => {
+    if (currentCattle) {
+      onSelectCattle(currentCattle)
+    }
+  }, [currentIndex, currentCattle, onSelectCattle])
+
+  const goToPrev = () => {
+    if (displayCattle.length <= 1) return
+    setCurrentIndex((prev) => (prev === 0 ? displayCattle.length - 1 : prev - 1))
+  }
+
+  const goToNext = () => {
+    if (displayCattle.length <= 1) return
+    setCurrentIndex((prev) => (prev === displayCattle.length - 1 ? 0 : prev + 1))
+  }
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -97,11 +126,61 @@ export function HeroSection() {
 
   return (
     <section ref={heroRef} className="reveal mx-auto grid max-w-[1400px] grid-cols-1 items-stretch lg:grid-cols-[1.05fr_1.2fr_.45fr]">
-      <div
-        className="hero-photo relative min-h-[220px] sm:min-h-[320px] lg:min-h-[350px]"
-        style={{ background: `url('https://images.unsplash.com/photo-1551750590-90f231373f73?auto=format&fit=crop&w=1600&q=85') center/cover no-repeat` }}
-      >
+      {/* Image Slider */}
+      <div className="hero-photo relative min-h-[220px] sm:min-h-[320px] lg:min-h-[350px] overflow-hidden">
+        {/* Current Image */}
+        {currentCattle?.mainImage ? (
+          <div
+            className="absolute inset-0 transition-opacity duration-500"
+            style={{
+              background: `url('${currentCattle.mainImage}') center/cover no-repeat`,
+            }}
+          />
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `url('https://images.unsplash.com/photo-1551750590-90f231373f73?auto=format&fit=crop&w=1600&q=85') center/cover no-repeat`,
+            }}
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-r from-black/12 via-transparent to-transparent" />
+
+        {/* Slider Arrows */}
+        {displayCattle.length > 1 && (
+          <>
+            <button
+              onClick={goToPrev}
+              className="absolute left-2 top-1/2 z-10 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[hsl(var(--forest))] shadow-lg transition-all hover:bg-white hover:scale-110"
+              aria-label="Previous"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+            <button
+              onClick={goToNext}
+              className="absolute right-2 top-1/2 z-10 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[hsl(var(--forest))] shadow-lg transition-all hover:bg-white hover:scale-110"
+              aria-label="Next"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+
+            {/* Pagination Dots */}
+            <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+              {displayCattle.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`h-2.5 w-2.5 rounded-full transition-all ${
+                    index === currentIndex
+                      ? 'scale-125 bg-white'
+                      : 'bg-white/50 hover:bg-white/80'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="flex flex-col justify-center bg-[#F4EFE2] px-4 py-5 sm:px-7 sm:py-8 lg:px-8">
@@ -146,6 +225,7 @@ export function HeroSection() {
         </div>
       </div>
 
+      {/* Dynamic Tag with Cattle Info */}
       <div className="relative flex items-center justify-center overflow-hidden bg-[#F4EFE2] px-4 py-5 lg:px-6">
         <div className="tag-leaf" />
         <div className="nusa-tag tag-shape animate-float-tag relative w-[156px] rounded-[22px] px-4 pb-4 pt-10 sm:w-[198px] lg:w-[156px] xl:w-[198px] rotate-[7deg]">
@@ -153,11 +233,34 @@ export function HeroSection() {
           <div className="hole" />
           <div className="text-center text-[10px] font-extrabold tracking-[.02em] text-[hsl(var(--forest))] sm:text-[12px]">samadyafarm.id</div>
           <div className="text-center text-[6px] font-semibold uppercase tracking-[.16em] text-[hsl(var(--forest))/70] sm:text-[7px]">Sapi Pilihan</div>
-          <div className="plate mt-2 rounded-[8px] px-2 py-2 text-center text-[18px] font-extrabold leading-none sm:text-[24px]">NF-26001</div>
-          <div className="tag-subtitle mt-2 text-center text-[10px] font-bold uppercase leading-tight text-[hsl(var(--forest))] sm:text-[13px]">LIMOUSIN</div>
-          <div className="tag-subtitle text-center text-[10px] font-bold uppercase leading-tight text-[hsl(var(--forest))] sm:text-[13px]">JANTAN</div>
+          {/* Dynamic Cattle Code */}
+          <div className="plate mt-2 rounded-[8px] px-2 py-2 text-center text-[18px] font-extrabold leading-none text-[hsl(var(--forest))] sm:text-[24px]">
+            {currentCattle?.code || 'NF-0001'}
+          </div>
+          {/* Dynamic Breed */}
+          <div className="tag-subtitle mt-2 text-center text-[10px] font-bold uppercase leading-tight text-[hsl(var(--forest))] sm:text-[13px]">
+            {currentCattle?.breed || 'LIMOUSIN'}
+          </div>
+          {/* Dynamic Gender */}
+          <div className="tag-subtitle text-center text-[10px] font-bold uppercase leading-tight text-[hsl(var(--forest))] sm:text-[13px]">
+            {currentCattle?.gender === 'FEMALE' ? 'BETINA' : 'JANTAN'}
+          </div>
+          {/* QR Code Box */}
           <div className="qr-box mx-auto mt-3 aspect-square h-[92px] w-[92px] shrink-0 rounded-[3px] bg-white p-1.5 sm:h-[116px] sm:w-[116px]">
-            <div className="flex items-center justify-center h-full text-[6px] text-[hsl(var(--forest))/50] text-center">QR Code</div>
+            {currentCattle ? (
+              <div className="flex h-full items-center justify-center">
+                {/* Generate QR code URL for cattle profile */}
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`/sapi/${currentCattle.code}`)}`}
+                  alt="QR Code"
+                  className="h-full w-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className="flex h-full items-center justify-center text-[6px] text-[hsl(var(--forest))/50] text-center">
+                QR Code
+              </div>
+            )}
           </div>
           <div className="mt-2 text-center text-[7px] font-bold uppercase tracking-[.02em] text-[hsl(var(--forest))/80] sm:text-[9px]">SCAN UNTUK PROFIL SAPI</div>
         </div>

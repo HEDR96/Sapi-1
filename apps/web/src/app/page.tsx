@@ -42,6 +42,10 @@ export default function HomePage() {
         }))
         setCattle(mapped)
         setFullCattleData(items)
+        // Set first cattle as default for hero
+        if (items.length > 0 && !selectedCattle) {
+          setSelectedCattle(items[0])
+        }
       })
       .catch(console.error)
 
@@ -96,10 +100,12 @@ export default function HomePage() {
   }
 
   return (
-    <div ref={pageRef} className="mx-auto my-2 max-w-[1500px] overflow-hidden border border-black/30 bg-[hsl(var(--cream2))] shadow-2xl">
-      <HeroSection />
-      <JourneySection />
-      <TrustRow />
+    <div ref={pageRef} className="min-h-screen bg-[hsl(var(--cream2))]">
+      <HeroSection
+        cattle={fullCattleData}
+        selectedCattle={selectedCattle}
+        onSelectCattle={handleSelectCattle}
+      />
       {/* KATALOG - Combined Swiper/Grid with Toggle */}
       <CatalogSection
         cattle={cattle}
@@ -128,7 +134,7 @@ export default function HomePage() {
         onCompareSelect={handleCompareSelect}
         onOpenCompare={handleOpenCompare}
       />
-
+      <TrustRow />
       <RecentComments />
       <CTASection />
 
