@@ -18,11 +18,12 @@ COPY packages/shared/package.json packages/shared/
 COPY apps/web/package.json apps/web/
 COPY apps/admin/package.json apps/admin/
 
-# Install dependencies
-RUN corepack enable pnpm && pnpm install --frozen-lockfile
+# Install pnpm 9 (compatible with Node 20) and dependencies
+RUN corepack enable && corepack prepare pnpm@9.0.0 --activate && pnpm install --frozen-lockfile
 
 # Stage 2: Build
 FROM node:20-alpine AS builder
+RUN apk add --no-cache libc6-compat python3 make g++
 WORKDIR /app
 
 # Copy dependencies from deps stage
@@ -33,6 +34,9 @@ COPY . .
 
 # Set environment for build
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# Activate pnpm 9
+RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 
 # Build both apps
 RUN pnpm build
