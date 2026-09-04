@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { BadgeCheck, Clock3, ClipboardList, Shield, ChevronLeft, ChevronRight } from 'lucide-react'
 import { CattleWithRelations } from '@samadya/shared/types'
@@ -83,26 +83,43 @@ const trustFeatures = [
 export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSectionProps) {
   const heroRef = useRef<HTMLElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
+  const isSliderChange = useRef(false)
 
   // Get available cattle with images
   const displayCattle = cattle.filter(c => c.mainImage)
   const currentCattle = displayCattle[currentIndex] || selectedCattle
 
-  // Update selected cattle when slider changes
+  // Sync currentIndex when selectedCattle changes from outside (e.g., catalog card click)
   useEffect(() => {
-    if (currentCattle) {
-      onSelectCattle(currentCattle)
+    if (!selectedCattle || displayCattle.length === 0) return
+
+    const index = displayCattle.findIndex(c => c.id === selectedCattle.id)
+    if (index !== -1 && index !== currentIndex && !isSliderChange.current) {
+      setCurrentIndex(index)
     }
-  }, [currentIndex, currentCattle, onSelectCattle])
+    // Reset flag after use
+    isSliderChange.current = false
+  }, [selectedCattle, displayCattle, currentIndex])
+
+  // Update selected cattle when slider changes (via arrows/dots)
+  const handleSliderChange = useCallback((index: number) => {
+    isSliderChange.current = true
+    setCurrentIndex(index)
+    if (displayCattle[index]) {
+      onSelectCattle(displayCattle[index])
+    }
+  }, [displayCattle, onSelectCattle])
 
   const goToPrev = () => {
     if (displayCattle.length <= 1) return
-    setCurrentIndex((prev) => (prev === 0 ? displayCattle.length - 1 : prev - 1))
+    const newIndex = currentIndex === 0 ? displayCattle.length - 1 : currentIndex - 1
+    handleSliderChange(newIndex)
   }
 
   const goToNext = () => {
     if (displayCattle.length <= 1) return
-    setCurrentIndex((prev) => (prev === displayCattle.length - 1 ? 0 : prev + 1))
+    const newIndex = currentIndex === displayCattle.length - 1 ? 0 : currentIndex + 1
+    handleSliderChange(newIndex)
   }
 
   useEffect(() => {
@@ -169,7 +186,7 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSect
               {displayCattle.map((_, index) => (
                 <button
                   key={index}
-                  onClick={() => setCurrentIndex(index)}
+                  onClick={() => handleSliderChange(index)}
                   className={`h-2.5 w-2.5 rounded-full transition-all ${
                     index === currentIndex
                       ? 'scale-125 bg-white'
