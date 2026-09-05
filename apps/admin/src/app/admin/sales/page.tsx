@@ -202,7 +202,7 @@ export default function SalesPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label>Sapi *</Label>
-                  <Select value={form.cattleId} onValueChange={(v) => setForm({ ...form, cattleId: v })}>
+                  <Select value={form.cattleId} onValueChange={(v: string) => setForm({ ...form, cattleId: v })}>
                     <SelectTrigger><SelectValue placeholder="Pilih sapi" /></SelectTrigger>
                     <SelectContent>
                       {cattle.map((c) => (
@@ -213,7 +213,7 @@ export default function SalesPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Pelanggan *</Label>
-                  <Select value={form.customerId} onValueChange={(v) => setForm({ ...form, customerId: v })}>
+                  <Select value={form.customerId} onValueChange={(v: string) => setForm({ ...form, customerId: v })}>
                     <SelectTrigger><SelectValue placeholder="Pilih pelanggan" /></SelectTrigger>
                     <SelectContent>
                       {customers.map((c) => (
@@ -238,7 +238,7 @@ export default function SalesPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Status</Label>
-                  <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
+                  <Select value={form.status} onValueChange={(v: string) => setForm({ ...form, status: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="PENDING">Pending</SelectItem>
