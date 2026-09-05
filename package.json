@@ -2,23 +2,21 @@
   "name": "samadyafarm",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@11.25.0",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
-    "dev:web": "pnpm --filter @samadya/web dev",
-    "dev:admin": "pnpm --filter @samadya/admin dev",
-    "dev:all": "turbo run dev --filter=@samadya/web --filter=@samadya/admin",
-    "build": "turbo build",
-    "build:web": "pnpm --filter @samadya/web build",
-    "build:admin": "pnpm --filter @samadya/admin build",
+    "dev:web": "npm run dev --workspace=@samadya/web",
+    "dev:admin": "npm run dev --workspace=@samadya/admin",
+    "build": "npm run build --workspace=@samadya/web && npm run build --workspace=@samadya/admin",
+    "build:web": "npm run build --workspace=@samadya/web",
+    "build:admin": "npm run build --workspace=@samadya/admin",
     "lint": "turbo lint",
-    "db:generate": "pnpm --filter @samadya/prisma prisma generate",
-    "db:push": "pnpm --filter @samadya/prisma prisma db push",
-    "db:migrate": "pnpm --filter @samadya/prisma prisma migrate dev",
-    "db:studio": "pnpm --filter @samadya/prisma prisma studio",
+    "db:generate": "npm run generate --workspace=@samadya/prisma",
+    "db:push": "npm run push --workspace=@samadya/prisma",
+    "db:migrate": "npm run migrate --workspace=@samadya/prisma",
+    "db:studio": "npm run studio --workspace=@samadya/prisma",
     "typecheck": "turbo typecheck"
   },
   "prisma": {
