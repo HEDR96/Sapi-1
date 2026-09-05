@@ -183,8 +183,8 @@ export default function CustomersPage() {
 
       {/* Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4 bg-white shadow-xl">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>{editingCustomer ? 'Edit Pelanggan' : 'Tambah Pelanggan'}</CardTitle>
               <Button variant="ghost" size="sm" onClick={() => setModalOpen(false)}>
@@ -211,7 +211,7 @@ export default function CustomersPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>% Pembelian</Label>
-                  <Input type="number" min="0" max="100" value={form.purchasePercentage} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, purchasePercentage: e.target.value })} placeholder="100" />
+                  <Input type="number" min="0" max="100" step="0.01" value={form.purchasePercentage} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, purchasePercentage: e.target.value })} placeholder="100" />
                 </div>
                 <div className="flex justify-end gap-2 pt-4">
                   <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>Batal</Button>

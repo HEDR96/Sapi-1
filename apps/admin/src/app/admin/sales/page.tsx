@@ -190,8 +190,8 @@ export default function SalesPage() {
 
       {/* Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-lg mx-4">
+        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <Card className="w-full max-w-lg mx-4 bg-white shadow-xl">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Tambah Penjualan</CardTitle>
               <Button variant="ghost" size="sm" onClick={() => setModalOpen(false)}>
@@ -225,15 +225,15 @@ export default function SalesPage() {
                 <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label>Jumlah *</Label>
-                    <Input type="number" min="1" value={form.quantity} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, quantity: e.target.value })} required />
+                    <Input type="number" min="1" step="1" value={form.quantity} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, quantity: e.target.value })} required />
                   </div>
                   <div className="space-y-2">
                     <Label>Harga *</Label>
-                    <Input type="number" value={form.price} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, price: e.target.value })} placeholder="25000000" required />
+                    <Input type="number" step="1" value={form.price} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, price: e.target.value })} placeholder="25000000" required />
                   </div>
                   <div className="space-y-2">
                     <Label>Margin</Label>
-                    <Input type="number" value={form.margin} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, margin: e.target.value })} placeholder="2500000" />
+                    <Input type="number" step="1" value={form.margin} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, margin: e.target.value })} placeholder="2500000" />
                   </div>
                 </div>
                 <div className="space-y-2">

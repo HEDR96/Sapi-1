@@ -15,6 +15,23 @@ import { formatCurrency } from '@samadya/shared/lib/utils/formatters'
 import { CattleStatusBadge as StatusBadge } from '@samadya/shared/components/ui/CattleStatusBadge'
 import { ImageUploader } from '@/components/admin/ImageUploader'
 
+// Format number with thousand separator
+const formatNumber = (num: number): string => {
+  return num.toLocaleString('id-ID')
+}
+
+// Format float with max 2 decimal places
+const formatFloat = (num: number): string => {
+  return Number(num.toFixed(2)).toLocaleString('id-ID')
+}
+
+interface MasterData {
+  id: string
+  category: string
+  key: string
+  value: string
+}
+
 interface CattleDetail {
   id: string
   code: string
@@ -49,15 +66,45 @@ export default function CattleDetailPage() {
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({ code: '', name: '', breed: '', status: 'AVAILABLE', birthDate: '', height: '', price: '', targetWeight: '', description: '', mainImage: '', buyPrice: '', sellPrice: '', healthCost: '', feedCost: '' })
 
+  // Master data states
+  const [feedTypes, setFeedTypes] = useState<MasterData[]>([])
+  const [healthStatuses, setHealthStatuses] = useState<MasterData[]>([])
+  const [cattleBreeds, setCattleBreeds] = useState<MasterData[]>([])
+  const [cattleStatuses, setCattleStatuses] = useState<MasterData[]>([])
+  const [loadingMasterData, setLoadingMasterData] = useState(false)
+
   // Modal states
   const [weightModalOpen, setWeightModalOpen] = useState(false)
   const [weightForm, setWeightForm] = useState({ weight: '', measurementDate: '', notes: '' })
+  const [weightSaving, setWeightSaving] = useState(false)
   const [healthModalOpen, setHealthModalOpen] = useState(false)
   const [healthForm, setHealthForm] = useState({ healthType: 'VACCINATION', status: 'SEHAT', recordDate: '', notes: '' })
+  const [healthSaving, setHealthSaving] = useState(false)
   const [feedModalOpen, setFeedModalOpen] = useState(false)
   const [feedForm, setFeedForm] = useState({ feedType: '', amount: '', frequency: '', recordDate: '', notes: '' })
+  const [feedSaving, setFeedSaving] = useState(false)
 
-  useEffect(() => { fetchCattle() }, [cattleId])
+  // Fetch master data
+  const fetchMasterData = async () => {
+    try {
+      setLoadingMasterData(true)
+      const res = await fetch('/api/admin/master-data')
+      if (res.ok) {
+        const data = await res.json()
+        const items = data.items || []
+        setFeedTypes(items.filter((m: MasterData) => m.category === 'JENIS_PAKAN'))
+        setHealthStatuses(items.filter((m: MasterData) => m.category === 'STATUS_SAPI'))
+        setCattleBreeds(items.filter((m: MasterData) => m.category === 'JENIS_SAPI'))
+        setCattleStatuses(items.filter((m: MasterData) => m.category === 'STATUS_SAPI'))
+      }
+    } catch (error) {
+      console.error('Failed to fetch master data:', error)
+    } finally {
+      setLoadingMasterData(false)
+    }
+  }
+
+  useEffect(() => { fetchCattle(); fetchMasterData() }, [cattleId])
 
   const fetchCattle = async () => {
     try {
@@ -100,24 +147,33 @@ export default function CattleDetailPage() {
   }
 
   const handleAddWeight = async () => {
+    setWeightSaving(true)
     try {
       await fetch(`/api/admin/cattle/${cattleId}/weights`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ weight: parseFloat(weightForm.weight), measurementDate: weightForm.measurementDate, notes: weightForm.notes || null }) })
       setWeightModalOpen(false); setWeightForm({ weight: '', measurementDate: '', notes: '' }); fetchCattle()
-    } catch (error) { console.error('Failed to add weight:', error) }
+    } catch (error) { console.error('Failed to add weight:', error) } finally {
+      setWeightSaving(false)
+    }
   }
 
   const handleAddHealth = async () => {
+    setHealthSaving(true)
     try {
       await fetch(`/api/admin/cattle/${cattleId}/health`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ healthType: healthForm.healthType, status: healthForm.status, recordDate: healthForm.recordDate, notes: healthForm.notes || null }) })
       setHealthModalOpen(false); setHealthForm({ healthType: 'VACCINATION', status: 'SEHAT', recordDate: '', notes: '' }); fetchCattle()
-    } catch (error) { console.error('Failed to add health record:', error) }
+    } catch (error) { console.error('Failed to add health record:', error) } finally {
+      setHealthSaving(false)
+    }
   }
 
   const handleAddFeed = async () => {
+    setFeedSaving(true)
     try {
       await fetch(`/api/admin/cattle/${cattleId}/feed`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ feedType: feedForm.feedType, amount: feedForm.amount, frequency: feedForm.frequency, recordDate: feedForm.recordDate, notes: feedForm.notes || null }) })
       setFeedModalOpen(false); setFeedForm({ feedType: '', amount: '', frequency: '', recordDate: '', notes: '' }); fetchCattle()
-    } catch (error) { console.error('Failed to add feed record:', error) }
+    } catch (error) { console.error('Failed to add feed record:', error) } finally {
+      setFeedSaving(false)
+    }
   }
 
   const handleDelete = async (type: string, id: string) => {
@@ -176,11 +232,11 @@ export default function CattleDetailPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div><p className="text-xs text-muted-foreground">Jenis</p><p className="font-medium">{cattle.breed}</p></div>
                     <div><p className="text-xs text-muted-foreground">Tanggal Lahir</p><p className="font-medium">{cattle.birthDate ? format(new Date(cattle.birthDate), 'dd MMM yyyy') : '-'}</p></div>
-                    <div><p className="text-xs text-muted-foreground">Tinggi</p><p className="font-medium">{cattle.height ? `${cattle.height} cm` : '-'}</p></div>
+                    <div><p className="text-xs text-muted-foreground">Tinggi</p><p className="font-medium">{cattle.height ? `${formatFloat(cattle.height)} cm` : '-'}</p></div>
                     <div><p className="text-xs text-muted-foreground">Harga Jual</p><p className="font-medium">{formatCurrency(cattle.price)}</p></div>
                     <div><p className="text-xs text-muted-foreground">Harga Beli</p><p className="font-medium">{cattle.buyPrice ? formatCurrency(cattle.buyPrice) : '-'}</p></div>
-                    <div><p className="text-xs text-muted-foreground">Target Bobot</p><p className="font-medium">{cattle.targetWeight ? `${cattle.targetWeight} Kg` : '-'}</p></div>
-                    <div><p className="text-xs text-muted-foreground">Bobot Terakhir</p><p className="font-medium">{cattle.lastWeight ? `${cattle.lastWeight} Kg` : '-'}</p></div>
+                    <div><p className="text-xs text-muted-foreground">Target Bobot</p><p className="font-medium">{cattle.targetWeight ? `${formatFloat(cattle.targetWeight)} Kg` : '-'}</p></div>
+                    <div><p className="text-xs text-muted-foreground">Bobot Terakhir</p><p className="font-medium">{cattle.lastWeight ? `${formatFloat(cattle.lastWeight)} Kg` : '-'}</p></div>
                     <div><p className="text-xs text-muted-foreground">Biaya Kesehatan</p><p className="font-medium">{cattle.healthCost ? formatCurrency(cattle.healthCost) : '-'}</p></div>
                     <div><p className="text-xs text-muted-foreground">Biaya Pakan</p><p className="font-medium">{cattle.feedCost ? formatCurrency(cattle.feedCost) : '-'}</p></div>
                   </div>
@@ -192,11 +248,11 @@ export default function CattleDetailPage() {
               <CardContent>
                 {cattle.weightStats ? (
                   <div className="grid grid-cols-2 gap-4">
-                    <div><p className="text-xs text-muted-foreground">Rata-rata</p><p className="text-2xl font-bold">{cattle.weightStats.avgWeight} Kg</p></div>
-                    <div><p className="text-xs text-muted-foreground">ADG</p><p className="text-2xl font-bold">{cattle.weightStats.adg.toFixed(2)} Kg/hari</p></div>
-                    <div><p className="text-xs text-muted-foreground">Min</p><p className="font-medium">{cattle.weightStats.minWeight} Kg</p></div>
-                    <div><p className="text-xs text-muted-foreground">Max</p><p className="font-medium">{cattle.weightStats.maxWeight} Kg</p></div>
-                    <div className="col-span-2"><p className="text-xs text-muted-foreground">Total Records</p><p className="font-medium">{cattle.weightStats.totalRecords} kali pengukuran</p></div>
+                    <div><p className="text-xs text-muted-foreground">Rata-rata</p><p className="text-2xl font-bold">{formatFloat(cattle.weightStats.avgWeight)} Kg</p></div>
+                    <div><p className="text-xs text-muted-foreground">ADG</p><p className="text-2xl font-bold">{formatFloat(cattle.weightStats.adg)} Kg/hari</p></div>
+                    <div><p className="text-xs text-muted-foreground">Min</p><p className="font-medium">{formatFloat(cattle.weightStats.minWeight)} Kg</p></div>
+                    <div><p className="text-xs text-muted-foreground">Max</p><p className="font-medium">{formatFloat(cattle.weightStats.maxWeight)} Kg</p></div>
+                    <div className="col-span-2"><p className="text-xs text-muted-foreground">Total Records</p><p className="font-medium">{formatNumber(cattle.weightStats.totalRecords)} kali pengukuran</p></div>
                   </div>
                 ) : <p className="text-muted-foreground">Belum ada data timbang</p>}
               </CardContent>
@@ -214,7 +270,7 @@ export default function CattleDetailPage() {
               {cattle.weights && cattle.weights.length > 0 ? (
                 <div className="space-y-2">{cattle.weights.map((w) => (
                   <div key={w.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div><p className="font-medium">{w.weight} Kg</p><p className="text-xs text-muted-foreground">{format(new Date(w.measurementDate), 'dd MMM yyyy')}{w.notes && ` • ${w.notes}`}</p></div>
+                    <div><p className="font-medium">{formatFloat(w.weight)} Kg</p><p className="text-xs text-muted-foreground">{format(new Date(w.measurementDate), 'dd MMM yyyy')}{w.notes && ` • ${w.notes}`}</p></div>
                     <Button variant="ghost" size="sm" onClick={() => handleDelete('weights', w.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                   </div>
                 ))}</div>
@@ -222,14 +278,14 @@ export default function CattleDetailPage() {
             </CardContent>
           </Card>
           {weightModalOpen && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <Card className="w-full max-w-md mx-4">
+            <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+              <Card className="w-full max-w-md mx-4 bg-white shadow-xl">
                 <CardHeader><CardTitle>Tambah Riwayat Timbang</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2"><Label>Bobot (Kg) *</Label><Input type="number" step="0.1" value={weightForm.weight} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWeightForm({ ...weightForm, weight: e.target.value })} placeholder="500" /></div>
+                  <div className="space-y-2"><Label>Bobot (Kg) *</Label><Input type="number" step="0.01" min="0" value={weightForm.weight} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWeightForm({ ...weightForm, weight: e.target.value })} placeholder="500.00" /></div>
                   <div className="space-y-2"><Label>Tanggal *</Label><Input type="date" value={weightForm.measurementDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWeightForm({ ...weightForm, measurementDate: e.target.value })} /></div>
                   <div className="space-y-2"><Label>Catatan</Label><Input value={weightForm.notes} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWeightForm({ ...weightForm, notes: e.target.value })} placeholder="Opsional" /></div>
-                  <div className="flex justify-end gap-2 pt-4"><Button variant="outline" onClick={() => setWeightModalOpen(false)}>Batal</Button><Button onClick={handleAddWeight}>Simpan</Button></div>
+                  <div className="flex justify-end gap-2 pt-4"><Button variant="outline" onClick={() => setWeightModalOpen(false)} disabled={weightSaving}>Batal</Button><Button onClick={handleAddWeight} disabled={weightSaving}>{weightSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Simpan</Button></div>
                 </CardContent>
               </Card>
             </div>
@@ -254,15 +310,43 @@ export default function CattleDetailPage() {
             </CardContent>
           </Card>
           {healthModalOpen && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <Card className="w-full max-w-md mx-4">
+            <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+              <Card className="w-full max-w-md mx-4 bg-white shadow-xl">
                 <CardHeader><CardTitle>Tambah Riwayat Kesehatan</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2"><Label>Jenis *</Label><Select value={healthForm.healthType} onValueChange={(v: string) => setHealthForm({ ...healthForm, healthType: v as any })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="VACCINATION">Vaksinasi</SelectItem><SelectItem value="CHECKUP">Checkup</SelectItem><SelectItem value="TREATMENT">Pengobatan</SelectItem></SelectContent></Select></div>
-                  <div className="space-y-2"><Label>Status *</Label><Select value={healthForm.status} onValueChange={(v: string) => setHealthForm({ ...healthForm, status: v as any })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="SEHAT">Sehat</SelectItem><SelectItem value="OBSERVASI">Observasi</SelectItem><SelectItem value="DALAM_PERAWATAN">Dalam Perawatan</SelectItem><SelectItem value="SEMBUH">Sembuh</SelectItem></SelectContent></Select></div>
+                  <div className="space-y-2">
+                    <Label>Jenis *</Label>
+                    {loadingMasterData ? (
+                      <Input disabled placeholder="Memuat..." />
+                    ) : (
+                      <Select value={healthForm.healthType} onValueChange={(v: string) => setHealthForm({ ...healthForm, healthType: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="VACCINATION">Vaksinasi</SelectItem>
+                          <SelectItem value="CHECKUP">Checkup</SelectItem>
+                          <SelectItem value="TREATMENT">Pengobatan</SelectItem>
+                          {healthStatuses.filter(s => !['SEHAT', 'OBSERVASI', 'DALAM_PERAWATAN', 'SEMBUH'].includes(s.key)).map((s) => (
+                            <SelectItem key={s.key} value={s.key}>{s.value}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Status *</Label>
+                    <Select value={healthForm.status} onValueChange={(v: string) => setHealthForm({ ...healthForm, status: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="SEHAT">Sehat</SelectItem>
+                        <SelectItem value="OBSERVASI">Observasi</SelectItem>
+                        <SelectItem value="DALAM_PERAWATAN">Dalam Perawatan</SelectItem>
+                        <SelectItem value="SEMBUH">Sembuh</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <div className="space-y-2"><Label>Tanggal *</Label><Input type="date" value={healthForm.recordDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHealthForm({ ...healthForm, recordDate: e.target.value })} /></div>
                   <div className="space-y-2"><Label>Catatan</Label><Input value={healthForm.notes} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHealthForm({ ...healthForm, notes: e.target.value })} placeholder="Opsional" /></div>
-                  <div className="flex justify-end gap-2 pt-4"><Button variant="outline" onClick={() => setHealthModalOpen(false)}>Batal</Button><Button onClick={handleAddHealth}>Simpan</Button></div>
+                  <div className="flex justify-end gap-2 pt-4"><Button variant="outline" onClick={() => setHealthModalOpen(false)} disabled={healthSaving}>Batal</Button><Button onClick={handleAddHealth} disabled={healthSaving}>{healthSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Simpan</Button></div>
                 </CardContent>
               </Card>
             </div>
@@ -287,18 +371,34 @@ export default function CattleDetailPage() {
             </CardContent>
           </Card>
           {feedModalOpen && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <Card className="w-full max-w-md mx-4">
+            <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+              <Card className="w-full max-w-md mx-4 bg-white shadow-xl">
                 <CardHeader><CardTitle>Tambah Riwayat Pakan</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2"><Label>Jenis Pakan *</Label><Input value={feedForm.feedType} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedForm({ ...feedForm, feedType: e.target.value })} placeholder="Rumput Gajah" /></div>
+                  <div className="space-y-2">
+                    <Label>Jenis Pakan *</Label>
+                    {loadingMasterData ? (
+                      <Input disabled placeholder="Memuat..." />
+                    ) : feedTypes.length > 0 ? (
+                      <Select value={feedForm.feedType} onValueChange={(v: string) => setFeedForm({ ...feedForm, feedType: v })}>
+                        <SelectTrigger><SelectValue placeholder="Pilih jenis pakan" /></SelectTrigger>
+                        <SelectContent>
+                          {feedTypes.map((f) => (
+                            <SelectItem key={f.key} value={f.value}>{f.value}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input value={feedForm.feedType} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedForm({ ...feedForm, feedType: e.target.value })} placeholder="Rumput Gajah" />
+                    )}
+                  </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2"><Label>Jumlah *</Label><Input value={feedForm.amount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedForm({ ...feedForm, amount: e.target.value })} placeholder="10 kg" /></div>
                     <div className="space-y-2"><Label>Frekuensi *</Label><Input value={feedForm.frequency} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedForm({ ...feedForm, frequency: e.target.value })} placeholder="2x sehari" /></div>
                   </div>
                   <div className="space-y-2"><Label>Tanggal *</Label><Input type="date" value={feedForm.recordDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedForm({ ...feedForm, recordDate: e.target.value })} /></div>
                   <div className="space-y-2"><Label>Catatan</Label><Input value={feedForm.notes} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedForm({ ...feedForm, notes: e.target.value })} placeholder="Opsional" /></div>
-                  <div className="flex justify-end gap-2 pt-4"><Button variant="outline" onClick={() => setFeedModalOpen(false)}>Batal</Button><Button onClick={handleAddFeed}>Simpan</Button></div>
+                  <div className="flex justify-end gap-2 pt-4"><Button variant="outline" onClick={() => setFeedModalOpen(false)} disabled={feedSaving}>Batal</Button><Button onClick={handleAddFeed} disabled={feedSaving}>{feedSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Simpan</Button></div>
                 </CardContent>
               </Card>
             </div>

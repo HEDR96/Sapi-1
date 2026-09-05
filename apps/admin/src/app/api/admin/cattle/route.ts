@@ -4,10 +4,10 @@ import { getCurrentAdmin } from '@/lib/auth/jwt'
 
 export const dynamic = 'force-dynamic'
 
-// Auto-generate cattle code with sequential numbering
+// Auto-generate cattle code with sequential numbering (7 digits: NF-xxxxxxx)
 async function generateCattleCode(): Promise<string> {
   const year = new Date().getFullYear()
-  const prefix = `NF-${year}`
+  const prefix = `SP-${year}`
 
   const lastCattle = await prisma.cattle.findFirst({
     where: { code: { startsWith: prefix } },
@@ -18,10 +18,10 @@ async function generateCattleCode(): Promise<string> {
   if (lastCattle) {
     const parts = lastCattle.code.split('-')
     const lastNum = parseInt(parts[parts.length - 1], 10)
-    return `${prefix}${String(lastNum + 1).padStart(4, '0')}`
+    return `${prefix}${String(lastNum + 1).padStart(7, '0')}`
   }
 
-  return `${prefix}0001`
+  return `${prefix}0000001`
 }
 
 export async function GET() {

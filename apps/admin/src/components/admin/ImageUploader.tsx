@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
-import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react'
+import { Upload, X, Loader2, Image as ImageIcon, Play, Pause } from 'lucide-react'
 import { getDirectImageUrl } from '@samadya/shared/lib/utils/imageUrl'
 
 interface ImageUploaderProps {
@@ -16,21 +16,30 @@ export function ImageUploader({
   value,
   onChange,
   folder = 'cattle',
-  accept = 'image/jpeg,image/png,image/jpg',
+  accept = 'image/jpeg,image/png,image/jpg,video/mp4,video/webm',
   maxSize = 5,
 }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  const isVideo = value?.includes('/api/stream') || value?.match(/\.(mp4|webm|ogg)$/i) || value?.startsWith('data:video')
 
   const validateFile = (file: File): string | null => {
-    if (!accept.includes(file.type)) {
-      return 'Format file tidak didukung. Gunakan JPG atau PNG.'
+    const isVideoFile = file.type.startsWith('video/')
+    const isImageFile = file.type.startsWith('image/')
+
+    if (!isImageFile && !isVideoFile) {
+      return 'Format file tidak didukung. Gunakan JPG, PNG, atau MP4.'
     }
-    if (file.size > maxSize * 1024 * 1024) {
-      return `Ukuran file terlalu besar. Maksimal ${maxSize}MB.`
+
+    const maxSizeBytes = isVideoFile ? 100 * 1024 * 1024 : maxSize * 1024 * 1024
+    if (file.size > maxSizeBytes) {
+      return `Ukuran file terlalu besar. Maksimal ${isVideoFile ? '100MB' : `${maxSize}MB`}.`
     }
     return null
   }
@@ -65,7 +74,7 @@ export function ImageUploader({
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || 'Gagal mengupload gambar')
+        setError(data.error || 'Gagal mengupload file')
         return
       }
 
@@ -73,7 +82,7 @@ export function ImageUploader({
         onChange(data.url)
         setUploadProgress(100)
       } else {
-        setError('Gagal mengupload gambar: URL tidak ditemukan')
+        setError('Gagal mengupload file: URL tidak ditemukan')
       }
     } catch (err) {
       console.error('Upload error:', err)
@@ -91,10 +100,8 @@ export function ImageUploader({
     setError(null)
 
     const file = e.dataTransfer.files[0]
-    if (file && file.type.startsWith('image/')) {
+    if (file) {
       handleUpload(file)
-    } else {
-      setError('File harus berupa gambar')
     }
   }, [folder])
 
@@ -109,11 +116,69 @@ export function ImageUploader({
   const handleRemove = () => {
     onChange('')
     setError(null)
+    setIsVideoPlaying(false)
     if (inputRef.current) {
       inputRef.current.value = ''
     }
   }
 
+  const toggleVideoPlayback = () => {
+    if (videoRef.current) {
+      if (isVideoPlaying) {
+        videoRef.current.pause()
+      } else {
+        videoRef.current.play()
+      }
+      setIsVideoPlaying(!isVideoPlaying)
+    }
+  }
+
+  // Show video preview
+  if (value && isVideo) {
+    const videoUrl = value.startsWith('/') ? value : getDirectImageUrl(value)
+
+    return (
+      <div className="space-y-2">
+        <div className="relative w-full rounded-lg overflow-hidden border border-[hsl(var(--line))] bg-black">
+          <video
+            ref={videoRef}
+            src={videoUrl}
+            className="w-full h-48 object-contain"
+            onEnded={() => setIsVideoPlaying(false)}
+            onError={(e) => {
+              console.error('Video load error:', e)
+              e.currentTarget.poster = ''
+            }}
+          />
+          <button
+            type="button"
+            onClick={toggleVideoPlayback}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-colors"
+            title={isVideoPlaying ? 'Pause' : 'Play'}
+          >
+            {isVideoPlaying ? (
+              <Pause className="h-8 w-8 text-white" />
+            ) : (
+              <Play className="h-8 w-8 text-white ml-1" />
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={handleRemove}
+            className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg"
+            title="Hapus video"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <p className="text-xs text-[hsl(var(--forest))/50] text-center">
+          Video dokumentasi
+        </p>
+      </div>
+    )
+  }
+
+  // Show image preview
   if (value) {
     const imageUrl = getDirectImageUrl(value)
 
@@ -183,10 +248,10 @@ export function ImageUploader({
               )}
             </div>
             <p className="text-sm text-[hsl(var(--forest))/60]">
-              {dragOver ? 'Lepaskan file di sini' : 'Klik atau drag gambar ke sini'}
+              {dragOver ? 'Lepaskan file di sini' : 'Klik atau drag gambar/video ke sini'}
             </p>
             <p className="text-xs text-[hsl(var(--forest))/40] mt-1">
-              JPG, PNG - Maksimal {maxSize}MB
+              JPG, PNG, MP4 - Maksimal {folder === 'video' || folder === 'video-upload' ? '100MB' : `${maxSize}MB`}
             </p>
           </>
         )}

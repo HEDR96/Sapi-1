@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       data: {
         cattleId,
         customerId,
-        quantity: quantity || 1,
+        quantity: quantity ? parseInt(quantity, 10) : 1,
         price: parseFloat(price),
         margin: margin ? parseFloat(margin) : null,
         status: status || 'PENDING',
@@ -97,13 +97,11 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Update cattle status if sale is confirmed
-    if (status === 'CONFIRMED' || status === 'COMPLETED') {
-      await prisma.cattle.update({
-        where: { id: cattleId },
-        data: { status: 'SOLD' },
-      })
-    }
+    // Update cattle status to SOLD when a sale is created
+    await prisma.cattle.update({
+      where: { id: cattleId },
+      data: { status: 'SOLD' },
+    })
 
     return NextResponse.json({ sale })
   } catch (error: any) {

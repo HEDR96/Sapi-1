@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { Button } from '@samadya/shared/components/ui/button'
@@ -10,6 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@samadya/shared/components/ui/label'
 import Link from 'next/link'
 import { ImageUploader } from '@/components/admin/ImageUploader'
+
+interface MasterData {
+  id: string
+  category: string
+  key: string
+  value: string
+}
 
 export default function NewCattlePage() {
   const router = useRouter()
@@ -31,6 +38,29 @@ export default function NewCattlePage() {
     mainImage: '',
     quantity: '1',
   })
+
+  // Master data
+  const [cattleBreeds, setCattleBreeds] = useState<MasterData[]>([])
+  const [loadingMasterData, setLoadingMasterData] = useState(true)
+
+  useEffect(() => {
+    fetchMasterData()
+  }, [])
+
+  const fetchMasterData = async () => {
+    try {
+      const res = await fetch('/api/admin/master-data')
+      if (res.ok) {
+        const data = await res.json()
+        const items = data.items || []
+        setCattleBreeds(items.filter((m: MasterData) => m.category === 'JENIS_SAPI'))
+      }
+    } catch (error) {
+      console.error('Failed to fetch master data:', error)
+    } finally {
+      setLoadingMasterData(false)
+    }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -126,19 +156,31 @@ export default function NewCattlePage() {
 
               <div className="space-y-2">
                 <Label htmlFor="breed">Jenis Sapi *</Label>
-                <Select value={form.breed} onValueChange={(v: string) => setForm({ ...form, breed: v as any })}>
-                  <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="Pilih jenis sapi" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Limousin">Limousin</SelectItem>
-                    <SelectItem value="Simental">Simental</SelectItem>
-                    <SelectItem value="Brahman">Brahman</SelectItem>
-                    <SelectItem value="Angus">Angus</SelectItem>
-                    <SelectItem value="PO">Peranakan Ongole (PO)</SelectItem>
-                    <SelectItem value="Lainnya">Lainnya</SelectItem>
-                  </SelectContent>
-                </Select>
+                {loadingMasterData ? (
+                  <Input disabled placeholder="Memuat..." />
+                ) : (
+                  <Select value={form.breed} onValueChange={(v: string) => setForm({ ...form, breed: v })}>
+                    <SelectTrigger className="bg-white">
+                      <SelectValue placeholder="Pilih jenis sapi" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cattleBreeds.length > 0 ? (
+                        cattleBreeds.map((b) => (
+                          <SelectItem key={b.key} value={b.value}>{b.value}</SelectItem>
+                        ))
+                      ) : (
+                        <>
+                          <SelectItem value="Limousin">Limousin</SelectItem>
+                          <SelectItem value="Simental">Simental</SelectItem>
+                          <SelectItem value="Brahman">Brahman</SelectItem>
+                          <SelectItem value="Angus">Angus</SelectItem>
+                          <SelectItem value="PO">Peranakan Ongole (PO)</SelectItem>
+                          <SelectItem value="Lainnya">Lainnya</SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -188,10 +230,10 @@ export default function NewCattlePage() {
                   id="height"
                   name="height"
                   type="number"
-                  step="0.1"
+                  step="0.01"
                   value={form.height}
                   onChange={handleChange}
-                  placeholder="145"
+                  placeholder="145.00"
                 />
               </div>
 
@@ -201,6 +243,7 @@ export default function NewCattlePage() {
                   id="price"
                   name="price"
                   type="number"
+                  step="1"
                   value={form.price}
                   onChange={handleChange}
                   placeholder="26500000"
@@ -214,6 +257,7 @@ export default function NewCattlePage() {
                   id="buyPrice"
                   name="buyPrice"
                   type="number"
+                  step="1"
                   value={form.buyPrice}
                   onChange={handleChange}
                   placeholder="0"
@@ -226,6 +270,7 @@ export default function NewCattlePage() {
                   id="sellPrice"
                   name="sellPrice"
                   type="number"
+                  step="1"
                   value={form.sellPrice}
                   onChange={handleChange}
                   placeholder="0"
@@ -238,6 +283,7 @@ export default function NewCattlePage() {
                   id="healthCost"
                   name="healthCost"
                   type="number"
+                  step="1"
                   value={form.healthCost}
                   onChange={handleChange}
                   placeholder="0"
@@ -250,6 +296,7 @@ export default function NewCattlePage() {
                   id="feedCost"
                   name="feedCost"
                   type="number"
+                  step="1"
                   value={form.feedCost}
                   onChange={handleChange}
                   placeholder="0"
@@ -262,10 +309,10 @@ export default function NewCattlePage() {
                   id="targetWeight"
                   name="targetWeight"
                   type="number"
-                  step="0.1"
+                  step="0.01"
                   value={form.targetWeight}
                   onChange={handleChange}
-                  placeholder="610"
+                  placeholder="610.00"
                 />
               </div>
 
