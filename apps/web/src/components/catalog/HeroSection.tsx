@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { BadgeCheck, Clock3, ClipboardList, Shield, ChevronLeft, ChevronRight } from 'lucide-react'
+import { BadgeCheck, Clock3, ClipboardList, Shield, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { CattleWithRelations } from '@samadya/shared/types'
 
 interface HeroSectionProps {
   cattle: CattleWithRelations[]
   selectedCattle: CattleWithRelations | null
   onSelectCattle: (cattle: CattleWithRelations) => void
+  isLoading?: boolean
 }
 
 interface CounterProps {
@@ -80,7 +81,7 @@ const trustFeatures = [
   { icon: Shield, text: 'InsyaAllah Sesuai Syariat' },
 ]
 
-export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSectionProps) {
+export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading }: HeroSectionProps) {
   const heroRef = useRef<HTMLElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const isSliderChange = useRef(false)
@@ -88,6 +89,9 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSect
   // Get available cattle with images
   const displayCattle = cattle.filter(c => c.mainImage)
   const currentCattle = displayCattle[currentIndex] || selectedCattle
+
+  // Determine if we should show loading state
+  const showLoading = isLoading || displayCattle.length === 0
 
   // Sync currentIndex when selectedCattle changes from outside (e.g., catalog card click)
   useEffect(() => {
@@ -145,8 +149,13 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSect
     <section ref={heroRef} className="reveal mx-auto grid max-w-full grid-cols-1 items-stretch lg:grid-cols-[3.3fr_2.1fr_.9fr]">
       {/* Image Slider */}
       <div className="hero-photo relative min-h-[280px] sm:min-h-[400px] lg:min-h-[580px] overflow-hidden">
-        {/* Current Image */}
-        {currentCattle?.mainImage ? (
+        {/* Loading Placeholder - Shows when data is being fetched */}
+        {showLoading ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[hsl(var(--cream))]">
+            <Loader2 className="h-12 w-12 animate-spin text-[hsl(var(--forest))] mb-3" />
+            <p className="text-sm font-semibold text-[hsl(var(--forest))]">Memuat...</p>
+          </div>
+        ) : currentCattle?.mainImage ? (
           <div
             className="absolute inset-0 transition-opacity duration-500"
             style={{
@@ -163,8 +172,8 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSect
         )}
         <div className="absolute inset-0 bg-gradient-to-r from-black/12 via-transparent to-transparent" />
 
-        {/* Slider Arrows */}
-        {displayCattle.length > 1 && (
+        {/* Slider Arrows - Only show when not loading and has multiple cattle */}
+        {!showLoading && displayCattle.length > 1 && (
           <>
             <button
               onClick={goToPrev}
@@ -243,7 +252,7 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSect
       </div>
 
 {/* Dynamic Tag Container */}
-      <div className="relative flex items-start justify-end overflow-hidden bg-[#F1EFE2] px-4 pt-0 py-2 lg:px-6 lg:pr-3">
+      <div className="relative flex items-start justify-center lg:justify-end overflow-hidden bg-[#F1EFE2] px-4 pt-0 py-2 lg:px-6 lg:pr-3">
         {/* 1. GANTUNGAN WOOD/METAL PIN (STATIK DI ATAS CONTAINER) */}
         <div className="pointer-events-none absolute right-[72px] sm:right-[92px] top-0 z-30 flex flex-col items-center">
           {/* Base Pin Kayu dengan Lis Gold & Shadow */}
@@ -307,7 +316,12 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle }: HeroSect
 
               {/* Container QR Code */}
               <div className="mx-auto mt-2 aspect-square h-[82px] w-[82px] shrink-0 rounded-[6px] border border-[#D4C9B0] bg-white p-1.5 sm:h-[105px] sm:w-[105px] shadow-sm">
-                {currentCattle ? (
+                {showLoading ? (
+                  <div className="flex h-full flex-col items-center justify-center text-center">
+                    <Loader2 className="h-5 w-5 animate-spin text-[hsl(var(--forest))/50]" />
+                    <span className="text-[5px] text-[hsl(var(--forest))/50] mt-0.5">Memuat...</span>
+                  </div>
+                ) : currentCattle ? (
                   <div className="flex h-full items-center justify-center">
                     <img
                       src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`/sapi/${currentCattle.code}`)}`}

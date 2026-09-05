@@ -1,14 +1,41 @@
 const IMAGE_BASE_URL = process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '/api/images'
 const VIDEO_BASE_URL = process.env.NEXT_PUBLIC_VIDEO_BASE_URL || '/api/videos'
+const IMAGE_PROXY_URL = process.env.NEXT_PUBLIC_IMAGE_PROXY_URL || '/api/image-proxy'
+
+/**
+ * Extract Google Drive file ID from various URL formats
+ */
+function extractDriveFileId(url: string): string | null {
+  // Format: https://drive.google.com/uc?export=view&id=FILE_ID
+  const ucMatch = url.match(/[?&]id=([^&]+)/)
+  if (ucMatch) return ucMatch[1]
+
+  // Format: https://drive.google.com/file/d/FILE_ID/view
+  const fileMatch = url.match(/\/file\/d\/([^/]+)/)
+  if (fileMatch) return fileMatch[1]
+
+  // Format: https://docs.google.com/uc?export=view&id=FILE_ID
+  const docsMatch = url.match(/docs\.google\.com.*[?&]id=([^&]+)/)
+  if (docsMatch) return docsMatch[1]
+
+  return null
+}
 
 /**
  * Get direct image URL for display
+ * Automatically proxies Google Drive images to bypass CORS
  */
 export function getDirectImageUrl(path: string | null | undefined): string {
   if (!path) return '/placeholder-cattle.png'
 
-  // If it's already an absolute URL (external), return as-is
+  // If it's already an absolute URL (external), check if it's Google Drive
   if (path.startsWith('http://') || path.startsWith('https://')) {
+    const driveFileId = extractDriveFileId(path)
+    if (driveFileId) {
+      // Use image proxy for Google Drive images
+      return `${IMAGE_PROXY_URL}?id=${driveFileId}`
+    }
+    // Return other external URLs as-is
     return path
   }
 
@@ -23,11 +50,18 @@ export function getDirectImageUrl(path: string | null | undefined): string {
 
 /**
  * Get direct video URL for display
+ * Automatically proxies Google Drive videos to bypass CORS
  */
 export function getVideoUrl(path: string | null | undefined): string {
   if (!path) return ''
 
   if (path.startsWith('http://') || path.startsWith('https://')) {
+    const driveFileId = extractDriveFileId(path)
+    if (driveFileId) {
+      // For videos, use a different proxy or direct URL
+      // Google Drive videos need special handling
+      return `https://drive.google.com/uc?export=download&id=${driveFileId}`
+    }
     return path
   }
 
@@ -52,4 +86,12 @@ export function isVideoUrl(url: string | null | undefined): boolean {
     lower.endsWith('.mov') ||
     lower.includes('mimeType=video')
   )
+}
+
+/**
+ * Check if URL is from Google Drive
+ */
+export function isGoogleDriveUrl(url: string | null | undefined): boolean {
+  if (!url) return false
+  return url.includes('drive.google.com') || url.includes('docs.google.com')
 }

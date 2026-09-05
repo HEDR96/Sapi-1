@@ -51,13 +51,13 @@ export function PantauPerkembanganSection({
   const activeComparingCattle = onCompareSelect ? comparingCattle : selectedForCompare
 
   return (
-    <section className="reveal mx-auto max-w-[1400px] px-4 pb-6 sm:px-5 lg:px-8">
-      <div className="rounded-2xl border border-[hsl(var(--line))] bg-white shadow-sm overflow-hidden">
+    <section className="reveal mx-auto max-w-[1400px] px-3 pb-4 sm:px-5 sm:pb-6 lg:px-8">
+      <div className="rounded-xl border border-[hsl(var(--line))] bg-white shadow-sm overflow-hidden">
         {/* Grid diset items-stretch agar sidebar & main memiliki tinggi yang sama */}
         <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] items-stretch">
-          
+
           {/* Left Sidebar - Dibuat h-full & flex agar menyerap tinggi container */}
-          <aside className="flex flex-col h-full border-b border-[hsl(var(--line))] p-5 lg:border-b-0 lg:border-r bg-[hsl(var(--cream))/10]">
+          <aside className="flex flex-col h-full border-b border-[hsl(var(--line))] p-3 sm:p-5 lg:border-b-0 lg:border-r bg-[hsl(var(--cream))/10]">
             <SelectedCattleDetail
               cattle={cattle}
               onCompare={onOpenCompare || handleOpenCompare}
@@ -66,7 +66,7 @@ export function PantauPerkembanganSection({
           </aside>
 
           {/* Right Main Content - Tracking Tabs */}
-          <div className="p-5 min-w-0">
+          <div className="p-3 sm:p-5 min-w-0">
             <TrackingTabs cattle={cattle} />
           </div>
 

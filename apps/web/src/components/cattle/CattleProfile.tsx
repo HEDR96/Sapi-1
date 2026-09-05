@@ -12,7 +12,6 @@ import { WeightHistoryTab } from './WeightHistoryTab'
 import { HealthHistoryTab } from './HealthHistoryTab'
 import { FeedHistoryTab } from './FeedHistoryTab'
 import { MediaTab } from './MediaTab'
-import { CommentSection } from './CommentSection'
 import { formatCurrency, formatWeight, formatHeight, formatDate, formatADG } from '@samadya/shared/lib/utils/formatters'
 import { calculateWeightStats, estimateTargetCompletion } from '@samadya/shared/lib/utils/calculations'
 import { getDirectImageUrl } from '@samadya/shared/lib/utils/imageUrl'
@@ -30,7 +29,6 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('summary')
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
-  const [currentUserId, setCurrentUserId] = useState<string | undefined>()
   const [showBookingModal, setShowBookingModal] = useState(false)
   const [mobileView, setMobileView] = useState<'gallery' | 'details'>('gallery')
 
@@ -73,13 +71,6 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
   const prevImage = () => {
     setLightboxIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1))
   }
-
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then(res => res.ok ? res.json() : null)
-      .then(data => setCurrentUserId(data?.user?.id))
-      .catch(() => {})
-  }, [])
 
   const tabs = [
     { key: 'summary', label: 'Ringkasan' },
@@ -334,12 +325,6 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
                   <MediaTab media={cattle.media || []} />
                 )}
               </div>
-
-              <CommentSection
-                cattleId={cattle.id}
-                cattleCode={cattle.code}
-                currentUserId={currentUserId}
-              />
             </div>
           </div>
 
@@ -547,12 +532,6 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
                   <MediaTab media={cattle.media || []} />
                 )}
               </div>
-
-              <CommentSection
-                cattleId={cattle.id}
-                cattleCode={cattle.code}
-                currentUserId={currentUserId}
-              />
             </div>
           </div>
         </div>

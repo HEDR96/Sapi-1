@@ -18,6 +18,7 @@ export default function HomePage() {
   const [selectedCattle, setSelectedCattle] = useState<CattleWithRelations | null>(null)
   const [comparingCattle, setComparingCattle] = useState<CattleWithRelations[]>([])
   const [compareModalOpen, setCompareModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const pageRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -46,8 +47,12 @@ export default function HomePage() {
         if (items.length > 0 && !selectedCattle) {
           setSelectedCattle(items[0])
         }
+        setIsLoading(false)
       })
-      .catch(console.error)
+      .catch(() => {
+        console.error('Failed to fetch cattle data')
+        setIsLoading(false)
+      })
 
     // Scroll reveal observer
     const observer = new IntersectionObserver(
@@ -105,6 +110,7 @@ export default function HomePage() {
         cattle={fullCattleData}
         selectedCattle={selectedCattle}
         onSelectCattle={handleSelectCattle}
+        isLoading={isLoading}
       />
       <JourneySection />
       {/* KATALOG - Combined Swiper/Grid with Toggle */}
