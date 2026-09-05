@@ -14,6 +14,7 @@ import { format } from 'date-fns'
 import { formatCurrency } from '@samadya/shared/lib/utils/formatters'
 import { CattleStatusBadge as StatusBadge } from '@samadya/shared/components/ui/CattleStatusBadge'
 import { ImageUploader } from '@/components/admin/ImageUploader'
+import { getDirectImageUrl, getVideoUrl } from '@samadya/shared/lib/utils/imageUrl'
 
 // Format number with thousand separator
 const formatNumber = (num: number): string => {
@@ -451,15 +452,15 @@ export default function CattleDetailPage() {
               {cattle.media && cattle.media.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{cattle.media.map((m) => (
                   <div key={m.id} className="relative aspect-square border rounded-lg overflow-hidden">
-                    {m.fileType === 'VIDEO' || m.fileUrl.includes('/api/stream') ? (
+                    {m.fileType === 'VIDEO' || m.fileUrl.includes('/api/stream') || m.fileUrl.includes('/api/videos') ? (
                       <video
-                        src={m.fileUrl}
+                        src={getVideoUrl(m.fileUrl)}
                         className="w-full h-full object-cover"
                         controls
                         preload="metadata"
                       />
                     ) : (
-                      <img src={m.fileUrl} alt="" className="w-full h-full object-cover" />
+                      <img src={getDirectImageUrl(m.fileUrl)} alt="" className="w-full h-full object-cover" />
                     )}
                     <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1">{m.fileType}</div>
                   </div>
