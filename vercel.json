@@ -9,11 +9,11 @@
     "JWT_SECRET": "@jwt_secret",
     "JWT_EXPIRES_IN": "24h",
     "RESEND_API_KEY": "@resend_api_key",
-    "IDRIVE_ACCESS_KEY_ID": "@idrive_access_key",
-    "IDRIVE_SECRET_ACCESS_KEY": "@idrive_secret_key",
-    "IDRIVE_BUCKET": "farm",
-    "IDRIVE_ENDPOINT": "https://farm.s3.ap-northeast-1.idrivee2.com",
-    "IDRIVE_REGION": "ap-northeast-1",
-    "NEXT_PUBLIC_APP_URL": "@app_url"
+    "GOOGLE_OAUTH_CLIENT_ID": "@google_oauth_client_id",
+    "GOOGLE_OAUTH_CLIENT_SECRET": "@google_oauth_client_secret",
+    "GOOGLE_OAUTH_REDIRECT_URI": "@google_oauth_redirect_uri",
+    "GOOGLE_DRIVE_IMAGE_FOLDER_ID": "@google_drive_image_folder_id",
+    "GOOGLE_DRIVE_VIDEO_FOLDER_ID": "@google_drive_video_folder_id",
+    "NEXT_PUBLIC_APP_URL": "@next_public_app_url"
   }
 }

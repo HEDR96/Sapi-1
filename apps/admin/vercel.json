@@ -1,0 +1,6 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm --filter @samadya/prisma prisma generate && pnpm --filter @samadya/admin build",
+  "installCommand": "pnpm install",
+  "devCommand": "pnpm --filter @samadya/admin dev"
+}
