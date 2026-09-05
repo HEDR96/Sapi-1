@@ -69,7 +69,7 @@ export default function HomePage() {
   }, [])
 
   // Handler when user selects a cow from catalog
-  const handleSelectCattle = (c: CattleWithRelations) => {
+  const handleSelectCattle = (c: any) => {
     const full = fullCattleData.find(x => x.id === c.id) || null
     setSelectedCattle(full)
   }

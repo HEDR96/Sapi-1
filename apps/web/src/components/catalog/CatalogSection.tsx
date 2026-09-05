@@ -9,7 +9,7 @@ import { SearchFilter, Filters } from './SearchFilter'
 
 interface CatalogSectionProps {
   cattle: CattleWithLatestWeight[]
-  onSelect: (cattle: CattleWithRelations) => void
+  onSelect: (cattle: any) => void
   selectedId?: string
   allCattle?: CattleWithRelations[]
   onCompareSelect?: (cattle: CattleWithRelations) => void
