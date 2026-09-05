@@ -1,6 +1,5 @@
 {
   "framework": "nextjs",
-  "buildCommand": "pnpm --filter @samadya/prisma prisma generate && pnpm --filter @samadya/web build",
-  "installCommand": "pnpm install",
-  "devCommand": "pnpm --filter @samadya/web dev"
+  "buildCommand": "npm run db:generate --workspace=@samadya/prisma && npm run build --workspace=@samadya/web",
+  "devCommand": "npm run dev --workspace=@samadya/web"
 }
