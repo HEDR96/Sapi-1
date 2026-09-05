@@ -15,6 +15,12 @@ export async function GET(request: NextRequest) {
   try {
     const drive = await getAuthenticatedDriveClient()
 
+    // Get file from Google Drive
+    const response = await drive.files.get(
+      { fileId, alt: 'media' },
+      { responseType: 'stream' }
+    )
+
     // Get file metadata for size
     const meta = await drive.files.get({
       fileId,
@@ -22,25 +28,52 @@ export async function GET(request: NextRequest) {
     })
     const fileSize = parseInt(meta.data.size || '0', 10)
 
-    // Stream from Google Drive
-    const response = await drive.files.get(
-      { fileId, alt: 'media' },
-      { responseType: 'stream' }
-    )
+    // Collect stream chunks
+    const chunks: Buffer[] = []
+    const stream = response.data as unknown as AsyncIterable<Buffer>
 
-    // Convert Node.js Readable to Web ReadableStream
-    const stream = response.data as unknown as ReadableStream
+    for await (const chunk of stream) {
+      chunks.push(Buffer.from(chunk))
+    }
 
-    return new Response(stream, {
+    const videoBuffer = Buffer.concat(chunks)
+
+    console.log('[Stream API] Success:', {
+      fileId,
+      mimeType,
+      size: videoBuffer.length,
+    })
+
+    return new Response(videoBuffer, {
       headers: {
         'Content-Type': mimeType,
-        'Content-Length': fileSize.toString(),
-        'Accept-Ranges': 'bytes',
+        'Content-Length': videoBuffer.length.toString(),
+        'Accept-Ranges': 'none',
         'Cache-Control': 'public, max-age=31536000, immutable',
       },
     })
   } catch (error: any) {
-    console.error('[Stream API] Error:', error.message)
-    return NextResponse.json({ error: 'Failed to stream file' }, { status: 500 })
+    console.error('[Stream API] Error:', error.message, error.code)
+
+    // Try fallback to direct Google Drive URL
+    try {
+      const directUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
+
+      const response = await fetch(directUrl)
+      if (response.ok) {
+        const videoBuffer = await response.arrayBuffer()
+        return new Response(videoBuffer, {
+          headers: {
+            'Content-Type': mimeType,
+            'Content-Length': videoBuffer.byteLength.toString(),
+            'Cache-Control': 'public, max-age=3600',
+          },
+        })
+      }
+    } catch (fallbackError) {
+      console.error('[Stream API] Fallback also failed:', fallbackError)
+    }
+
+    return NextResponse.json({ error: 'Failed to stream video: ' + error.message }, { status: 500 })
   }
 }

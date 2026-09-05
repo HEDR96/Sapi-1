@@ -255,7 +255,7 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
 {/* Dynamic Tag Container */}
       <div className="relative flex items-start justify-center lg:justify-end overflow-hidden bg-[#F1EFE2] px-4 pt-0 py-2 lg:px-6 lg:pr-3">
         {/* 1. GANTUNGAN WOOD/METAL PIN (STATIK DI ATAS CONTAINER) */}
-        <div className="pointer-events-none absolute right-[72px] sm:right-[92px] top-0 z-30 flex flex-col items-center">
+        <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-0 z-30 flex flex-col items-center">
           {/* Base Pin Kayu dengan Lis Gold & Shadow */}
           <div className="h-3 w-7 rounded-b-md bg-gradient-to-b from-[#5c4328] via-[#7a5c37] to-[#43301b] shadow-md border-x border-b border-[#302111]" />
           {/* Ring Pengait Kecil */}
