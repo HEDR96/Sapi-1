@@ -25,13 +25,22 @@ export async function POST(request: NextRequest) {
     console.log('[OAuth Callback] Processing callback...')
 
     // Exchange code for tokens
-    await handleOAuthCallback(code)
+    const token = await handleOAuthCallback(code)
 
     console.log('[OAuth Callback] OAuth flow completed successfully')
 
+    // Return the token JSON so user can copy it for environment variable
     return NextResponse.json({
       success: true,
-      message: 'Google Drive authorization successful! You can now upload files.',
+      message: 'Google Drive authorization successful! Token received.',
+      token: token,
+      instructions: [
+        'For production (Vercel): Set the following environment variable:',
+        '',
+        'GOOGLE_TOKEN_JSON=' + JSON.stringify(token),
+        '',
+        'Copy the token value above and add it to your Vercel project environment variables.',
+      ],
     })
   } catch (error: any) {
     console.error('[OAuth Callback] Error:', error.message)
@@ -45,20 +54,9 @@ export async function POST(request: NextRequest) {
 
 /**
  * GET /api/auth/google/callback
- *
- * Show instructions for manual callback handling
  */
 export async function GET() {
   return NextResponse.json({
-    message: 'OAuth callback endpoint',
-    instructions: [
-      'This endpoint expects a POST request with the authorization code.',
-      'After authorizing at /api/auth/google/init, you will be redirected.',
-      'Use the code from the redirect URL to complete authorization:',
-      '',
-      'POST /api/auth/google/callback',
-      'Content-Type: application/json',
-      'Body: { "code": "your_authorization_code" }'
-    ]
+    message: 'OAuth callback endpoint - use POST with authorization code',
   })
 }

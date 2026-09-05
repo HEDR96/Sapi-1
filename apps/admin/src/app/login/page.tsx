@@ -119,7 +119,7 @@ export default function AdminLoginPage() {
               </Button>
             </form>
             <div className="mt-4 text-center text-sm text-muted-foreground">
-              <p>Default: admin@sapikatalog.com / admin123</p>
+              <p>Admin Login</p>
             </div>
           </CardContent>
         </Card>

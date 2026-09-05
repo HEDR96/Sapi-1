@@ -67,16 +67,26 @@ export function getAuthorizationUrl(): string {
   const oauth2Client = getOAuth2Client()
 
   return oauth2Client.generateAuthUrl({
-    access_type: 'offline', // Important: get refresh token
+    access_type: 'offline',
     scope: SCOPES,
-    prompt: 'consent', // Force consent screen to get refresh token
+    prompt: 'consent',
   })
 }
 
 /**
- * Handle OAuth callback - exchange code for tokens
+ * Stored token interface
  */
-export async function handleOAuthCallback(code: string): Promise<void> {
+interface StoredToken {
+  access_token: string
+  refresh_token: string
+  expiry_date: number
+}
+
+/**
+ * Handle OAuth callback - exchange code for tokens
+ * Returns the token so it can be saved as environment variable in production
+ */
+export async function handleOAuthCallback(code: string): Promise<StoredToken> {
   const oauth2Client = getOAuth2Client()
 
   console.log('[Google OAuth] Exchanging code for tokens...')
@@ -92,14 +102,20 @@ export async function handleOAuthCallback(code: string): Promise<void> {
   // Calculate actual expiry date if not provided (default: 1 hour from now)
   const expiryDate = tokens.expiry_date || (Date.now() + 3600 * 1000)
 
-  // Save tokens
-  await saveTokens({
+  // Build stored token object
+  const storedToken: StoredToken = {
     access_token: tokens.access_token!,
     refresh_token: tokens.refresh_token!,
     expiry_date: expiryDate,
-  })
+  }
+
+  // Save tokens to file (for local development)
+  await saveTokens(storedToken)
 
   console.log('[Google OAuth] Tokens saved successfully')
+
+  // Return token so it can be used/set as environment variable
+  return storedToken
 }
 
 /**
@@ -157,11 +173,6 @@ export async function getAuthenticatedDriveClient(): Promise<drive_v3.Drive> {
 
 /**
  * Upload a file to Google Drive using OAuth
- * @param buffer - File buffer
- * @param fileName - Original file name
- * @param mimeType - MIME type of the file
- * @param folder - 'image' or 'video'
- * @returns Object containing file ID and public URL
  */
 export async function uploadToGoogleDrive(
   buffer: Buffer,
@@ -266,7 +277,6 @@ async function makeFilePublic(drive: drive_v3.Drive, fileId: string): Promise<vo
     console.log('[Google Drive OAuth] File made public:', fileId)
   } catch (error: any) {
     console.error('[Google Drive OAuth] Failed to make file public:', error.message)
-    // Don't throw - file is uploaded, just not public
   }
 }
 
@@ -304,13 +314,11 @@ function bufferToStream(buffer: Buffer): NodeJS.ReadableStream {
 }
 
 /**
- * Check if user is authorized (has tokens, even if expired - refresh will happen on use)
+ * Check if user is authorized
  */
 export async function isAuthorized(): Promise<boolean> {
   try {
     const tokens = await loadTokens()
-    // Return true if we have tokens, even if expired
-    // The actual refresh will happen in getAuthenticatedDriveClient()
     return tokens !== null
   } catch {
     return false
