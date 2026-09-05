@@ -115,7 +115,7 @@ export default function AdminCattlePage() {
           <Input
             placeholder="Cari nama atau kode sapi..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
             className="pl-10"
           />
         </div>

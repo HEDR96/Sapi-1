@@ -225,7 +225,7 @@ export default function MasterDataPage() {
                 <Input
                   id="key"
                   value={form.key}
-                  onChange={(e) => setForm({ ...form, key: e.target.value })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, key: e.target.value })}
                   placeholder="Contoh: LIMOSIN"
                   className="border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
                 />
@@ -236,7 +236,7 @@ export default function MasterDataPage() {
                 <Input
                   id="value"
                   value={form.value}
-                  onChange={(e) => setForm({ ...form, value: e.target.value })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, value: e.target.value })}
                   placeholder="Contoh: Limousin"
                 />
               </div>

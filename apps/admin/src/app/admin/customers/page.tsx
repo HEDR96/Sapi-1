@@ -113,7 +113,7 @@ export default function CustomersPage() {
         <Input
           placeholder="Cari pelanggan..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
           className="pl-10"
         />
       </div>
@@ -195,23 +195,23 @@ export default function CustomersPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label>Nama *</Label>
-                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Nama lengkap" required />
+                  <Input value={form.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })} placeholder="Nama lengkap" required />
                 </div>
                 <div className="space-y-2">
                   <Label>Email</Label>
-                  <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="email@example.com" />
+                  <Input type="email" value={form.email} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, email: e.target.value })} placeholder="email@example.com" />
                 </div>
                 <div className="space-y-2">
                   <Label>Telepon</Label>
-                  <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="08xx-xxxx-xxxx" />
+                  <Input value={form.phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, phone: e.target.value })} placeholder="08xx-xxxx-xxxx" />
                 </div>
                 <div className="space-y-2">
                   <Label>Alamat</Label>
-                  <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Alamat lengkap" />
+                  <Input value={form.address} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, address: e.target.value })} placeholder="Alamat lengkap" />
                 </div>
                 <div className="space-y-2">
                   <Label>% Pembelian</Label>
-                  <Input type="number" min="0" max="100" value={form.purchasePercentage} onChange={(e) => setForm({ ...form, purchasePercentage: e.target.value })} placeholder="100" />
+                  <Input type="number" min="0" max="100" value={form.purchasePercentage} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, purchasePercentage: e.target.value })} placeholder="100" />
                 </div>
                 <div className="flex justify-end gap-2 pt-4">
                   <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>Batal</Button>

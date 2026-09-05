@@ -122,7 +122,7 @@ export default function SalesPage() {
 
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Cari penjualan..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+        <Input placeholder="Cari penjualan..." value={search} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)} className="pl-10" />
       </div>
 
       {loading ? (
@@ -225,15 +225,15 @@ export default function SalesPage() {
                 <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label>Jumlah *</Label>
-                    <Input type="number" min="1" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} required />
+                    <Input type="number" min="1" value={form.quantity} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, quantity: e.target.value })} required />
                   </div>
                   <div className="space-y-2">
                     <Label>Harga *</Label>
-                    <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="25000000" required />
+                    <Input type="number" value={form.price} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, price: e.target.value })} placeholder="25000000" required />
                   </div>
                   <div className="space-y-2">
                     <Label>Margin</Label>
-                    <Input type="number" value={form.margin} onChange={(e) => setForm({ ...form, margin: e.target.value })} placeholder="2500000" />
+                    <Input type="number" value={form.margin} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, margin: e.target.value })} placeholder="2500000" />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -250,7 +250,7 @@ export default function SalesPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Catatan</Label>
-                  <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Catatan optional" />
+                  <Input value={form.notes} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, notes: e.target.value })} placeholder="Catatan optional" />
                 </div>
                 <div className="flex justify-end gap-2 pt-4">
                   <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>Batal</Button>
