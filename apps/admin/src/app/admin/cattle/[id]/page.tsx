@@ -226,9 +226,9 @@ export default function CattleDetailPage() {
               <Card className="w-full max-w-md mx-4">
                 <CardHeader><CardTitle>Tambah Riwayat Timbang</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2"><Label>Bobot (Kg) *</Label><Input type="number" step="0.1" value={weightForm.weight} onChange={e => setWeightForm({ ...weightForm, weight: e.target.value })} placeholder="500" /></div>
-                  <div className="space-y-2"><Label>Tanggal *</Label><Input type="date" value={weightForm.measurementDate} onChange={e => setWeightForm({ ...weightForm, measurementDate: e.target.value })} /></div>
-                  <div className="space-y-2"><Label>Catatan</Label><Input value={weightForm.notes} onChange={e => setWeightForm({ ...weightForm, notes: e.target.value })} placeholder="Opsional" /></div>
+                  <div className="space-y-2"><Label>Bobot (Kg) *</Label><Input type="number" step="0.1" value={weightForm.weight} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWeightForm({ ...weightForm, weight: e.target.value })} placeholder="500" /></div>
+                  <div className="space-y-2"><Label>Tanggal *</Label><Input type="date" value={weightForm.measurementDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWeightForm({ ...weightForm, measurementDate: e.target.value })} /></div>
+                  <div className="space-y-2"><Label>Catatan</Label><Input value={weightForm.notes} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWeightForm({ ...weightForm, notes: e.target.value })} placeholder="Opsional" /></div>
                   <div className="flex justify-end gap-2 pt-4"><Button variant="outline" onClick={() => setWeightModalOpen(false)}>Batal</Button><Button onClick={handleAddWeight}>Simpan</Button></div>
                 </CardContent>
               </Card>
@@ -258,10 +258,10 @@ export default function CattleDetailPage() {
               <Card className="w-full max-w-md mx-4">
                 <CardHeader><CardTitle>Tambah Riwayat Kesehatan</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2"><Label>Jenis *</Label><Select value={healthForm.healthType} onValueChange={v => setHealthForm({ ...healthForm, healthType: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="VACCINATION">Vaksinasi</SelectItem><SelectItem value="CHECKUP">Checkup</SelectItem><SelectItem value="TREATMENT">Pengobatan</SelectItem></SelectContent></Select></div>
-                  <div className="space-y-2"><Label>Status *</Label><Select value={healthForm.status} onValueChange={v => setHealthForm({ ...healthForm, status: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="SEHAT">Sehat</SelectItem><SelectItem value="OBSERVASI">Observasi</SelectItem><SelectItem value="DALAM_PERAWATAN">Dalam Perawatan</SelectItem><SelectItem value="SEMBUH">Sembuh</SelectItem></SelectContent></Select></div>
-                  <div className="space-y-2"><Label>Tanggal *</Label><Input type="date" value={healthForm.recordDate} onChange={e => setHealthForm({ ...healthForm, recordDate: e.target.value })} /></div>
-                  <div className="space-y-2"><Label>Catatan</Label><Input value={healthForm.notes} onChange={e => setHealthForm({ ...healthForm, notes: e.target.value })} placeholder="Opsional" /></div>
+                  <div className="space-y-2"><Label>Jenis *</Label><Select value={healthForm.healthType} onValueChange={(v: string) => setHealthForm({ ...healthForm, healthType: v as any })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="VACCINATION">Vaksinasi</SelectItem><SelectItem value="CHECKUP">Checkup</SelectItem><SelectItem value="TREATMENT">Pengobatan</SelectItem></SelectContent></Select></div>
+                  <div className="space-y-2"><Label>Status *</Label><Select value={healthForm.status} onValueChange={(v: string) => setHealthForm({ ...healthForm, status: v as any })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="SEHAT">Sehat</SelectItem><SelectItem value="OBSERVASI">Observasi</SelectItem><SelectItem value="DALAM_PERAWATAN">Dalam Perawatan</SelectItem><SelectItem value="SEMBUH">Sembuh</SelectItem></SelectContent></Select></div>
+                  <div className="space-y-2"><Label>Tanggal *</Label><Input type="date" value={healthForm.recordDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHealthForm({ ...healthForm, recordDate: e.target.value })} /></div>
+                  <div className="space-y-2"><Label>Catatan</Label><Input value={healthForm.notes} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHealthForm({ ...healthForm, notes: e.target.value })} placeholder="Opsional" /></div>
                   <div className="flex justify-end gap-2 pt-4"><Button variant="outline" onClick={() => setHealthModalOpen(false)}>Batal</Button><Button onClick={handleAddHealth}>Simpan</Button></div>
                 </CardContent>
               </Card>
@@ -291,13 +291,13 @@ export default function CattleDetailPage() {
               <Card className="w-full max-w-md mx-4">
                 <CardHeader><CardTitle>Tambah Riwayat Pakan</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2"><Label>Jenis Pakan *</Label><Input value={feedForm.feedType} onChange={e => setFeedForm({ ...feedForm, feedType: e.target.value })} placeholder="Rumput Gajah" /></div>
+                  <div className="space-y-2"><Label>Jenis Pakan *</Label><Input value={feedForm.feedType} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedForm({ ...feedForm, feedType: e.target.value })} placeholder="Rumput Gajah" /></div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label>Jumlah *</Label><Input value={feedForm.amount} onChange={e => setFeedForm({ ...feedForm, amount: e.target.value })} placeholder="10 kg" /></div>
-                    <div className="space-y-2"><Label>Frekuensi *</Label><Input value={feedForm.frequency} onChange={e => setFeedForm({ ...feedForm, frequency: e.target.value })} placeholder="2x sehari" /></div>
+                    <div className="space-y-2"><Label>Jumlah *</Label><Input value={feedForm.amount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedForm({ ...feedForm, amount: e.target.value })} placeholder="10 kg" /></div>
+                    <div className="space-y-2"><Label>Frekuensi *</Label><Input value={feedForm.frequency} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedForm({ ...feedForm, frequency: e.target.value })} placeholder="2x sehari" /></div>
                   </div>
-                  <div className="space-y-2"><Label>Tanggal *</Label><Input type="date" value={feedForm.recordDate} onChange={e => setFeedForm({ ...feedForm, recordDate: e.target.value })} /></div>
-                  <div className="space-y-2"><Label>Catatan</Label><Input value={feedForm.notes} onChange={e => setFeedForm({ ...feedForm, notes: e.target.value })} placeholder="Opsional" /></div>
+                  <div className="space-y-2"><Label>Tanggal *</Label><Input type="date" value={feedForm.recordDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedForm({ ...feedForm, recordDate: e.target.value })} /></div>
+                  <div className="space-y-2"><Label>Catatan</Label><Input value={feedForm.notes} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedForm({ ...feedForm, notes: e.target.value })} placeholder="Opsional" /></div>
                   <div className="flex justify-end gap-2 pt-4"><Button variant="outline" onClick={() => setFeedModalOpen(false)}>Batal</Button><Button onClick={handleAddFeed}>Simpan</Button></div>
                 </CardContent>
               </Card>
