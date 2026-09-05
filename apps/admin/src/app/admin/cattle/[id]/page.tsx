@@ -159,18 +159,18 @@ export default function CattleDetailPage() {
               <CardContent className="space-y-4">
                 {editing ? (
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label>Kode</Label><Input value={form.code} onChange={e => setForm({ ...form, code: e.target.value })} /></div>
-                    <div className="space-y-2"><Label>Nama</Label><Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div>
-                    <div className="space-y-2"><Label>Jenis</Label><Input value={form.breed} onChange={e => setForm({ ...form, breed: e.target.value })} /></div>
-                    <div className="space-y-2"><Label>Status</Label><Select value={form.status} onValueChange={v => setForm({ ...form, status: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="AVAILABLE">Tersedia</SelectItem><SelectItem value="BOOKED">Dibooking</SelectItem><SelectItem value="SOLD">Terjual</SelectItem><SelectItem value="ARCHIVED">Diarchive</SelectItem></SelectContent></Select></div>
-                    <div className="space-y-2"><Label>Tanggal Lahir</Label><Input type="date" value={form.birthDate} onChange={e => setForm({ ...form, birthDate: e.target.value })} /></div>
-                    <div className="space-y-2"><Label>Tinggi (cm)</Label><Input type="number" value={form.height} onChange={e => setForm({ ...form, height: e.target.value })} /></div>
-                    <div className="space-y-2"><Label>Harga Jual (Rp)</Label><Input type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} /></div>
-                    <div className="space-y-2"><Label>Harga Beli (Rp)</Label><Input type="number" value={form.buyPrice} onChange={e => setForm({ ...form, buyPrice: e.target.value })} placeholder="0" /></div>
-                    <div className="space-y-2"><Label>Target Bobot (Kg)</Label><Input type="number" value={form.targetWeight} onChange={e => setForm({ ...form, targetWeight: e.target.value })} /></div>
-                    <div className="space-y-2"><Label>Biaya Kesehatan (Rp)</Label><Input type="number" value={form.healthCost} onChange={e => setForm({ ...form, healthCost: e.target.value })} placeholder="0" /></div>
-                    <div className="space-y-2"><Label>Biaya Pakan (Rp)</Label><Input type="number" value={form.feedCost} onChange={e => setForm({ ...form, feedCost: e.target.value })} placeholder="0" /></div>
-                    <div className="col-span-2 space-y-2"><Label>Deskripsi</Label><textarea className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>Kode</Label><Input value={form.code} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, code: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>Nama</Label><Input value={form.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>Jenis</Label><Input value={form.breed} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, breed: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>Status</Label><Select value={form.status} onValueChange={(v: string) => setForm({ ...form, status: v as any })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="AVAILABLE">Tersedia</SelectItem><SelectItem value="BOOKED">Dibooking</SelectItem><SelectItem value="SOLD">Terjual</SelectItem><SelectItem value="ARCHIVED">Diarchive</SelectItem></SelectContent></Select></div>
+                    <div className="space-y-2"><Label>Tanggal Lahir</Label><Input type="date" value={form.birthDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, birthDate: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>Tinggi (cm)</Label><Input type="number" value={form.height} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, height: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>Harga Jual (Rp)</Label><Input type="number" value={form.price} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, price: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>Harga Beli (Rp)</Label><Input type="number" value={form.buyPrice} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, buyPrice: e.target.value })} placeholder="0" /></div>
+                    <div className="space-y-2"><Label>Target Bobot (Kg)</Label><Input type="number" value={form.targetWeight} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, targetWeight: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>Biaya Kesehatan (Rp)</Label><Input type="number" value={form.healthCost} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, healthCost: e.target.value })} placeholder="0" /></div>
+                    <div className="space-y-2"><Label>Biaya Pakan (Rp)</Label><Input type="number" value={form.feedCost} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, feedCost: e.target.value })} placeholder="0" /></div>
+                    <div className="col-span-2 space-y-2"><Label>Deskripsi</Label><textarea className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" rows={3} value={form.description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setForm({ ...form, description: e.target.value })} /></div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-4">
