@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "installCommand": "npm install -g pnpm@11 && pnpm install",
-  "buildCommand": "pnpm --filter @samadya/prisma prisma generate && pnpm --filter @samadya/admin build",
-  "devCommand": "pnpm --filter @samadya/admin dev"
+  "installCommand": "npm install",
+  "buildCommand": "npm run db:generate && npm run build:admin",
+  "devCommand": "npm run dev:admin"
 }
