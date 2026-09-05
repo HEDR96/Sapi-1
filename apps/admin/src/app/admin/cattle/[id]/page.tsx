@@ -65,6 +65,8 @@ export default function CattleDetailPage() {
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({ code: '', name: '', breed: '', status: 'AVAILABLE', birthDate: '', height: '', price: '', targetWeight: '', description: '', mainImage: '', buyPrice: '', sellPrice: '', healthCost: '', feedCost: '' })
+  const [uploadedMediaUrl, setUploadedMediaUrl] = useState<string>('')
+  const [mediaSaving, setMediaSaving] = useState(false)
 
   // Master data states
   const [feedTypes, setFeedTypes] = useState<MasterData[]>([])
@@ -411,12 +413,54 @@ export default function CattleDetailPage() {
             <CardContent>
               <div className="mb-6">
                 <Label>Upload Foto/Video</Label>
-                <ImageUploader folder="cattle" onChange={(url) => { console.log('Uploaded:', url); fetchCattle() }} />
+                <ImageUploader
+                  folder="cattle"
+                  value={uploadedMediaUrl}
+                  onChange={async (url) => {
+                    if (url) {
+                      setMediaSaving(true)
+                      try {
+                        const isVideo = url.includes('/api/stream')
+                        const res = await fetch('/api/admin/media', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            cattleId: cattleId,
+                            fileUrl: url,
+                            fileType: isVideo ? 'VIDEO' : 'IMAGE',
+                            category: 'GENERAL',
+                          }),
+                        })
+                        if (res.ok) {
+                          setUploadedMediaUrl('')
+                          fetchCattle()
+                        } else {
+                          const data = await res.json()
+                          alert(data.error || 'Gagal menyimpan media')
+                        }
+                      } catch (err) {
+                        console.error('Failed to save media:', err)
+                        alert('Terjadi kesalahan saat menyimpan media')
+                      } finally {
+                        setMediaSaving(false)
+                      }
+                    }
+                  }}
+                />
               </div>
               {cattle.media && cattle.media.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{cattle.media.map((m) => (
                   <div key={m.id} className="relative aspect-square border rounded-lg overflow-hidden">
-                    <img src={m.fileUrl} alt="" className="w-full h-full object-cover" />
+                    {m.fileType === 'VIDEO' || m.fileUrl.includes('/api/stream') ? (
+                      <video
+                        src={m.fileUrl}
+                        className="w-full h-full object-cover"
+                        controls
+                        preload="metadata"
+                      />
+                    ) : (
+                      <img src={m.fileUrl} alt="" className="w-full h-full object-cover" />
+                    )}
                     <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1">{m.fileType}</div>
                   </div>
                 ))}</div>

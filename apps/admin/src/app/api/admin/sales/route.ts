@@ -5,15 +5,11 @@ import { prisma } from '@/lib/db/prisma'
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
-    const status = searchParams.get('status')
     const search = searchParams.get('search') || ''
 
     console.log('[GET /api/admin/sales] Starting...')
 
     const sales = await prisma.sale.findMany({
-      where: {
-        ...(status && { status: status as any }),
-      },
       include: {
         cattle: {
           select: {
@@ -69,41 +65,62 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { cattleId, customerId, quantity, price, margin, status, notes } = body
+    const { cattleId, customerIds, quantity, price, notes } = body
 
     console.log('[POST /api/admin/sales] Body:', body)
 
-    if (!cattleId || !customerId || !price) {
+    if (!cattleId || !customerIds || customerIds.length === 0 || !price) {
       return NextResponse.json(
-        { error: 'cattleId, customerId, and price are required' },
+        { error: 'cattleId, customerIds (array), and price are required' },
         { status: 400 }
       )
     }
 
-    // Create sale
-    const sale = await prisma.sale.create({
-      data: {
-        cattleId,
-        customerId,
-        quantity: quantity ? parseInt(quantity, 10) : 1,
-        price: parseFloat(price),
-        margin: margin ? parseFloat(margin) : null,
-        status: status || 'PENDING',
-        notes: notes || null,
-      },
-      include: {
-        cattle: true,
-        customer: true,
-      },
-    })
-
-    // Update cattle status to SOLD when a sale is created
-    await prisma.cattle.update({
+    // Get cattle buyPrice to calculate margin
+    const cattle = await prisma.cattle.findUnique({
       where: { id: cattleId },
-      data: { status: 'SOLD' },
+      select: { buyPrice: true },
     })
 
-    return NextResponse.json({ sale })
+    // Calculate margin: price - buyPrice
+    const buyPrice = cattle?.buyPrice ? Number(cattle.buyPrice) : 0
+    const margin = parseFloat(price) - buyPrice
+
+    // Create sales for each customer
+    const saleData = customerIds.map((customerId: string) => ({
+      cattleId,
+      customerId,
+      quantity: quantity ? parseInt(quantity, 10) : 1,
+      price: parseFloat(price),
+      margin: margin,
+      status: 'COMPLETED' as const,
+      notes: notes || null,
+    }))
+
+    const sales = await prisma.$transaction(async (tx) => {
+      // Create all sale records
+      const createdSales = await Promise.all(
+        saleData.map((data) =>
+          tx.sale.create({
+            data,
+            include: {
+              cattle: true,
+              customer: true,
+            },
+          })
+        )
+      )
+
+      // Update cattle status to SOLD
+      await tx.cattle.update({
+        where: { id: cattleId },
+        data: { status: 'SOLD' },
+      })
+
+      return createdSales
+    })
+
+    return NextResponse.json({ sales })
   } catch (error: any) {
     console.error('[POST /api/admin/sales] Error:', error)
     return NextResponse.json({ error: 'Failed to create sale', details: error.message }, { status: 500 })

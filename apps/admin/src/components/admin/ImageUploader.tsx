@@ -24,6 +24,7 @@ export function ImageUploader({
   const [error, setError] = useState<string | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
+  const [uploadingIsVideo, setUploadingIsVideo] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -52,15 +53,19 @@ export function ImageUploader({
     }
 
     setUploading(true)
+    setUploadingIsVideo(file.type.startsWith('video/'))
     setError(null)
     setUploadProgress(10)
 
     try {
       setUploadProgress(20)
 
+      // Determine folder based on file type
+      const uploadFolder = file.type.startsWith('video/') ? 'video' : 'image'
+
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('folder', folder)
+      formData.append('folder', uploadFolder)
 
       setUploadProgress(40)
 
@@ -90,6 +95,7 @@ export function ImageUploader({
       setError(`Upload gagal: ${errorMessage}`)
     } finally {
       setUploading(false)
+      setUploadingIsVideo(false)
       setUploadProgress(0)
     }
   }
@@ -229,7 +235,7 @@ export function ImageUploader({
           <div className="text-center">
             <Loader2 className="h-10 w-10 animate-spin text-[hsl(var(--forest))] mx-auto mb-3" />
             <p className="text-sm text-[hsl(var(--forest))/60]">
-              Mengupload... {uploadProgress}%
+              {uploadingIsVideo ? 'Mengupload video...' : 'Mengupload gambar...'} {uploadProgress}%
             </p>
             <div className="w-48 h-2 bg-[hsl(var(--line))] rounded-full mt-3 mx-auto overflow-hidden">
               <div

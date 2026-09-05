@@ -44,8 +44,7 @@ export async function GET() {
       healthCost: c.healthCost ? Number(c.healthCost) : null,
       feedCost: c.feedCost ? Number(c.feedCost) : null,
       lastWeight: weights[0]?.weight || null,
-      weights: undefined,
-      media: undefined,
+      // Keep buyPrice for sales calculations
     }))
 
     console.log(`[GET /api/admin/cattle] Found ${items.length} cattle`)

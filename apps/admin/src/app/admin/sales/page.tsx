@@ -1,12 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, Search, Pencil, Trash2, X } from 'lucide-react'
+import { Plus, Search, Trash2, X, Check, ChevronDown } from 'lucide-react'
 import { Button } from '@samadya/shared/components/ui/button'
 import { Input } from '@samadya/shared/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@samadya/shared/components/ui/card'
 import { Label } from '@samadya/shared/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@samadya/shared/components/ui/select'
 import { formatCurrency, formatDate } from '@samadya/shared/lib/utils/formatters'
 
 interface Sale {
@@ -26,6 +25,7 @@ interface Sale {
 interface Customer {
   id: string
   name: string
+  phone: string | null
 }
 
 interface Cattle {
@@ -33,6 +33,7 @@ interface Cattle {
   code: string
   name: string
   breed: string
+  buyPrice: number | null
 }
 
 export default function SalesPage() {
@@ -42,8 +43,10 @@ export default function SalesPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
-  const [form, setForm] = useState({ cattleId: '', customerId: '', quantity: '1', price: '', margin: '', status: 'PENDING', notes: '' })
+  const [form, setForm] = useState({ cattleId: '', customerIds: [] as string[], quantity: '1', price: '', notes: '' })
   const [saving, setSaving] = useState(false)
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false)
+  const [calculatedMargin, setCalculatedMargin] = useState<number | null>(null)
 
   useEffect(() => {
     fetchData()
@@ -69,8 +72,27 @@ export default function SalesPage() {
     }
   }
 
+  // Calculate margin when cattle or price changes
+  useEffect(() => {
+    if (form.cattleId && form.price) {
+      const selectedCattle = cattle.find(c => c.id === form.cattleId)
+      if (selectedCattle?.buyPrice) {
+        const margin = parseFloat(form.price) - selectedCattle.buyPrice
+        setCalculatedMargin(margin)
+      } else {
+        setCalculatedMargin(parseFloat(form.price))
+      }
+    } else {
+      setCalculatedMargin(null)
+    }
+  }, [form.cattleId, form.price, cattle])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (form.customerIds.length === 0) {
+      alert('Pilih minimal 1 pelanggan')
+      return
+    }
     setSaving(true)
     try {
       const res = await fetch('/api/admin/sales', {
@@ -80,8 +102,12 @@ export default function SalesPage() {
       })
       if (res.ok) {
         setModalOpen(false)
-        setForm({ cattleId: '', customerId: '', quantity: '1', price: '', margin: '', status: 'PENDING', notes: '' })
+        setForm({ cattleId: '', customerIds: [], quantity: '1', price: '', notes: '' })
+        setCalculatedMargin(null)
         fetchData()
+      } else {
+        const data = await res.json()
+        alert(data.error || 'Gagal menyimpan')
       }
     } catch (error) {
       console.error('Failed to save sale:', error)
@@ -100,12 +126,16 @@ export default function SalesPage() {
     }
   }
 
-  const statusColors: Record<string, string> = {
-    PENDING: 'bg-yellow-100 text-yellow-800',
-    CONFIRMED: 'bg-blue-100 text-blue-800',
-    COMPLETED: 'bg-green-100 text-green-800',
-    CANCELLED: 'bg-red-100 text-red-800',
+  const toggleCustomer = (customerId: string) => {
+    setForm(prev => ({
+      ...prev,
+      customerIds: prev.customerIds.includes(customerId)
+        ? prev.customerIds.filter(id => id !== customerId)
+        : [...prev.customerIds, customerId]
+    }))
   }
+
+  const selectedCustomers = customers.filter(c => form.customerIds.includes(c.id))
 
   return (
     <div className="space-y-6">
@@ -114,7 +144,7 @@ export default function SalesPage() {
           <h2 className="text-2xl font-bold">Penjualan</h2>
           <p className="text-muted-foreground">Kelola penjualan sapi</p>
         </div>
-        <Button onClick={() => { setForm({ cattleId: '', customerId: '', quantity: '1', price: '', margin: '', status: 'PENDING', notes: '' }); setModalOpen(true) }}>
+        <Button onClick={() => { setForm({ cattleId: '', customerIds: [], quantity: '1', price: '', notes: '' }); setCalculatedMargin(null); setModalOpen(true) }}>
           <Plus className="h-4 w-4 mr-2" />
           Tambah Penjualan
         </Button>
@@ -148,7 +178,6 @@ export default function SalesPage() {
                 <th className="text-right p-3 text-sm font-medium">Jumlah</th>
                 <th className="text-right p-3 text-sm font-medium">Harga</th>
                 <th className="text-right p-3 text-sm font-medium">Margin</th>
-                <th className="text-center p-3 text-sm font-medium">Status</th>
                 <th className="text-right p-3 text-sm font-medium">Aksi</th>
               </tr>
             </thead>
@@ -171,11 +200,6 @@ export default function SalesPage() {
                   <td className="p-3 text-right">{sale.quantity}</td>
                   <td className="p-3 text-right font-medium">{formatCurrency(sale.price)}</td>
                   <td className="p-3 text-right text-green-600">{sale.margin ? formatCurrency(sale.margin) : '-'}</td>
-                  <td className="p-3 text-center">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[sale.status]}`}>
-                      {sale.status}
-                    </span>
-                  </td>
                   <td className="p-3 text-right">
                     <Button variant="ghost" size="sm" onClick={() => handleDelete(sale.id)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
@@ -202,59 +226,111 @@ export default function SalesPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label>Sapi *</Label>
-                  <Select value={form.cattleId} onValueChange={(v: string) => setForm({ ...form, cattleId: v })}>
-                    <SelectTrigger><SelectValue placeholder="Pilih sapi" /></SelectTrigger>
-                    <SelectContent>
-                      {cattle.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>{c.name} ({c.code})</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <select
+                    value={form.cattleId}
+                    onChange={(e) => setForm({ ...form, cattleId: e.target.value })}
+                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                    required
+                  >
+                    <option value="">Pilih sapi</option>
+                    {cattle.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} ({c.code}) {c.buyPrice ? `- Beli: ${formatCurrency(c.buyPrice)}` : ''}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+
                 <div className="space-y-2">
-                  <Label>Pelanggan *</Label>
-                  <Select value={form.customerId} onValueChange={(v: string) => setForm({ ...form, customerId: v })}>
-                    <SelectTrigger><SelectValue placeholder="Pilih pelanggan" /></SelectTrigger>
-                    <SelectContent>
-                      {customers.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  <Label>Pelanggan * (pilih satu atau lebih)</Label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowCustomerDropdown(!showCustomerDropdown)}
+                      className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm text-left flex items-center justify-between"
+                    >
+                      <span>
+                        {selectedCustomers.length === 0
+                          ? 'Pilih pelanggan'
+                          : `${selectedCustomers.length} pelanggan dipilih`}
+                      </span>
+                      <ChevronDown className="h-4 w-4" />
+                    </button>
+                    {showCustomerDropdown && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+                        {customers.map((c) => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => toggleCustomer(c.id)}
+                            className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex items-center justify-between"
+                          >
+                            <div>
+                              <p className="font-medium">{c.name}</p>
+                              {c.phone && <p className="text-xs text-muted-foreground">{c.phone}</p>}
+                            </div>
+                            {form.customerIds.includes(c.id) && <Check className="h-4 w-4 text-green-600" />}
+                          </button>
+                        ))}
+                        {customers.length === 0 && (
+                          <p className="px-3 py-2 text-sm text-muted-foreground">Belum ada pelanggan</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {selectedCustomers.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {selectedCustomers.map((c) => (
+                        <span
+                          key={c.id}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs"
+                        >
+                          {c.name}
+                          <button
+                            type="button"
+                            onClick={() => toggleCustomer(c.id)}
+                            className="hover:text-green-900"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
                       ))}
-                    </SelectContent>
-                  </Select>
+                    </div>
+                  )}
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Jumlah *</Label>
                     <Input type="number" min="1" step="1" value={form.quantity} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, quantity: e.target.value })} required />
                   </div>
                   <div className="space-y-2">
-                    <Label>Harga *</Label>
+                    <Label>Harga Jual *</Label>
                     <Input type="number" step="1" value={form.price} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, price: e.target.value })} placeholder="25000000" required />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Margin</Label>
-                    <Input type="number" step="1" value={form.margin} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, margin: e.target.value })} placeholder="2500000" />
+                </div>
+
+                {calculatedMargin !== null && (
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+                    <p className="text-sm text-green-800">
+                      <span className="font-medium">Margin:</span> {formatCurrency(calculatedMargin)}
+                    </p>
+                    <p className="text-xs text-green-600 mt-1">
+                      Dihitung dari harga jual - harga beli
+                    </p>
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <Select value={form.status} onValueChange={(v: string) => setForm({ ...form, status: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="PENDING">Pending</SelectItem>
-                      <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-                      <SelectItem value="COMPLETED">Completed</SelectItem>
-                      <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                )}
+
                 <div className="space-y-2">
                   <Label>Catatan</Label>
                   <Input value={form.notes} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, notes: e.target.value })} placeholder="Catatan optional" />
                 </div>
+
                 <div className="flex justify-end gap-2 pt-4">
                   <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>Batal</Button>
-                  <Button type="submit" disabled={saving}>{saving ? 'Menyimpan...' : 'Simpan'}</Button>
+                  <Button type="submit" disabled={saving || form.customerIds.length === 0}>
+                    {saving ? 'Menyimpan...' : 'Simpan'}
+                  </Button>
                 </div>
               </form>
             </CardContent>

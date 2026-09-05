@@ -55,6 +55,7 @@ export function getDirectImageUrl(path: string | null | undefined): string {
 export function getVideoUrl(path: string | null | undefined): string {
   if (!path) return ''
 
+  // If it's already an absolute URL (external), check if it's Google Drive
   if (path.startsWith('http://') || path.startsWith('https://')) {
     const driveFileId = extractDriveFileId(path)
     if (driveFileId) {
@@ -65,6 +66,12 @@ export function getVideoUrl(path: string | null | undefined): string {
     return path
   }
 
+  // If it's a stream URL (like /api/stream?fileId=xxx), return as-is
+  if (path.startsWith('/api/stream') || path.startsWith('/api/videos')) {
+    return path
+  }
+
+  // If it's a path starting with /, prepend the video base URL
   if (path.startsWith('/')) {
     return `${VIDEO_BASE_URL}${path}`
   }
