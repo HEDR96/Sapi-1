@@ -55,14 +55,7 @@ export async function POST(request: NextRequest) {
     const isImage = file.type.startsWith('image/')
 
     // Validate file type
-    if (isVideo) {
-      if (folder !== 'video' && folder !== 'video-upload') {
-        return NextResponse.json(
-          { error: 'Video hanya bisa diupload ke folder video' },
-          { status: 400 }
-        )
-      }
-    } else if (isImage) {
+    if (isImage) {
       const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/gif']
       if (!allowedTypes.includes(file.type)) {
         return NextResponse.json(
@@ -70,9 +63,9 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
-    } else {
+    } else if (!isVideo) {
       return NextResponse.json(
-        { error: 'Format file tidak didukung' },
+        { error: 'Format file tidak didukung. Gunakan JPG, PNG, atau MP4.' },
         { status: 400 }
       )
     }

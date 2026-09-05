@@ -1,5 +1,25 @@
 {
   "framework": "nextjs",
   "buildCommand": "npm run generate --workspace=@samadya/prisma && npm run build --workspace=@samadya/admin",
-  "devCommand": "npm run dev --workspace=@samadya/admin"
+  "devCommand": "npm run dev --workspace=@samadya/admin",
+  "headers": [
+    {
+      "source": "/api/upload",
+      "headers": [
+        {
+          "key": "Body-Size-Limit",
+          "value": "52428800"
+        }
+      ]
+    },
+    {
+      "source": "/api/admin/media",
+      "headers": [
+        {
+          "key": "Body-Size-Limit",
+          "value": "52428800"
+        }
+      ]
+    }
+  ]
 }

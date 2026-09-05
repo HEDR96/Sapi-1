@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthenticatedDriveClient } from '@/lib/storage/google-drive-oauth'
 
 export const dynamic = 'force-dynamic'
 
+/**
+ * Video Streaming API
+ *
+ * Proxies video from Google Drive to bypass ORB blocking
+ */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const fileId = searchParams.get('fileId')
@@ -12,68 +16,57 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'fileId is required' }, { status: 400 })
   }
 
+  console.log('[Stream API] Request:', { fileId, mimeType })
+
   try {
-    const drive = await getAuthenticatedDriveClient()
+    // Google Drive export URL for video streaming
+    const googleDriveUrl = `https://drive.google.com/uc?export=download&confirm=t&id=${fileId}`
 
-    // Get file from Google Drive
-    const response = await drive.files.get(
-      { fileId, alt: 'media' },
-      { responseType: 'stream' }
-    )
+    console.log('[Stream API] Fetching from:', googleDriveUrl)
 
-    // Get file metadata for size
-    const meta = await drive.files.get({
-      fileId,
-      fields: 'size, name',
-    })
-    const fileSize = parseInt(meta.data.size || '0', 10)
-
-    // Collect stream chunks
-    const chunks: Buffer[] = []
-    const stream = response.data as unknown as AsyncIterable<Buffer>
-
-    for await (const chunk of stream) {
-      chunks.push(Buffer.from(chunk))
-    }
-
-    const videoBuffer = Buffer.concat(chunks)
-
-    console.log('[Stream API] Success:', {
-      fileId,
-      mimeType,
-      size: videoBuffer.length,
-    })
-
-    return new Response(videoBuffer, {
+    const response = await fetch(googleDriveUrl, {
       headers: {
-        'Content-Type': mimeType,
-        'Content-Length': videoBuffer.length.toString(),
-        'Accept-Ranges': 'none',
-        'Cache-Control': 'public, max-age=31536000, immutable',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'video/mp4,video/webm,video/*,*/*',
+        'Referer': 'https://drive.google.com/',
       },
     })
-  } catch (error: any) {
-    console.error('[Stream API] Error:', error.message, error.code)
 
-    // Try fallback to direct Google Drive URL
-    try {
-      const directUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
+    console.log('[Stream API] Google response:', {
+      status: response.status,
+      contentType: response.headers.get('content-type'),
+      contentLength: response.headers.get('content-length'),
+    })
 
-      const response = await fetch(directUrl)
-      if (response.ok) {
-        const videoBuffer = await response.arrayBuffer()
-        return new Response(videoBuffer, {
-          headers: {
-            'Content-Type': mimeType,
-            'Content-Length': videoBuffer.byteLength.toString(),
-            'Cache-Control': 'public, max-age=3600',
-          },
-        })
-      }
-    } catch (fallbackError) {
-      console.error('[Stream API] Fallback also failed:', fallbackError)
+    if (response.ok || response.status === 200) {
+      const videoBuffer = await response.arrayBuffer()
+
+      console.log('[Stream API] Success:', {
+        fileId,
+        size: videoBuffer.byteLength,
+      })
+
+      return new Response(videoBuffer, {
+        headers: {
+          'Content-Type': mimeType,
+          'Content-Length': videoBuffer.byteLength.toString(),
+          'Accept-Ranges': 'none',
+          'Cache-Control': 'public, max-age=86400',
+          'Access-Control-Allow-Origin': '*',
+        },
+      })
     }
 
-    return NextResponse.json({ error: 'Failed to stream video: ' + error.message }, { status: 500 })
+    // If download fails, try direct view URL redirect
+    console.log('[Stream API] Download failed, trying view URL')
+    const viewUrl = `https://drive.google.com/file/d/${fileId}/view`
+    return NextResponse.redirect(viewUrl, 302)
+
+  } catch (error: any) {
+    console.error('[Stream API] Error:', error.message)
+
+    return NextResponse.json({
+      error: 'Video tidak dapat diputar. Error: ' + error.message
+    }, { status: 500 })
   }
 }
