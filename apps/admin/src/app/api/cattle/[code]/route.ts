@@ -42,7 +42,7 @@ export async function GET(
     const weightStats = calculateWeightStats(cattle.weights || [])
 
     // Calculate target estimation
-    let targetEstimation = null
+    let targetEstimation: { estimatedDays: number; estimatedDate: Date | null; remainingWeight: number; progressPercentage: number } | null = null
     if (cattle.targetWeight && weightStats.lastWeight) {
       targetEstimation = estimateTargetCompletion(
         cattle.targetWeight,
