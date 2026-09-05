@@ -1,5 +1,5 @@
 {
   "framework": "nextjs",
-  "buildCommand": "npm run db:generate --workspace=@samadya/prisma && npm run build --workspace=@samadya/admin",
+  "buildCommand": "npm run generate --workspace=@samadya/prisma && npm run build --workspace=@samadya/admin",
   "devCommand": "npm run dev --workspace=@samadya/admin"
 }
