@@ -97,11 +97,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
   }
 
   const handleBookingClick = () => {
-    if (!currentUserId) {
-      window.dispatchEvent(new CustomEvent('openAuthModal'))
-    } else {
-      setShowBookingModal(true)
-    }
+    setShowBookingModal(true)
   }
 
   return (

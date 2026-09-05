@@ -16,6 +16,7 @@ import {
 import { CattleStatusBadge as StatusBadge } from '@samadya/shared/components/ui/CattleStatusBadge'
 import { EmptyState } from '@samadya/shared/components/EmptyState'
 import { formatCurrency, formatDate } from '@samadya/shared/lib/utils/formatters'
+import { getDirectImageUrl } from '@samadya/shared/lib/utils/imageUrl'
 
 interface CattleWithRelations {
   id: string
@@ -173,7 +174,7 @@ export default function AdminCattlePage() {
                       className="w-12 h-12 rounded-lg bg-cover bg-center"
                       style={{
                         backgroundImage: c.mainImage
-                          ? `url(${c.mainImage})`
+                          ? `url(${getDirectImageUrl(c.mainImage)})`
                           : 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)',
                       }}
                     />

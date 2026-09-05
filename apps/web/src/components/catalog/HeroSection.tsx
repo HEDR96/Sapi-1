@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { BadgeCheck, Clock3, ClipboardList, Shield, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { CattleWithRelations } from '@samadya/shared/types'
+import { getDirectImageUrl } from '@samadya/shared/lib/utils/imageUrl'
 
 interface HeroSectionProps {
   cattle: CattleWithRelations[]
@@ -159,7 +160,7 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
           <div
             className="absolute inset-0 transition-opacity duration-500"
             style={{
-              background: `url('${currentCattle.mainImage}') center/cover no-repeat`,
+              background: `url('${getDirectImageUrl(currentCattle.mainImage)}') center/cover no-repeat`,
             }}
           />
         ) : (
