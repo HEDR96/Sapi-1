@@ -1,0 +1,127 @@
+$ tsc --noEmit
+src/app/admin/cattle/[id]/page.tsx(162,102): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(163,102): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(164,104): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(165,112): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(166,128): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(167,125): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(168,128): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(169,131): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(170,137): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(171,138): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(172,132): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(229,141): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(230,134): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(231,110): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(261,121): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(262,118): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(263,129): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(264,110): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(294,117): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(296,112): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(297,118): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(299,127): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/[id]/page.tsx(300,108): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/cattle/new/page.tsx(129,60): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/app/admin/cattle/new/page.tsx(146,61): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/app/admin/cattle/page.tsx(118,24): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/customers/page.tsx(116,22): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/customers/page.tsx(198,55): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/customers/page.tsx(202,69): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/customers/page.tsx(206,56): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/customers/page.tsx(210,58): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/customers/page.tsx(214,101): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/master-data/page.tsx(228,30): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/master-data/page.tsx(239,30): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/sales/page.tsx(125,74): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/sales/page.tsx(205,65): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/app/admin/sales/page.tsx(216,67): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/app/admin/sales/page.tsx(228,83): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/sales/page.tsx(232,72): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/sales/page.tsx(236,73): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/admin/sales/page.tsx(241,63): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/app/admin/sales/page.tsx(253,56): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/api/admin/auth/login/route.ts(4,20): error TS2307: Cannot find module 'bcryptjs' or its corresponding type declarations.
+src/app/api/auth/login/route.ts(3,20): error TS2307: Cannot find module 'bcryptjs' or its corresponding type declarations.
+src/app/api/auth/register/route.ts(3,20): error TS2307: Cannot find module 'bcryptjs' or its corresponding type declarations.
+src/app/api/cattle/route.ts(2,26): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+src/app/api/cattle/route.ts(88,22): error TS18046: 'error' is of type 'unknown'.
+src/app/api/cattle/route.ts(88,39): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/login/page.tsx(99,30): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/app/login/page.tsx(112,30): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/lib/auth/jwt.ts(1,34): error TS2307: Cannot find module 'jsonwebtoken' or its corresponding type declarations.
+src/lib/email/resend.ts(1,24): error TS2307: Cannot find module 'resend' or its corresponding type declarations.
+src/lib/storage/google-drive-oauth.ts(8,34): error TS2307: Cannot find module 'googleapis' or its corresponding type declarations.
+src/lib/validations/cattle.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+src/lib/validations/cattle.ts(20,36): error TS7006: Parameter 's' implicitly has an 'any' type.
+../../packages/shared/components/ui/button.tsx(1,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+../../packages/shared/components/ui/button.tsx(2,22): error TS2307: Cannot find module '@radix-ui/react-slot' or its corresponding type declarations.
+../../packages/shared/components/ui/button.tsx(3,40): error TS2307: Cannot find module 'class-variance-authority' or its corresponding type declarations.
+../../packages/shared/components/ui/button.tsx(43,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/button.tsx(43,17): error TS7031: Binding element 'variant' implicitly has an 'any' type.
+../../packages/shared/components/ui/button.tsx(43,26): error TS7031: Binding element 'size' implicitly has an 'any' type.
+../../packages/shared/components/ui/button.tsx(43,61): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/card.tsx(1,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+../../packages/shared/components/ui/card.tsx(8,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/card.tsx(8,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/card.tsx(23,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/card.tsx(23,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/card.tsx(35,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/card.tsx(35,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/card.tsx(50,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/card.tsx(50,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/card.tsx(62,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/card.tsx(62,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/input.tsx(1,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+../../packages/shared/components/ui/input.tsx(6,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/input.tsx(6,17): error TS7031: Binding element 'type' implicitly has an 'any' type.
+../../packages/shared/components/ui/input.tsx(6,35): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/label.tsx(1,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+../../packages/shared/components/ui/label.tsx(2,33): error TS2307: Cannot find module '@radix-ui/react-label' or its corresponding type declarations.
+../../packages/shared/components/ui/label.tsx(9,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/label.tsx(9,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+../../packages/shared/components/ui/select.tsx(4,34): error TS2307: Cannot find module '@radix-ui/react-select' or its corresponding type declarations.
+../../packages/shared/components/ui/select.tsx(18,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(18,17): error TS7031: Binding element 'children' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(18,39): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(38,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(38,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(55,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(55,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(73,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(73,17): error TS7031: Binding element 'children' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(73,60): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(105,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(105,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(117,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(117,17): error TS7031: Binding element 'children' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(117,39): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(140,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/select.tsx(140,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(1,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+../../packages/shared/components/ui/table.tsx(8,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(8,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(22,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(22,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(30,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(30,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(42,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(42,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(57,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(57,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(72,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(72,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(87,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(87,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(99,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/table.tsx(99,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/tabs.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+../../packages/shared/components/ui/tabs.tsx(4,32): error TS2307: Cannot find module '@radix-ui/react-tabs' or its corresponding type declarations.
+../../packages/shared/components/ui/tabs.tsx(13,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/tabs.tsx(13,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/tabs.tsx(28,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/tabs.tsx(28,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+../../packages/shared/components/ui/tabs.tsx(43,6): error TS7031: Binding element 'className' implicitly has an 'any' type.
+../../packages/shared/components/ui/tabs.tsx(43,29): error TS7006: Parameter 'ref' implicitly has an 'any' type.
+[ELIFECYCLE] Command failed with exit code 1.

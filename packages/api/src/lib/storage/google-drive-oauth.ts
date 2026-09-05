@@ -12,7 +12,7 @@ import { loadTokens, saveTokens } from './token-store'
 const SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
 // Folder IDs from environment
-export const DRIVE_FOLDERS = {
+const DRIVE_FOLDERS = {
   image: process.env.GOOGLE_DRIVE_IMAGE_FOLDER_ID || '',
   video: process.env.GOOGLE_DRIVE_VIDEO_FOLDER_ID || '',
 }

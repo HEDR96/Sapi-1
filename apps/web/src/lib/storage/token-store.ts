@@ -68,41 +68,6 @@ export async function saveTokens(tokens: StoredToken): Promise<void> {
 }
 
 /**
- * Check if tokens exist and are valid
- */
-export async function hasValidTokens(): Promise<boolean> {
-  const tokens = await loadTokens()
-  if (!tokens) {
-    return false
-  }
-
-  // Check if access token is expired (with 5 minute buffer)
-  const bufferMs = 5 * 60 * 1000
-  const isExpired = Date.now() >= tokens.expiry_date - bufferMs
-
-  if (isExpired) {
-    console.log('[TokenStore] Tokens are expired or about to expire')
-    return false
-  }
-
-  return true
-}
-
-/**
- * Delete stored tokens
- */
-export async function deleteTokens(): Promise<void> {
-  try {
-    await fs.unlink(TOKEN_FILE)
-    console.log('[TokenStore] Tokens deleted from file')
-  } catch (error: any) {
-    if (error.code !== 'ENOENT') {
-      console.warn('[TokenStore] Could not delete tokens:', error.message)
-    }
-  }
-}
-
-/**
  * Get token status for debugging
  */
 export async function getTokenStatus(): Promise<{
