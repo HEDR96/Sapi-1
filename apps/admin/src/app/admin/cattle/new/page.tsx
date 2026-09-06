@@ -47,9 +47,24 @@ export default function NewCattlePage() {
     fetchMasterData()
   }, [])
 
+  // Refresh master data when page becomes visible (e.g., after returning from master data page)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchMasterData()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
+
   const fetchMasterData = async () => {
     try {
-      const res = await fetch('/api/admin/master-data')
+      // Add cache-busting timestamp to ensure fresh data
+      const res = await fetch(`/api/admin/master-data?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      })
       if (res.ok) {
         const data = await res.json()
         const items = data.items || []
@@ -161,22 +176,17 @@ export default function NewCattlePage() {
                 ) : (
                   <Select value={form.breed} onValueChange={(v: string) => setForm({ ...form, breed: v })}>
                     <SelectTrigger className="bg-white">
-                      <SelectValue placeholder="Pilih jenis sapi" />
+                      <SelectValue placeholder={cattleBreeds.length === 0 ? "Tidak ada data master" : "Pilih jenis sapi"} />
                     </SelectTrigger>
                     <SelectContent>
                       {cattleBreeds.length > 0 ? (
                         cattleBreeds.map((b) => (
-                          <SelectItem key={b.key} value={b.value}>{b.value}</SelectItem>
+                          <SelectItem key={b.id} value={b.key}>{b.value}</SelectItem>
                         ))
                       ) : (
-                        <>
-                          <SelectItem value="Limousin">Limousin</SelectItem>
-                          <SelectItem value="Simental">Simental</SelectItem>
-                          <SelectItem value="Brahman">Brahman</SelectItem>
-                          <SelectItem value="Angus">Angus</SelectItem>
-                          <SelectItem value="PO">Peranakan Ongole (PO)</SelectItem>
-                          <SelectItem value="Lainnya">Lainnya</SelectItem>
-                        </>
+                        <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                          Tambahkan data di menu Master Data
+                        </div>
                       )}
                     </SelectContent>
                   </Select>

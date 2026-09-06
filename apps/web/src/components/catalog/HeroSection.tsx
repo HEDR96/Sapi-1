@@ -62,7 +62,7 @@ function AnimatedCounter({ end, suffix, duration = 1200 }: CounterProps) {
   const displayValue = end >= 1000 ? count.toLocaleString('id-ID') + '+' : count
 
   return (
-    <div ref={ref} className="counter text-[12px] sm:text-[14px] md:text-[16px] font-extrabold text-[hsl(var(--forest))]">
+    <div ref={ref} className="counter text-[10px] xs:text-[11px] sm:text-[13px] md:text-[15px] lg:text-[16px] font-extrabold text-[hsl(var(--forest))]">
       {displayValue}{suffix}
     </div>
   )
@@ -147,14 +147,14 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
   }, [])
 
   return (
-    <section ref={heroRef} className="reveal mx-auto grid max-w-full grid-cols-1 items-stretch lg:grid-cols-[3.3fr_2.1fr_.9fr]">
-      {/* Image Slider */}
-      <div className="hero-photo relative min-h-[180px] sm:min-h-[280px] md:min-h-[350px] lg:min-h-[450px] xl:min-h-[580px] overflow-hidden">
+    <section ref={heroRef} className="reveal mx-auto grid max-w-full grid-cols-1 items-stretch md:grid-cols-[3.3fr_2.1fr_.9fr]">
+      {/* Image Slider - Responsive height */}
+      <div className="hero-photo relative min-h-[140px] xs:min-h-[160px] sm:min-h-[200px] md:min-h-[280px] lg:min-h-[350px] xl:min-h-[450px] 2xl:min-h-[520px] overflow-hidden">
         {/* Loading Placeholder - Shows when data is being fetched */}
         {showLoading ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[hsl(var(--cream))]">
-            <Loader2 className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 animate-spin text-[hsl(var(--forest))] mb-2 sm:mb-3" />
-            <p className="text-[10px] sm:text-xs font-semibold text-[hsl(var(--forest))]">Memuat...</p>
+            <Loader2 className="h-6 w-6 xs:h-8 xs:w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 animate-spin text-[hsl(var(--forest))] mb-1 sm:mb-2 md:mb-3" />
+            <p className="text-[8px] xs:text-[9px] sm:text-xs font-semibold text-[hsl(var(--forest))]">Memuat...</p>
           </div>
         ) : currentCattle?.mainImage ? (
           <div
@@ -178,26 +178,26 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
           <>
             <button
               onClick={goToPrev}
-              className="absolute left-1 sm:left-2 top-1/2 z-10 grid h-8 w-8 sm:h-10 sm:w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[hsl(var(--forest))] shadow-lg transition-all hover:bg-white hover:scale-110"
+              className="absolute left-0.5 xs:left-1 sm:left-2 top-1/2 z-10 grid h-6 w-6 xs:h-8 xs:w-8 sm:h-10 sm:w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[hsl(var(--forest))] shadow-lg transition-all hover:bg-white hover:scale-110"
               aria-label="Previous"
             >
-              <ChevronLeft className="h-4 w-4 sm:h-6 sm:w-6" />
+              <ChevronLeft className="h-3 w-3 xs:h-4 xs:w-4 sm:h-6 sm:w-6" />
             </button>
             <button
               onClick={goToNext}
-              className="absolute right-1 sm:right-2 top-1/2 z-10 grid h-8 w-8 sm:h-10 sm:w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[hsl(var(--forest))] shadow-lg transition-all hover:bg-white hover:scale-110"
+              className="absolute right-0.5 xs:right-1 sm:right-2 top-1/2 z-10 grid h-6 w-6 xs:h-8 xs:w-8 sm:h-10 sm:w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[hsl(var(--forest))] shadow-lg transition-all hover:bg-white hover:scale-110"
               aria-label="Next"
             >
-              <ChevronRight className="h-4 w-4 sm:h-6 sm:w-6" />
+              <ChevronRight className="h-3 w-3 xs:h-4 xs:w-4 sm:h-6 sm:w-6" />
             </button>
 
             {/* Pagination Dots */}
-            <div className="absolute bottom-2 sm:bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5 sm:gap-2">
+            <div className="absolute bottom-1 xs:bottom-2 sm:bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1 xs:gap-1.5 sm:gap-2">
               {displayCattle.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => handleSliderChange(index)}
-                  className={`h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full transition-all ${
+                  className={`h-1.5 w-1.5 xs:h-2 xs:w-2 sm:h-2.5 sm:w-2.5 rounded-full transition-all ${
                     index === currentIndex
                       ? 'scale-125 bg-white'
                       : 'bg-white/50 hover:bg-white/80'
@@ -210,45 +210,45 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
         )}
       </div>
 
-      {/* Middle Content Section */}
-      <div className="flex flex-col justify-center bg-[#F4EFE2] px-3 py-3 sm:px-5 sm:py-5 md:px-6 md:py-6 lg:px-6 lg:py-6">
-        <h1 className="text-[18px] sm:text-[22px] md:text-[26px] lg:text-[28px] xl:text-[34px] 2xl:text-[38px] font-bold leading-[1.1] text-[hsl(var(--forest))]">
+      {/* Middle Content Section - Responsive */}
+      <div className="flex flex-col justify-center bg-[#F4EFE2] px-2 xs:px-3 sm:px-5 py-2 xs:py-3 sm:py-5 md:px-6 md:py-6 lg:px-6 lg:py-6">
+        <h1 className="text-[14px] xs:text-[16px] sm:text-[20px] md:text-[24px] lg:text-[28px] xl:text-[32px] 2xl:text-[36px] font-bold leading-[1.1] text-[hsl(var(--forest))]">
           Sapi Anda, Amanah Kami.<br />
           Dipantau Transparan, Hingga Siap Dipilih.
         </h1>
-        <p className="mt-2 sm:mt-3 max-w-[520px] text-[9px] sm:text-[10px] md:text-[11px] leading-4 sm:leading-5 text-[hsl(var(--forest))/75]">
+        <p className="mt-1.5 xs:mt-2 sm:mt-3 max-w-[520px] text-[8px] xs:text-[9px] sm:text-[10px] md:text-[11px] leading-3 xs:leading-4 sm:leading-5 text-[hsl(var(--forest))/75]">
           Setiap sapi pilihan dirawat dengan penuh perhatian di peternakan kami. Anda bisa memantau bobot, kesehatan, dan perawatannya secara berkala sebelum memutuskan membeli.
         </p>
 
-        <div className="mt-3 sm:mt-4 flex flex-wrap gap-1.5 sm:gap-2.5">
-          <Link href="#katalog" className="rounded-md bg-[hsl(var(--forest))] px-3 py-2 sm:px-4 sm:py-2.5 text-[9px] sm:text-[10px] md:text-[11px] font-semibold text-white shadow-card">
+        <div className="mt-2 xs:mt-3 sm:mt-4 flex flex-wrap gap-1 xs:gap-1.5 sm:gap-2.5">
+          <Link href="#katalog" className="rounded-md bg-[hsl(var(--forest))] px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 text-[8px] xs:text-[9px] sm:text-[10px] md:text-[11px] font-semibold text-white shadow-card">
             Pilih Sapi
           </Link>
-          <Link href="#cara-kerja" className="rounded-md border border-[hsl(var(--forest))/25] bg-white px-3 py-2 sm:px-4 sm:py-2.5 text-[9px] sm:text-[10px] md:text-[11px] font-semibold text-[hsl(var(--forest))]">
+          <Link href="#cara-kerja" className="rounded-md border border-[hsl(var(--forest))/25] bg-white px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 text-[8px] xs:text-[9px] sm:text-[10px] md:text-[11px] font-semibold text-[hsl(var(--forest))]">
             Lihat Cara Kerja
           </Link>
         </div>
 
-        <div className="mt-2 sm:mt-3 inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-[hsl(var(--line))] bg-white px-2 sm:px-3 py-1 sm:py-1.5 text-[8px] sm:text-[9px] md:text-[10px] font-semibold text-[hsl(var(--forest))]">
-          <BadgeCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[hsl(var(--olive))]" />
+        <div className="mt-1.5 xs:mt-2 sm:mt-3 inline-flex items-center gap-1 xs:gap-1.5 sm:gap-2 rounded-full border border-[hsl(var(--line))] bg-white px-1.5 xs:px-2 sm:px-3 py-0.5 xs:py-1 sm:py-1.5 text-[7px] xs:text-[8px] sm:text-[9px] md:text-[10px] font-semibold text-[hsl(var(--forest))]">
+          <BadgeCheck className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 text-[hsl(var(--olive))]" />
           Semua foto di halaman ini khusus sapi
         </div>
 
         {/* Stats Grid - Responsive */}
-        <div className="mt-3 sm:mt-4 md:mt-5 grid grid-cols-4 gap-1 sm:gap-1.5 md:gap-2 rounded-xl border border-[hsl(var(--line))/80] bg-white/75 p-1.5 sm:p-2 md:p-2.5 shadow-card backdrop-blur">
+        <div className="mt-2 xs:mt-3 sm:mt-4 md:mt-5 grid grid-cols-4 gap-0.5 xs:gap-1 sm:gap-1.5 md:gap-2 rounded-lg sm:rounded-xl border border-[hsl(var(--line))/80] bg-white/75 p-1 xs:p-1.5 sm:p-2 md:p-2.5 shadow-card backdrop-blur">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
               <AnimatedCounter end={stat.value} suffix={stat.suffix} />
-              <div className="text-[7px] sm:text-[8px] md:text-[10px] text-[hsl(var(--forest))/55]">{stat.label}</div>
+              <div className="text-[5px] xs:text-[6px] sm:text-[8px] md:text-[10px] text-[hsl(var(--forest))/55]">{stat.label}</div>
             </div>
           ))}
         </div>
 
-        {/* trust Features - Responsive */}
-        <div className="mt-2 sm:mt-3 md:mt-4 grid grid-cols-2 gap-x-2 gap-y-1 sm:gap-x-3 sm:gap-y-2 text-[8px] sm:text-[9px] md:text-[10px] text-[hsl(var(--forest))/70]">
+        {/* Trust Features - Responsive */}
+        <div className="mt-1.5 xs:mt-2 sm:mt-3 md:mt-4 grid grid-cols-2 gap-x-1 xs:gap-x-2 gap-y-0.5 xs:gap-y-1 sm:gap-x-3 sm:gap-y-2 text-[6px] xs:text-[7px] sm:text-[9px] md:text-[10px] text-[hsl(var(--forest))/70]">
           {trustFeatures.map((feature, index) => (
-            <div key={index} className="flex items-center gap-1 sm:gap-1.5">
-              <feature.icon className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-[hsl(var(--olive))]" />
+            <div key={index} className="flex items-center gap-0.5 xs:gap-1 sm:gap-1.5">
+              <feature.icon className="h-3 w-3 xs:h-4 xs:w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-[hsl(var(--olive))]" />
               <span className="truncate">{feature.text}</span>
             </div>
           ))}
@@ -256,68 +256,68 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
       </div>
 
       {/* Dynamic Tag Container - Responsive */}
-      <div className="relative flex items-start justify-center lg:justify-end overflow-hidden bg-[#F1EFE2] px-2 sm:px-3 md:px-4 pt-0 py-1 sm:py-1.5 md:py-2 lg:px-4 lg:pr-2">
-        {/* Pin Hanger */}
+      <div className="relative flex items-start justify-center lg:justify-end overflow-hidden bg-[#F1EFE2] px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 lg:px-4 lg:pr-2">
+        {/* Combined Pin Hanger + Rope - connected as one unit */}
         <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-0 z-30 flex flex-col items-center">
+          {/* Pin Hanger Head */}
           <div className="h-2 w-5 sm:h-2.5 sm:w-6 rounded-b-md bg-gradient-to-b from-[#5c4328] via-[#7a5c37] to-[#43301b] shadow-md border-x border-b border-[#302111]" />
+          {/* Integrated Rope from pin - no gap, directly connected */}
+          <svg width="4" height="20" viewBox="0 0 6 32" fill="none" className="w-1 sm:w-[6px] h-4 sm:h-8 drop-shadow-sm -mt-0.5 sm:-mt-1">
+            <line x1="3" y1="0" x2="3" y2="32" stroke="#6E5030" strokeWidth="3.5" strokeLinecap="round" />
+            <line x1="3" y1="0" x2="3" y2="32" stroke="#A88B63" strokeWidth="1.5" strokeDasharray="3 3" />
+          </svg>
+          {/* Pin bottom connector - attached to rope */}
           <div className="-mt-0.5 sm:-mt-1 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full border border-[#8B7355] bg-[#302111]" />
         </div>
 
         <div className="relative mr-0.5 sm:mr-1 lg:mr-0">
           <div
             key={currentCattle?.id || 'default'}
-            className="paper-pull-up relative z-10 flex flex-col items-center pt-1.5 sm:pt-2"
+            className="paper-pull-up relative z-10 flex flex-col items-center pt-1 xs:pt-1.5 sm:pt-2"
           >
-            {/* Rope */}
-            <div className="pointer-events-none relative -mb-0.5 sm:-mb-1 z-20 flex flex-col items-center">
-              <svg width="4" height="20" viewBox="0 0 6 32" fill="none" className="w-1 sm:w-[6px] h-4 sm:h-8 drop-shadow-sm">
-                <line x1="3" y1="0" x2="3" y2="32" stroke="#6E5030" strokeWidth="3.5" strokeLinecap="round" />
-                <line x1="3" y1="0" x2="3" y2="32" stroke="#A88B63" strokeWidth="1.5" strokeDasharray="3 3" />
-              </svg>
-            </div>
 
             {/* Tag Card - Fully Responsive */}
             <div
-              className="relative w-[100px] sm:w-[120px] md:w-[140px] lg:w-[145px] xl:w-[165px] rounded-[14px] sm:rounded-[16px] md:rounded-[18px] lg:rounded-[20px] bg-gradient-to-b from-[#F7F3E9] via-[#F0EAD8] to-[#E3D9C2] px-2 sm:px-3 md:px-3.5 pb-2 sm:pb-3 md:pb-3.5 pt-4 sm:pt-5 md:pt-5.5 shadow-2xl"
+              className="relative w-[80px] xs:w-[90px] sm:w-[110px] md:w-[130px] lg:w-[145px] xl:w-[155px] rounded-[12px] xs:rounded-[14px] sm:rounded-[16px] md:rounded-[18px] lg:rounded-[20px] bg-gradient-to-b from-[#F7F3E9] via-[#F0EAD8] to-[#E3D9C2] px-1.5 xs:px-2 sm:px-3 md:px-3.5 pb-1.5 xs:pb-2 sm:pb-3 md:pb-3.5 pt-3 xs:pt-4 sm:pt-5 md:pt-5.5 shadow-2xl"
               style={{
                 boxShadow: '0 8px 20px -5px rgba(40, 30, 15, 0.22)',
                 border: '1.5px solid #D4C9B0'
               }}
             >
               {/* Eyelet */}
-              <div className="absolute -top-1.5 sm:-top-2 md:-top-2.5 left-1/2 -translate-x-1/2 z-30">
-                <div className="relative flex h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 items-center justify-center rounded-full border-[2px] sm:border-[2.5px] border-[#9E7B4F] bg-gradient-to-br from-[#D4AF37] via-[#AA7C11] to-[#5B430B] shadow-md">
-                  <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#302111] shadow-inner" />
+              <div className="absolute -top-1 xs:-top-1.5 sm:-top-2 md:-top-2.5 left-1/2 -translate-x-1/2 z-30">
+                <div className="relative flex h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 items-center justify-center rounded-full border-[1.5px] xs:border-[2px] sm:border-[2.5px] border-[#9E7B4F] bg-gradient-to-br from-[#D4AF37] via-[#AA7C11] to-[#5B430B] shadow-md">
+                  <div className="h-1.5 w-1.5 xs:h-1.5 xs:w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#302111] shadow-inner" />
                 </div>
               </div>
 
               {/* Website Name */}
-              <div className="text-center text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] font-extrabold tracking-[.02em] text-[hsl(var(--forest))] pt-0.5 sm:pt-1">
+              <div className="text-center text-[7px] xs:text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] font-extrabold tracking-[.02em] text-[hsl(var(--forest))] pt-0.5 sm:pt-1">
                 samadyafarm.id
               </div>
-              <div className="text-center text-[5px] sm:text-[5.5px] md:text-[6px] lg:text-[7px] font-semibold uppercase tracking-[.12em] sm:tracking-[.14em] md:tracking-[.16em] text-[hsl(var(--forest))/70]">
+              <div className="text-center text-[4px] xs:text-[5px] sm:text-[5.5px] md:text-[6px] lg:text-[7px] font-semibold uppercase tracking-[.12em] sm:tracking-[.14em] md:tracking-[.16em] text-[hsl(var(--forest))/70]">
                 Sapi Pilihan
               </div>
 
               {/* Code Plate */}
-              <div className="mt-1 sm:mt-1.5 rounded-[5px] sm:rounded-[6px] md:rounded-[8px] border border-[#D4C9B0] bg-gradient-to-b from-[#FFFFFF] to-[#F4EFE2] px-1 sm:px-1.5 py-1 sm:py-1.5 text-center font-extrabold leading-none text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] text-[hsl(var(--forest))] shadow-sm">
+              <div className="mt-0.5 xs:mt-1 sm:mt-1.5 rounded-[4px] xs:rounded-[5px] sm:rounded-[6px] md:rounded-[8px] border border-[#D4C9B0] bg-gradient-to-b from-[#FFFFFF] to-[#F4EFE2] px-0.5 xs:px-1 sm:px-1.5 py-0.5 xs:py-1 sm:py-1.5 text-center font-extrabold leading-none text-[12px] xs:text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] text-[hsl(var(--forest))] shadow-sm">
                 {currentCattle?.code || 'NF-0001'}
               </div>
 
               {/* Breed & Gender */}
-              <div className="mt-1 sm:mt-1.5 text-center text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] font-bold uppercase leading-tight text-[hsl(var(--forest))]">
+              <div className="mt-0.5 xs:mt-1 sm:mt-1.5 text-center text-[7px] xs:text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] font-bold uppercase leading-tight text-[hsl(var(--forest))]">
                 {currentCattle?.breed || 'LIMOUSIN'}
               </div>
-              <div className="text-center text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] font-bold uppercase leading-tight text-[hsl(var(--forest))/80]">
+              <div className="text-center text-[7px] xs:text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] font-bold uppercase leading-tight text-[hsl(var(--forest))/80]">
                 {currentCattle?.gender === 'FEMALE' ? 'BETINA' : 'JANTAN'}
               </div>
 
               {/* QR Code */}
-              <div className="mx-auto mt-1 sm:mt-1.5 aspect-square h-[60px] sm:h-[70px] md:h-[80px] lg:h-[90px] w-[60px] sm:w-[70px] md:w-[80px] lg:w-[90px] shrink-0 rounded-[4px] sm:rounded-[5px] md:rounded-[6px] border border-[#D4C9B0] bg-white p-1 sm:p-1.5 shadow-sm">
+              <div className="mx-auto mt-0.5 xs:mt-1 sm:mt-1.5 aspect-square h-[40px] xs:h-[50px] sm:h-[60px] md:h-[70px] lg:h-[80px] w-[40px] xs:w-[50px] sm:w-[60px] md:w-[70px] lg:w-[80px] shrink-0 rounded-[3px] xs:rounded-[4px] sm:rounded-[5px] md:rounded-[6px] border border-[#D4C9B0] bg-white p-0.5 xs:p-1 sm:p-1.5 shadow-sm">
                 {showLoading ? (
                   <div className="flex h-full flex-col items-center justify-center text-center">
-                    <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin text-[hsl(var(--forest))/50]" />
-                    <span className="text-[4px] sm:text-[5px] text-[hsl(var(--forest))/50] mt-0.5">Memuat...</span>
+                    <Loader2 className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-4 sm:w-4 animate-spin text-[hsl(var(--forest))/50]" />
+                    <span className="text-[3px] xs:text-[4px] sm:text-[5px] text-[hsl(var(--forest))/50] mt-0.5">Memuat...</span>
                   </div>
                 ) : currentCattle ? (
                   <div className="flex h-full items-center justify-center">
@@ -328,13 +328,13 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
                     />
                   </div>
                 ) : (
-                  <div className="flex h-full items-center justify-center text-center text-[5px] sm:text-[6px] text-[hsl(var(--forest))/50]">
+                  <div className="flex h-full items-center justify-center text-center text-[4px] xs:text-[5px] sm:text-[6px] text-[hsl(var(--forest))/50]">
                     QR Code
                   </div>
                 )}
               </div>
 
-              <div className="mt-1 sm:mt-1.5 text-center text-[5px] sm:text-[6px] md:text-[7px] lg:text-[9px] font-bold uppercase tracking-[.02em] sm:tracking-[.03em] md:tracking-[.04em] text-[hsl(var(--forest))/75]">
+              <div className="mt-0.5 xs:mt-1 sm:mt-1.5 text-center text-[4px] xs:text-[5px] sm:text-[6px] md:text-[7px] lg:text-[9px] font-bold uppercase tracking-[.02em] sm:tracking-[.03em] md:tracking-[.04em] text-[hsl(var(--forest))/75]">
                 SCAN UNTUK PROFIL
               </div>
             </div>
