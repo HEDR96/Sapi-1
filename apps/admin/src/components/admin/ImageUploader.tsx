@@ -53,18 +53,28 @@ export function ImageUploader({
         setUploadProgress(Math.round(progress * 100))
       })
 
-      try {
-        const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm'
-        await ffmpeg.load({
-          coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-          wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-        })
-        ffmpegLoaded.current = true
-        console.log('[ImageUploader] FFmpeg loaded successfully')
-      } catch (err) {
-        console.error('[ImageUploader] Failed to load FFmpeg:', err)
-        ffmpegLoaded.current = false
+      // Try multiple CDNs
+      const CDNS = [
+        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm',
+        'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm',
+      ]
+
+      for (const baseURL of CDNS) {
+        try {
+          await ffmpeg.load({
+            coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+            wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+          })
+          ffmpegLoaded.current = true
+          console.log('[ImageUploader] FFmpeg loaded from:', baseURL)
+          return
+        } catch (err) {
+          console.warn('[ImageUploader] Failed to load from', baseURL)
+        }
       }
+
+      console.error('[ImageUploader] All CDNs failed')
+      ffmpegLoaded.current = false
     }
 
     loadFFmpeg()
@@ -98,16 +108,29 @@ export function ImageUploader({
         setUploadProgress(Math.round(progress * 100))
       })
 
-      try {
-        const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm'
-        await ffmpeg.load({
-          coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-          wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-        })
-        ffmpegLoaded.current = true
-        console.log('[ImageUploader] FFmpeg loaded successfully')
-      } catch (err) {
-        console.error('[ImageUploader] Failed to load FFmpeg:', err)
+      // Try multiple CDNs
+      const CDNS = [
+        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm',
+        'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm',
+      ]
+
+      let loaded = false
+      for (const baseURL of CDNS) {
+        try {
+          await ffmpeg.load({
+            coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+            wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+          })
+          ffmpegLoaded.current = true
+          loaded = true
+          console.log('[ImageUploader] FFmpeg loaded from:', baseURL)
+          break
+        } catch (cdnErr) {
+          console.warn('[ImageUploader] Failed to load from', baseURL)
+        }
+      }
+
+      if (!loaded) {
         ffmpegLoaded.current = false
         setCompressing(false)
         throw new Error('Gagal memuat video compressor. Pastikan koneksi internet stabil.')
