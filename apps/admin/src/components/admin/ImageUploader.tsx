@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
-import { Upload, X, Loader2, Image as ImageIcon, Play, Pause } from 'lucide-react'
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { Upload, X, Loader2, Image as ImageIcon, Play, Pause, FileVideo } from 'lucide-react'
 import { getDirectImageUrl } from '@samadya/shared/lib/utils/imageUrl'
+import { FFmpeg } from '@ffmpeg/ffmpeg'
+import { fetchFile, toBlobURL } from '@ffmpeg/util'
 
 interface ImageUploaderProps {
   value?: string
@@ -11,6 +13,11 @@ interface ImageUploaderProps {
   accept?: string
   maxSize?: number
 }
+
+// Max file size for direct upload (4MB - Vercel limit)
+const MAX_DIRECT_UPLOAD_SIZE = 4 * 1024 * 1024
+// Target video size after compression
+const TARGET_VIDEO_SIZE = 4 * 1024 * 1024 // 4MB
 
 export function ImageUploader({
   value,
@@ -25,10 +32,43 @@ export function ImageUploader({
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
   const [uploadingIsVideo, setUploadingIsVideo] = useState(false)
+  const [compressing, setCompressing] = useState(false)
+  const [statusText, setStatusText] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const ffmpegRef = useRef<FFmpeg | null>(null)
+  const ffmpegLoaded = useRef(false)
 
   const isVideo = value?.includes('/api/stream') || value?.match(/\.(mp4|webm|ogg)$/i) || value?.startsWith('data:video')
+
+  // Initialize FFmpeg once
+  useEffect(() => {
+    const loadFFmpeg = async () => {
+      if (ffmpegLoaded.current) return
+
+      const ffmpeg = new FFmpeg()
+      ffmpegRef.current = ffmpeg
+
+      ffmpeg.on('progress', ({ progress }) => {
+        setUploadProgress(Math.round(progress * 100))
+      })
+
+      try {
+        const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm'
+        await ffmpeg.load({
+          coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+          wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+        })
+        ffmpegLoaded.current = true
+        console.log('[ImageUploader] FFmpeg loaded successfully')
+      } catch (err) {
+        console.error('[ImageUploader] Failed to load FFmpeg:', err)
+        ffmpegLoaded.current = false
+      }
+    }
+
+    loadFFmpeg()
+  }, [])
 
   const validateFile = (file: File): string | null => {
     const isVideoFile = file.type.startsWith('video/')
@@ -45,6 +85,87 @@ export function ImageUploader({
     return null
   }
 
+  const compressVideo = async (file: File): Promise<File> => {
+    if (!ffmpegRef.current || !ffmpegLoaded.current) {
+      throw new Error('Video compressor tidak tersedia')
+    }
+
+    setCompressing(true)
+    setStatusText('Memuat compressor video...')
+
+    try {
+      const ffmpeg = ffmpegRef.current
+
+      // Write input file
+      setStatusText('Mempersiapkan video...')
+      const inputName = 'input.mp4'
+      const outputName = 'output.mp4'
+
+      await ffmpeg.writeFile(inputName, await fetchFile(file))
+
+      // Calculate target bitrate based on file size
+      // Target: compress to ~4MB or less while maintaining reasonable quality
+      const duration = await getVideoDuration(file)
+      const targetBitrate = Math.max(500, (TARGET_VIDEO_SIZE * 8) / duration) // kbps
+
+      setStatusText('Mengcompress video...')
+
+      // Compress with FFmpeg
+      await ffmpeg.exec([
+        '-i', inputName,
+        '-c:v', 'libx264',
+        '-preset', 'fast',
+        '-crf', '28',
+        '-b:v', `${targetBitrate}k`,
+        '-c:a', 'aac',
+        '-b:a', '64k',
+        '-movflags', '+faststart',
+        '-y',
+        outputName
+      ])
+
+      // Read output file
+      const data = await ffmpeg.readFile(outputName)
+      // Create blob from ffmpeg output
+      const compressedBlob = new Blob([data as unknown as BlobPart], { type: 'video/mp4' })
+
+      // Cleanup
+      await ffmpeg.deleteFile(inputName)
+      await ffmpeg.deleteFile(outputName)
+
+      const compressedFile = new File([compressedBlob], file.name.replace(/\.[^.]+$/, '.mp4'), {
+        type: 'video/mp4'
+      })
+
+      console.log('[ImageUploader] Compression result:', {
+        originalSize: file.size,
+        compressedSize: compressedFile.size,
+        reduction: `${Math.round((1 - compressedFile.size / file.size) * 100)}%`
+      })
+
+      return compressedFile
+    } finally {
+      setCompressing(false)
+      setStatusText('')
+    }
+  }
+
+  const getVideoDuration = (file: File): Promise<number> => {
+    return new Promise((resolve) => {
+      const video = document.createElement('video')
+      video.preload = 'metadata'
+      video.onloadedmetadata = () => {
+        URL.revokeObjectURL(video.src)
+        resolve(video.duration)
+      }
+      video.onerror = () => {
+        URL.revokeObjectURL(video.src)
+        resolve(60) // Default 60 seconds
+      }
+      video.src = URL.createObjectURL(file)
+    })
+  }
+
   const handleUpload = async (file: File) => {
     const validationError = validateFile(file)
     if (validationError) {
@@ -53,15 +174,31 @@ export function ImageUploader({
     }
 
     setUploading(true)
-    setUploadingIsVideo(file.type.startsWith('video/'))
+    const isVideoFile = file.type.startsWith('video/')
+    setUploadingIsVideo(isVideoFile)
     setError(null)
-    setUploadProgress(10)
+    setUploadProgress(0)
 
     try {
-      const uploadFolder = file.type.startsWith('video/') ? 'video' : 'image'
+      let fileToUpload = file
+
+      // Compress video if it's larger than 4MB (Vercel limit)
+      if (isVideoFile && file.size > MAX_DIRECT_UPLOAD_SIZE) {
+        try {
+          fileToUpload = await compressVideo(file)
+        } catch (compressErr) {
+          console.error('[ImageUploader] Compression failed:', compressErr)
+          // If compression fails and file is too large, show error
+          if (file.size > MAX_DIRECT_UPLOAD_SIZE) {
+            throw new Error('Video terlalu besar. Maksimal 4MB atau gunakan video yang lebih kecil.')
+          }
+        }
+      }
+
+      const uploadFolder = isVideoFile ? 'video' : 'image'
 
       const formData = new FormData()
-      formData.append('file', file)
+      formData.append('file', fileToUpload)
       formData.append('folder', uploadFolder)
 
       setUploadProgress(30)
@@ -79,7 +216,6 @@ export function ImageUploader({
       try {
         data = JSON.parse(responseText)
       } catch (jsonError) {
-        // Server returned non-JSON response (e.g., "Request Entity Too Large")
         console.error('Server response (not JSON):', responseText)
         throw new Error(responseText || 'Server error: ' + response.status)
       }
@@ -105,7 +241,9 @@ export function ImageUploader({
     } finally {
       setUploading(false)
       setUploadingIsVideo(false)
+      setCompressing(false)
       setUploadProgress(0)
+      setStatusText('')
     }
   }
 
@@ -244,8 +382,13 @@ export function ImageUploader({
           <div className="text-center">
             <Loader2 className="h-10 w-10 animate-spin text-[hsl(var(--forest))] mx-auto mb-3" />
             <p className="text-sm text-[hsl(var(--forest))/60]">
-              {uploadingIsVideo ? 'Mengupload video...' : 'Mengupload gambar...'} {uploadProgress}%
+              {compressing ? statusText : (uploadingIsVideo ? 'Mengupload video...' : 'Mengupload gambar...')} {uploadProgress}%
             </p>
+            {compressing && (
+              <p className="text-xs text-[hsl(var(--forest))/40] mt-1">
+                Mohon tunggu, compress video...
+              </p>
+            )}
             <div className="w-48 h-2 bg-[hsl(var(--line))] rounded-full mt-3 mx-auto overflow-hidden">
               <div
                 className="h-full bg-[hsl(var(--forest))] transition-all duration-300"
@@ -266,7 +409,7 @@ export function ImageUploader({
               {dragOver ? 'Lepaskan file di sini' : 'Klik atau drag gambar/video ke sini'}
             </p>
             <p className="text-xs text-[hsl(var(--forest))/40] mt-1">
-              JPG, PNG, MP4 - Maksimal {folder === 'video' || folder === 'video-upload' ? '100MB' : `${maxSize}MB`}
+              JPG, PNG - Maksimal {maxSize}MB | Video - Maksimal 4MB (otomatis compress jika lebih besar)
             </p>
           </>
         )}
