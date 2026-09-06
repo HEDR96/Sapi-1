@@ -86,12 +86,38 @@ export function ImageUploader({
   }
 
   const compressVideo = async (file: File): Promise<File> => {
-    if (!ffmpegRef.current || !ffmpegLoaded.current) {
-      throw new Error('Video compressor tidak tersedia')
-    }
-
     setCompressing(true)
     setStatusText('Memuat compressor video...')
+
+    // Load FFmpeg if not loaded yet
+    if (!ffmpegRef.current) {
+      const ffmpeg = new FFmpeg()
+      ffmpegRef.current = ffmpeg
+
+      ffmpeg.on('progress', ({ progress }) => {
+        setUploadProgress(Math.round(progress * 100))
+      })
+
+      try {
+        const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm'
+        await ffmpeg.load({
+          coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+          wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+        })
+        ffmpegLoaded.current = true
+        console.log('[ImageUploader] FFmpeg loaded successfully')
+      } catch (err) {
+        console.error('[ImageUploader] Failed to load FFmpeg:', err)
+        ffmpegLoaded.current = false
+        setCompressing(false)
+        throw new Error('Gagal memuat video compressor. Pastikan koneksi internet stabil.')
+      }
+    }
+
+    if (!ffmpegLoaded.current) {
+      setCompressing(false)
+      throw new Error('Video compressor tidak tersedia')
+    }
 
     try {
       const ffmpeg = ffmpegRef.current
@@ -188,9 +214,12 @@ export function ImageUploader({
           fileToUpload = await compressVideo(file)
         } catch (compressErr) {
           console.error('[ImageUploader] Compression failed:', compressErr)
-          // If compression fails and file is too large, show error
+          const errorMsg = compressErr instanceof Error ? compressErr.message : 'Compression failed'
+          // If compression fails and file is still too large, show error
           if (file.size > MAX_DIRECT_UPLOAD_SIZE) {
-            throw new Error('Video terlalu besar. Maksimal 4MB atau gunakan video yang lebih kecil.')
+            throw new Error(errorMsg.includes('compressor') || errorMsg.includes('Gagal memuat')
+              ? errorMsg
+              : 'Video terlalu besar. Gunakan video ≤ 4MB atau kompres manual.')
           }
         }
       }
