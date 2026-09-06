@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { category, key, value, order = 0 } = body
+    const { category, key, value } = body
 
     if (!category || !key || !value) {
       return NextResponse.json({ error: 'category, key, and value are required' }, { status: 400 })
@@ -45,8 +45,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Master data with this category and key already exists' }, { status: 400 })
     }
 
+    // Get max order for this category and auto-increment
+    const maxOrderItem = await prisma.masterData.findFirst({
+      where: { category },
+      orderBy: { order: 'desc' },
+    })
+    const newOrder = maxOrderItem ? maxOrderItem.order + 1 : 1
+
     const item = await prisma.masterData.create({
-      data: { category, key, value, order },
+      data: { category, key, value, order: newOrder },
     })
 
     return NextResponse.json({ item })

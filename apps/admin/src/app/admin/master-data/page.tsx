@@ -31,7 +31,7 @@ export default function MasterDataPage() {
   const [categoryFilter, setCategoryFilter] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<MasterData | null>(null)
-  const [form, setForm] = useState({ category: 'JENIS_SAPI', key: '', value: '', order: '0' })
+  const [form, setForm] = useState({ category: 'JENIS_SAPI', key: '', value: '' })
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function MasterDataPage() {
       const url = editingItem ? '/api/admin/master-data' : '/api/admin/master-data'
       const method = editingItem ? 'PUT' : 'POST'
 
-      const body: any = { ...form, order: parseInt(form.order) || 0 }
+      const body: any = { category: form.category, key: form.key, value: form.value }
       if (editingItem) body.id = editingItem.id
 
       const res = await fetch(url, {
@@ -71,7 +71,7 @@ export default function MasterDataPage() {
       if (res.ok) {
         setModalOpen(false)
         setEditingItem(null)
-        setForm({ category: 'JENIS_SAPI', key: '', value: '', order: '0' })
+        setForm({ category: 'JENIS_SAPI', key: '', value: '' })
         fetchData()
       } else {
         const data = await res.json()
@@ -86,17 +86,23 @@ export default function MasterDataPage() {
 
   const handleEdit = (item: MasterData) => {
     setEditingItem(item)
-    setForm({ category: item.category, key: item.key, value: item.value, order: item.order.toString() })
+    setForm({ category: item.category, key: item.key, value: item.value })
     setModalOpen(true)
   }
 
   const handleDelete = async (id: string) => {
     if (!confirm('Hapus data ini?')) return
     try {
-      await fetch(`/api/admin/master-data?id=${id}`, { method: 'DELETE' })
-      fetchData()
+      const res = await fetch(`/api/admin/master-data?id=${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        fetchData()
+      } else {
+        const data = await res.json()
+        alert(data.error || 'Gagal menghapus data')
+      }
     } catch (error) {
       console.error('Failed to delete:', error)
+      alert('Terjadi kesalahan saat menghapus data')
     }
   }
 
@@ -156,7 +162,7 @@ export default function MasterDataPage() {
           <p className="text-muted-foreground">Kelola data referensi (jenis sapi, pakan, status)</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => { setEditingItem(null); setForm({ category: 'JENIS_SAPI', key: '', value: '', order: '0' }); setModalOpen(true) }}>
+          <Button onClick={() => { setEditingItem(null); setForm({ category: 'JENIS_SAPI', key: '', value: '' }); setModalOpen(true) }}>
             <Plus className="h-4 w-4 mr-2" />
             Tambah Data
           </Button>
@@ -254,10 +260,6 @@ export default function MasterDataPage() {
                 <div className="space-y-2">
                   <Label>Value *</Label>
                   <Input value={form.value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, value: e.target.value })} placeholder="Contoh Value" required />
-                </div>
-                <div className="space-y-2">
-                  <Label>Order</Label>
-                  <Input type="number" value={form.order} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, order: e.target.value })} placeholder="0" />
                 </div>
                 <div className="flex justify-end gap-2 pt-4">
                   <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>Batal</Button>
