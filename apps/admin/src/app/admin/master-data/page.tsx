@@ -68,7 +68,11 @@ export default function MasterDataPage() {
       const url = editingItem ? '/api/admin/master-data' : '/api/admin/master-data'
       const method = editingItem ? 'PUT' : 'POST'
 
-      const body = { category: form.category, key: form.key, value: form.value }
+      const body: { category: string; key: string; value: string; id?: string } = {
+        category: form.category,
+        key: form.key,
+        value: form.value,
+      }
       if (editingItem) body.id = editingItem.id
 
       const res = await fetch(url, {

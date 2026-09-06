@@ -271,44 +271,18 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
             key={currentCattle?.id || 'default'}
             className="paper-pull-up relative z-10 flex flex-col items-center"
           >
-            {/* Integrated Rope + Eyelet - rope connects to card */}
+            {/* Integrated Rope - pin circle + rope segment */}
             <svg width="10" height="30" viewBox="0 0 10 30" fill="none" className="drop-shadow-sm">
-              {/* Pin Circle - attached to hanger */}
               <circle cx="5" cy="5" r="5" fill="#302111" stroke="#8B7355" strokeWidth="1.5" />
-              {/* Short Rope segment from pin to card */}
               <rect x="3.5" y="10" width="3" height="20" rx="1.5" fill="#6E5030" />
             </svg>
 
-            {/* Tag Card - with eyelet at top connecting to rope */}
-            <div className="relative -mt-px">
-              {/* Eyelet - golden ring at top of card, connected to rope */}
-              <div className="absolute -top-2 sm:-top-2.5 left-1/2 -translate-x-1/2 z-30">
-                <div className="relative flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full border-[2px] sm:border-[2.5px] border-[#9E7B4F] bg-gradient-to-br from-[#D4AF37] via-[#AA7C11] to-[#5B430B] shadow-md">
-                  <div className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-[#302111] shadow-inner" />
-                </div>
-              </div>
-
-              {/* Tag Card */}
-              <div
-                className="relative w-[80px] xs:w-[90px] sm:w-[110px] md:w-[130px] lg:w-[145px] xl:w-[155px] rounded-[12px] xs:rounded-[14px] sm:rounded-[16px] md:rounded-[18px] lg:rounded-[20px] bg-gradient-to-b from-[#F7F3E9] via-[#F0EAD8] to-[#E3D9C2] px-1.5 xs:px-2 sm:px-3 md:px-3.5 pb-1.5 xs:pb-2 sm:pb-3 md:pb-3.5 pt-3 xs:pt-4 sm:pt-5 md:pt-5.5 shadow-2xl"
-                style={{
-                  boxShadow: '0 8px 20px -5px rgba(40, 30, 15, 0.22)',
-                  border: '1.5px solid #D4C9B0'
-                }}
-              >
-
-            {/* Tag Card - Fully Responsive, attached to rope */}
-            <div
-              className="relative w-[80px] xs:w-[90px] sm:w-[110px] md:w-[130px] lg:w-[145px] xl:w-[155px] rounded-[12px] xs:rounded-[14px] sm:rounded-[16px] md:rounded-[18px] lg:rounded-[20px] bg-gradient-to-b from-[#F7F3E9] via-[#F0EAD8] to-[#E3D9C2] px-1.5 xs:px-2 sm:px-3 md:px-3.5 pb-1.5 xs:pb-2 sm:pb-3 md:pb-3.5 pt-3 xs:pt-4 sm:pt-5 md:pt-5.5 shadow-2xl"
-              style={{
-                boxShadow: '0 8px 20px -5px rgba(40, 30, 15, 0.22)',
-                border: '1.5px solid #D4C9B0'
-              }}
-            >
-              {/* Eyelet */}
-              <div className="absolute -top-1 xs:-top-1.5 sm:-top-2 md:-top-2.5 left-1/2 -translate-x-1/2 z-30">
-                <div className="relative flex h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 items-center justify-center rounded-full border-[1.5px] xs:border-[2px] sm:border-[2.5px] border-[#9E7B4F] bg-gradient-to-br from-[#D4AF37] via-[#AA7C11] to-[#5B430B] shadow-md">
-                  <div className="h-1.5 w-1.5 xs:h-1.5 xs:w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#302111] shadow-inner" />
+            {/* Tag Card - connected to rope */}
+            <div className="relative -mt-px w-[80px] xs:w-[90px] sm:w-[110px] md:w-[130px] lg:w-[145px] xl:w-[155px] rounded-[12px] xs:rounded-[14px] sm:rounded-[16px] md:rounded-[18px] lg:rounded-[20px] bg-gradient-to-b from-[#F7F3E9] via-[#F0EAD8] to-[#E3D9C2] px-1.5 xs:px-2 sm:px-3 md:px-3.5 pb-1.5 xs:pb-2 sm:pb-3 md:pb-3.5 pt-4 sm:pt-5 md:pt-5.5 shadow-2xl border border-[#D4C9B0]">
+              {/* Eyelet - golden ring */}
+              <div className="absolute -top-1.5 sm:-top-2 left-1/2 -translate-x-1/2 z-30">
+                <div className="relative flex h-3 w-3 sm:h-4 sm:w-4 items-center justify-center rounded-full border-[2px] sm:border-[2.5px] border-[#9E7B4F] bg-gradient-to-br from-[#D4AF37] via-[#AA7C11] to-[#5B430B] shadow-md">
+                  <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#302111] shadow-inner" />
                 </div>
               </div>
 
