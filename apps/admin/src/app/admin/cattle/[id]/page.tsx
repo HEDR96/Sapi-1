@@ -111,12 +111,16 @@ export default function CattleDetailPage() {
 
   useEffect(() => { fetchCattle(); fetchMasterData() }, [cattleId])
 
-  // Refresh master data when tab changes to summary (when user returns from master data page)
+  // Refresh master data when page becomes visible (e.g., after returning from master data page)
   useEffect(() => {
-    if (activeTab === 'summary') {
-      fetchMasterData()
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchMasterData()
+      }
     }
-  }, [activeTab])
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
 
   const fetchCattle = async () => {
     try {
