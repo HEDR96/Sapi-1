@@ -1,10 +1,8 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
-import { Upload, X, Loader2, Image as ImageIcon, Play, Pause, FileVideo } from 'lucide-react'
+import { useState, useRef, useCallback } from 'react'
+import { Upload, X, Loader2, Image as ImageIcon, Play, Pause } from 'lucide-react'
 import { getDirectImageUrl } from '@samadya/shared/lib/utils/imageUrl'
-import { FFmpeg } from '@ffmpeg/ffmpeg'
-import { fetchFile, toBlobURL } from '@ffmpeg/util'
 
 interface ImageUploaderProps {
   value?: string
@@ -14,10 +12,8 @@ interface ImageUploaderProps {
   maxSize?: number
 }
 
-// Max file size for direct upload (4MB - Vercel limit)
-const MAX_DIRECT_UPLOAD_SIZE = 4 * 1024 * 1024
-// Target video size after compression
-const TARGET_VIDEO_SIZE = 4 * 1024 * 1024 // 4MB
+// Chunk size: 2MB (must be smaller than Vercel 4.5MB limit)
+const CHUNK_SIZE = 2 * 1024 * 1024
 
 export function ImageUploader({
   value,
@@ -32,56 +28,11 @@ export function ImageUploader({
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
   const [uploadingIsVideo, setUploadingIsVideo] = useState(false)
-  const [compressing, setCompressing] = useState(false)
   const [statusText, setStatusText] = useState('')
-  const [ffmpegReady, setFfmpegReady] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const ffmpegRef = useRef<FFmpeg | null>(null)
-  const ffmpegLoaded = useRef(false)
 
   const isVideo = value?.includes('/api/stream') || value?.match(/\.(mp4|webm|ogg)$/i) || value?.startsWith('data:video')
-
-  // Initialize FFmpeg once
-  useEffect(() => {
-    const loadFFmpeg = async () => {
-      if (ffmpegLoaded.current) return
-
-      const ffmpeg = new FFmpeg()
-      ffmpegRef.current = ffmpeg
-
-      ffmpeg.on('progress', ({ progress }) => {
-        setUploadProgress(Math.round(progress * 100))
-      })
-
-      // Try multiple CDNs
-      const CDNS = [
-        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm',
-        'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm',
-      ]
-
-      for (const baseURL of CDNS) {
-        try {
-          await ffmpeg.load({
-            coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-            wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-          })
-          ffmpegLoaded.current = true
-          setFfmpegReady(true)
-          console.log('[ImageUploader] FFmpeg loaded from:', baseURL)
-          return
-        } catch (err) {
-          console.warn('[ImageUploader] Failed to load from', baseURL)
-        }
-      }
-
-      console.error('[ImageUploader] All CDNs failed')
-      ffmpegLoaded.current = false
-      setFfmpegReady(false)
-    }
-
-    loadFFmpeg()
-  }, [])
 
   const validateFile = (file: File): string | null => {
     const isVideoFile = file.type.startsWith('video/')
@@ -91,132 +42,82 @@ export function ImageUploader({
       return 'Format file tidak didukung. Gunakan JPG, PNG, atau MP4.'
     }
 
-    const maxSizeBytes = isVideoFile ? 100 * 1024 * 1024 : maxSize * 1024 * 1024
+    const maxSizeBytes = isVideoFile ? 500 * 1024 * 1024 : maxSize * 1024 * 1024
     if (file.size > maxSizeBytes) {
-      return `Ukuran file terlalu besar. Maksimal ${isVideoFile ? '100MB' : `${maxSize}MB`}.`
+      return `Ukuran file terlalu besar. Maksimal ${isVideoFile ? '500MB' : `${maxSize}MB`}.`
     }
     return null
   }
 
-  const compressVideo = async (file: File): Promise<File> => {
-    setCompressing(true)
-    setStatusText('Memuat compressor video...')
+  // Chunked upload for large files
+  const uploadChunked = async (file: File, uploadFolder: string): Promise<string> => {
+    const totalChunks = Math.ceil(file.size / CHUNK_SIZE)
+    const uploadId = `${Date.now()}-${Math.random().toString(36).substring(7)}`
 
-    // Load FFmpeg if not loaded yet
-    if (!ffmpegRef.current) {
-      const ffmpeg = new FFmpeg()
-      ffmpegRef.current = ffmpeg
+    setStatusText(`Mengupload video (0/${totalChunks})...`)
 
-      ffmpeg.on('progress', ({ progress }) => {
-        setUploadProgress(Math.round(progress * 100))
-      })
-
-      // Try multiple CDNs
-      const CDNS = [
-        'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm',
-        'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm',
-      ]
-
-      let loaded = false
-      for (const baseURL of CDNS) {
-        try {
-          await ffmpeg.load({
-            coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-            wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-          })
-          ffmpegLoaded.current = true
-          loaded = true
-          setFfmpegReady(true)
-          console.log('[ImageUploader] FFmpeg loaded from:', baseURL)
-          break
-        } catch (cdnErr) {
-          console.warn('[ImageUploader] Failed to load from', baseURL)
-        }
-      }
-
-      if (!loaded) {
-        ffmpegLoaded.current = false
-        setCompressing(false)
-        throw new Error('Gagal memuat video compressor. Pastikan koneksi internet stabil.')
-      }
-    }
-
-    if (!ffmpegLoaded.current) {
-      setCompressing(false)
-      throw new Error('Video compressor tidak tersedia')
-    }
-
-    try {
-      const ffmpeg = ffmpegRef.current
-
-      // Write input file
-      setStatusText('Mempersiapkan video...')
-      const inputName = 'input.mp4'
-      const outputName = 'output.mp4'
-
-      await ffmpeg.writeFile(inputName, await fetchFile(file))
-
-      // Calculate target bitrate based on file size
-      // Target: compress to ~4MB or less while maintaining reasonable quality
-      const duration = await getVideoDuration(file)
-      const targetBitrate = Math.max(500, (TARGET_VIDEO_SIZE * 8) / duration) // kbps
-
-      setStatusText('Mengcompress video...')
-
-      // Compress with FFmpeg
-      await ffmpeg.exec([
-        '-i', inputName,
-        '-c:v', 'libx264',
-        '-preset', 'fast',
-        '-crf', '28',
-        '-b:v', `${targetBitrate}k`,
-        '-c:a', 'aac',
-        '-b:a', '64k',
-        '-movflags', '+faststart',
-        '-y',
-        outputName
-      ])
-
-      // Read output file
-      const data = await ffmpeg.readFile(outputName)
-      // Create blob from ffmpeg output
-      const compressedBlob = new Blob([data as unknown as BlobPart], { type: 'video/mp4' })
-
-      // Cleanup
-      await ffmpeg.deleteFile(inputName)
-      await ffmpeg.deleteFile(outputName)
-
-      const compressedFile = new File([compressedBlob], file.name.replace(/\.[^.]+$/, '.mp4'), {
-        type: 'video/mp4'
-      })
-
-      console.log('[ImageUploader] Compression result:', {
-        originalSize: file.size,
-        compressedSize: compressedFile.size,
-        reduction: `${Math.round((1 - compressedFile.size / file.size) * 100)}%`
-      })
-
-      return compressedFile
-    } finally {
-      setCompressing(false)
-      setStatusText('')
-    }
-  }
-
-  const getVideoDuration = (file: File): Promise<number> => {
-    return new Promise((resolve) => {
-      const video = document.createElement('video')
-      video.preload = 'metadata'
-      video.onloadedmetadata = () => {
-        URL.revokeObjectURL(video.src)
-        resolve(video.duration)
-      }
-      video.onerror = () => {
-        URL.revokeObjectURL(video.src)
-        resolve(60) // Default 60 seconds
-      }
-      video.src = URL.createObjectURL(file)
+    // Initialize upload session
+    const initRes = await fetch('/api/upload-chunked/init', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fileName: file.name,
+        fileSize: file.size,
+        mimeType: file.type,
+        folder: uploadFolder,
+        totalChunks,
+        uploadId,
+      }),
     })
+
+    if (!initRes.ok) {
+      const text = await initRes.text()
+      throw new Error(text || 'Gagal inisialisasi upload')
+    }
+
+    const { sessionId } = await initRes.json()
+
+    // Upload each chunk
+    for (let i = 0; i < totalChunks; i++) {
+      const start = i * CHUNK_SIZE
+      const end = Math.min(start + CHUNK_SIZE, file.size)
+      const chunk = file.slice(start, end)
+
+      const formData = new FormData()
+      formData.append('chunk', chunk)
+      formData.append('sessionId', sessionId)
+      formData.append('chunkIndex', i.toString())
+
+      const chunkRes = await fetch('/api/upload-chunked', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!chunkRes.ok) {
+        const text = await chunkRes.text()
+        throw new Error(text || `Gagal upload chunk ${i + 1}`)
+      }
+
+      setUploadProgress(Math.round(((i + 1) / totalChunks) * 80))
+      setStatusText(`Mengupload video (${i + 1}/${totalChunks})...`)
+    }
+
+    setStatusText('Memproses video...')
+
+    // Finalize upload (server will compress and upload to Google Drive)
+    const finalizeRes = await fetch('/api/upload-chunked/finalize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId }),
+    })
+
+    if (!finalizeRes.ok) {
+      const text = await finalizeRes.text()
+      throw new Error(text || 'Gagal finalize upload')
+    }
+
+    const result = await finalizeRes.json()
+    return result.url
   }
 
   const handleUpload = async (file: File) => {
@@ -231,72 +132,50 @@ export function ImageUploader({
     setUploadingIsVideo(isVideoFile)
     setError(null)
     setUploadProgress(0)
+    setStatusText('')
 
     try {
-      let fileToUpload = file
-
-      // Compress video if it's larger than 4MB (Vercel limit)
-      if (isVideoFile && file.size > MAX_DIRECT_UPLOAD_SIZE) {
-        // Wait for FFmpeg to be ready (max 10 seconds)
-        if (!ffmpegReady && !ffmpegLoaded.current) {
-          setStatusText('Memuat compressor...')
-          const startTime = Date.now()
-          while (!ffmpegLoaded.current && Date.now() - startTime < 10000) {
-            await new Promise(resolve => setTimeout(resolve, 500))
-          }
-        }
-
-        if (!ffmpegLoaded.current) {
-          // FFmpeg failed to load - show manual compression message
-          throw new Error('Video compressor belum siap. Silakan kompres video terlebih dahulu (maksimal 4MB) atau coba lagi dalam beberapa saat.')
-        }
-
-        try {
-          fileToUpload = await compressVideo(file)
-        } catch (compressErr) {
-          console.error('[ImageUploader] Compression failed:', compressErr)
-          const errorMsg = compressErr instanceof Error ? compressErr.message : 'Compression failed'
-          // If compression fails and file is still too large, show error
-          if (file.size > MAX_DIRECT_UPLOAD_SIZE) {
-            throw new Error(errorMsg.includes('compressor') || errorMsg.includes('Gagal memuat')
-              ? errorMsg
-              : 'Video terlalu besar. Gunakan video ≤ 4MB atau kompres manual.')
-          }
-        }
-      }
-
       const uploadFolder = isVideoFile ? 'video' : 'image'
+      let url: string
 
-      const formData = new FormData()
-      formData.append('file', fileToUpload)
-      formData.append('folder', uploadFolder)
+      // For images or small videos, use direct upload
+      // For large videos, use chunked upload
+      if (isVideoFile && file.size > CHUNK_SIZE) {
+        url = await uploadChunked(file, uploadFolder)
+      } else {
+        // Direct upload for images and small videos
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('folder', uploadFolder)
 
-      setUploadProgress(30)
+        setStatusText('Mengupload...')
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      })
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
 
-      setUploadProgress(80)
+        setUploadProgress(80)
 
-      let data
-      const responseText = await response.text()
+        const responseText = await response.text()
+        let data
+        try {
+          data = JSON.parse(responseText)
+        } catch {
+          throw new Error(responseText || 'Server error: ' + response.status)
+        }
 
-      try {
-        data = JSON.parse(responseText)
-      } catch (jsonError) {
-        console.error('Server response (not JSON):', responseText)
-        throw new Error(responseText || 'Server error: ' + response.status)
+        if (!response.ok) {
+          throw new Error(data.error || 'Gagal mengupload file')
+        }
+
+        url = data.url
       }
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Gagal mengupload file')
-      }
-
-      if (data.url) {
-        onChange(data.url)
+      if (url) {
+        onChange(url)
         setUploadProgress(100)
+        setStatusText('Berhasil!')
       } else {
         throw new Error('URL tidak ditemukan')
       }
@@ -311,7 +190,6 @@ export function ImageUploader({
     } finally {
       setUploading(false)
       setUploadingIsVideo(false)
-      setCompressing(false)
       setUploadProgress(0)
       setStatusText('')
     }
@@ -452,13 +330,8 @@ export function ImageUploader({
           <div className="text-center">
             <Loader2 className="h-10 w-10 animate-spin text-[hsl(var(--forest))] mx-auto mb-3" />
             <p className="text-sm text-[hsl(var(--forest))/60]">
-              {compressing ? statusText : (uploadingIsVideo ? 'Mengupload video...' : 'Mengupload gambar...')} {uploadProgress}%
+              {uploadingIsVideo ? statusText || 'Mengupload video...' : 'Mengupload gambar...'} {uploadProgress}%
             </p>
-            {compressing && (
-              <p className="text-xs text-[hsl(var(--forest))/40] mt-1">
-                Mohon tunggu, compress video...
-              </p>
-            )}
             <div className="w-48 h-2 bg-[hsl(var(--line))] rounded-full mt-3 mx-auto overflow-hidden">
               <div
                 className="h-full bg-[hsl(var(--forest))] transition-all duration-300"
@@ -479,18 +352,8 @@ export function ImageUploader({
               {dragOver ? 'Lepaskan file di sini' : 'Klik atau drag gambar/video ke sini'}
             </p>
             <p className="text-xs text-[hsl(var(--forest))/40] mt-1">
-              JPG, PNG - Maksimal {maxSize}MB | Video - Maksimal 4MB (otomatis compress jika lebih besar)
+              JPG, PNG - Maksimal {maxSize}MB | Video - Maksimal 500MB
             </p>
-            {!ffmpegReady && (
-              <p className="text-xs text-yellow-600 mt-1">
-                Memuat compressor video...
-              </p>
-            )}
-            {ffmpegReady && (
-              <p className="text-xs text-green-600 mt-1">
-                ✓ Compressor siap
-              </p>
-            )}
           </>
         )}
         <input
