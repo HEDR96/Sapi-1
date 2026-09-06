@@ -106,49 +106,6 @@ export default function MasterDataPage() {
     }
   }
 
-  const handleSeed = async () => {
-    if (!confirm('Seed data default? Data yang sudah ada tidak akan ditimpa.')) return
-    setSeeding(true)
-    try {
-      const defaultData = [
-        { category: 'JENIS_SAPI', key: 'LIMOSIN', value: 'Limousin', order: 1 },
-        { category: 'JENIS_SAPI', key: 'SIMENTAL', value: 'Simental', order: 2 },
-        { category: 'JENIS_SAPI', key: 'BRAHMAN', value: 'Brahman', order: 3 },
-        { category: 'JENIS_SAPI', key: 'ANGUS', value: 'Angus', order: 4 },
-        { category: 'JENIS_SAPI', key: 'PO', value: 'Peranakan Ongole (PO)', order: 5 },
-        { category: 'JENIS_SAPI', key: 'BALI', value: 'Bali', order: 6 },
-        { category: 'JENIS_SAPI', key: 'MADURA', value: 'Madura', order: 7 },
-        { category: 'JENIS_SAPI', key: 'LAINNYA', value: 'Lainnya', order: 99 },
-        { category: 'JENIS_PAKAN', key: 'RUMPUT_GAJAH', value: 'Rumput Gajah', order: 1 },
-        { category: 'JENIS_PAKAN', key: 'RUMPUT_NAPIER', value: 'Rumput Napier', order: 2 },
-        { category: 'JENIS_PAKAN', key: 'JERAMI', value: 'Jerami Padi', order: 3 },
-        { category: 'JENIS_PAKAN', key: 'KANGKUNG', value: 'Kangkung', order: 4 },
-        { category: 'JENIS_PAKAN', key: 'GANDUM', value: 'Gandum', order: 5 },
-        { category: 'JENIS_PAKAN', key: 'KONSENTRAT', value: 'Konsentrat', order: 6 },
-        { category: 'JENIS_PAKAN', key: 'LAINNYA', value: 'Lainnya', order: 99 },
-        { category: 'STATUS_SAPI', key: 'AVAILABLE', value: 'Tersedia', order: 1 },
-        { category: 'STATUS_SAPI', key: 'BOOKED', value: 'Dibooking', order: 2 },
-        { category: 'STATUS_SAPI', key: 'SOLD', value: 'Terjual', order: 3 },
-        { category: 'STATUS_SAPI', key: 'ARCHIVED', value: 'Diarchive', order: 4 },
-      ]
-
-      for (const item of defaultData) {
-        await fetch('/api/admin/master-data', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(item),
-        })
-      }
-      fetchData()
-      alert('Data berhasil di-seed!')
-    } catch (error) {
-      console.error('Failed to seed:', error)
-      alert('Gagal seed data')
-    } finally {
-      setSeeding(false)
-    }
-  }
-
   const filteredItems = items.filter(item =>
     item.value.toLowerCase().includes(search.toLowerCase()) ||
     item.key.toLowerCase().includes(search.toLowerCase())
