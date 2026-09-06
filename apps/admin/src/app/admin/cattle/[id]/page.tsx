@@ -72,6 +72,7 @@ export default function CattleDetailPage() {
   // Master data states
   const [feedTypes, setFeedTypes] = useState<MasterData[]>([])
   const [healthStatuses, setHealthStatuses] = useState<MasterData[]>([])
+  const [healthTypes, setHealthTypes] = useState<MasterData[]>([])
   const [cattleBreeds, setCattleBreeds] = useState<MasterData[]>([])
   const [cattleStatuses, setCattleStatuses] = useState<MasterData[]>([])
   const [loadingMasterData, setLoadingMasterData] = useState(false)
@@ -96,7 +97,8 @@ export default function CattleDetailPage() {
         const data = await res.json()
         const items = data.items || []
         setFeedTypes(items.filter((m: MasterData) => m.category === 'JENIS_PAKAN'))
-        setHealthStatuses(items.filter((m: MasterData) => m.category === 'STATUS_SAPI'))
+        setHealthStatuses(items.filter((m: MasterData) => m.category === 'STATUS_KESEHATAN'))
+        setHealthTypes(items.filter((m: MasterData) => m.category === 'JENIS_KESEHATAN'))
         setCattleBreeds(items.filter((m: MasterData) => m.category === 'JENIS_SAPI'))
         setCattleStatuses(items.filter((m: MasterData) => m.category === 'STATUS_SAPI'))
       }
@@ -220,8 +222,18 @@ export default function CattleDetailPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2"><Label>Kode</Label><Input value={form.code} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, code: e.target.value })} /></div>
                     <div className="space-y-2"><Label>Nama</Label><Input value={form.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })} /></div>
-                    <div className="space-y-2"><Label>Jenis</Label><Input value={form.breed} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, breed: e.target.value })} /></div>
-                    <div className="space-y-2"><Label>Status</Label><Select value={form.status} onValueChange={(v: string) => setForm({ ...form, status: v as any })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="AVAILABLE">Tersedia</SelectItem><SelectItem value="BOOKED">Dibooking</SelectItem><SelectItem value="SOLD">Terjual</SelectItem><SelectItem value="ARCHIVED">Diarchive</SelectItem></SelectContent></Select></div>
+                    <div className="space-y-2"><Label>Jenis</Label>
+                      <Select value={form.breed} onValueChange={(v: string) => setForm({ ...form, breed: v })} disabled={loadingMasterData || editing}>
+                        <SelectTrigger><SelectValue placeholder={loadingMasterData ? 'Memuat...' : 'Pilih jenis sapi'} /></SelectTrigger>
+                        <SelectContent>{cattleBreeds.map((b) => <SelectItem key={b.id} value={b.key}>{b.value}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2"><Label>Status</Label>
+                      <Select value={form.status} onValueChange={(v: string) => setForm({ ...form, status: v })} disabled={loadingMasterData || editing}>
+                        <SelectTrigger><SelectValue placeholder={loadingMasterData ? 'Memuat...' : 'Pilih status'} /></SelectTrigger>
+                        <SelectContent>{cattleStatuses.map((s) => <SelectItem key={s.id} value={s.key}>{s.value}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
                     <div className="space-y-2"><Label>Tanggal Lahir</Label><Input type="date" value={form.birthDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, birthDate: e.target.value })} /></div>
                     <div className="space-y-2"><Label>Tinggi (cm)</Label><Input type="number" value={form.height} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, height: e.target.value })} /></div>
                     <div className="space-y-2"><Label>Harga Jual (Rp)</Label><Input type="number" value={form.price} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, price: e.target.value })} /></div>
@@ -323,29 +335,25 @@ export default function CattleDetailPage() {
                       <Input disabled placeholder="Memuat..." />
                     ) : (
                       <Select value={healthForm.healthType} onValueChange={(v: string) => setHealthForm({ ...healthForm, healthType: v })}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectTrigger><SelectValue placeholder="Pilih jenis kesehatan" /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="VACCINATION">Vaksinasi</SelectItem>
-                          <SelectItem value="CHECKUP">Checkup</SelectItem>
-                          <SelectItem value="TREATMENT">Pengobatan</SelectItem>
-                          {healthStatuses.filter(s => !['SEHAT', 'OBSERVASI', 'DALAM_PERAWATAN', 'SEMBUH'].includes(s.key)).map((s) => (
-                            <SelectItem key={s.key} value={s.key}>{s.value}</SelectItem>
-                          ))}
+                          {healthTypes.map((t) => <SelectItem key={t.id} value={t.key}>{t.value}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     )}
                   </div>
                   <div className="space-y-2">
                     <Label>Status *</Label>
-                    <Select value={healthForm.status} onValueChange={(v: string) => setHealthForm({ ...healthForm, status: v })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="SEHAT">Sehat</SelectItem>
-                        <SelectItem value="OBSERVASI">Observasi</SelectItem>
-                        <SelectItem value="DALAM_PERAWATAN">Dalam Perawatan</SelectItem>
-                        <SelectItem value="SEMBUH">Sembuh</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    {loadingMasterData ? (
+                      <Input disabled placeholder="Memuat..." />
+                    ) : (
+                      <Select value={healthForm.status} onValueChange={(v: string) => setHealthForm({ ...healthForm, status: v })}>
+                        <SelectTrigger><SelectValue placeholder="Pilih status kesehatan" /></SelectTrigger>
+                        <SelectContent>
+                          {healthStatuses.map((s) => <SelectItem key={s.id} value={s.key}>{s.value}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </div>
                   <div className="space-y-2"><Label>Tanggal *</Label><Input type="date" value={healthForm.recordDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHealthForm({ ...healthForm, recordDate: e.target.value })} /></div>
                   <div className="space-y-2"><Label>Catatan</Label><Input value={healthForm.notes} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHealthForm({ ...healthForm, notes: e.target.value })} placeholder="Opsional" /></div>
