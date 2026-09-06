@@ -68,6 +68,19 @@ export async function GET(request: NextRequest) {
 
     console.log('[Stream API] Fetching file from Drive API...')
 
+    // First get file metadata to get the correct mimeType
+    const fileMetadata = await drive.files.get({
+      fileId,
+      fields: 'name,mimeType,size',
+    })
+
+    const actualMimeType = fileMetadata.data.mimeType || mimeType
+    console.log('[Stream API] File metadata:', {
+      name: fileMetadata.data.name,
+      mimeType: actualMimeType,
+      size: fileMetadata.data.size,
+    })
+
     // Download the video using alt=media
     const response = await drive.files.get({
       fileId,
@@ -80,12 +93,13 @@ export async function GET(request: NextRequest) {
 
     console.log('[Stream API] Success:', {
       fileId,
+      mimeType: actualMimeType,
       size: videoBuffer.length,
     })
 
     return new Response(videoBuffer, {
       headers: {
-        'Content-Type': mimeType,
+        'Content-Type': actualMimeType,
         'Content-Length': videoBuffer.length.toString(),
         'Accept-Ranges': 'none',
         'Cache-Control': 'public, max-age=86400',

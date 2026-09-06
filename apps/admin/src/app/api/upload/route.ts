@@ -64,6 +64,14 @@ export async function POST(request: NextRequest) {
     const isVideo = file.type.startsWith('video/')
     const isImage = file.type.startsWith('image/')
 
+    console.log('[Upload API] File info:', {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      isVideo,
+      isImage
+    })
+
     // Validate file type
     if (isImage) {
       const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/gif']
