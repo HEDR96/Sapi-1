@@ -46,7 +46,7 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
 
     const originalSize = originalSvg.getAttribute('width') || '200'
     const svgInnerHTML = originalSvg.innerHTML
-    const printSize = 300
+    const printSize = 100 // mm, ukuran QR saat cetak
 
     printWindow.document.write(`
       <!DOCTYPE html>
@@ -54,39 +54,31 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
         <head>
           <title>QR Code - ${code}</title>
           <style>
-            @page { size: A4; margin: 15mm; }
-            * { box-sizing: border-box; }
+            @page { size: A4; margin: 0; }
+            * { box-sizing: border-box; margin: 0; padding: 0; }
             html, body {
-              width: 100%;
-              height: 100%;
-              margin: 0;
-              padding: 0;
+              width: 210mm;
+              height: 297mm;
+              overflow: hidden;
             }
             body {
               font-family: 'Segoe UI', Arial, sans-serif;
-              text-align: center;
               display: flex;
-              flex-direction: column;
               align-items: center;
               justify-content: center;
-              min-height: 100vh;
-              padding: 30px;
             }
             .qr-container {
               background: white;
-              padding: 40px;
-              border-radius: 20px;
-              box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-              border: 3px solid #2d5016;
+              padding: 15mm;
+              border-radius: 8mm;
+              border: 1.5mm solid #2d5016;
               display: flex;
               flex-direction: column;
               align-items: center;
               justify-content: center;
+              text-align: center;
             }
             .qr-wrapper {
-              padding: 15px;
-              background: white;
-              border-radius: 12px;
               display: flex;
               align-items: center;
               justify-content: center;
@@ -94,51 +86,42 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
             .qr-wrapper svg {
               display: block;
             }
-            .info {
-              margin-top: 30px;
-              text-align: center;
-              width: 100%;
-            }
             .farm-name {
-              font-size: 14px;
+              font-size: 4mm;
               color: #666;
               text-transform: uppercase;
-              letter-spacing: 2px;
-              margin-bottom: 10px;
+              letter-spacing: 1mm;
+              margin-bottom: 6mm;
+            }
+            .info {
+              margin-top: 8mm;
             }
             .cattle-name {
-              font-size: 28px;
+              font-size: 7mm;
               font-weight: 800;
               color: #2d5016;
-              margin: 5px 0;
+              margin: 1mm 0;
             }
             .cattle-code {
-              font-size: 42px;
+              font-size: 10mm;
               font-weight: 900;
               color: #1a3009;
-              letter-spacing: 4px;
-              margin: 10px 0;
-              padding: 10px 30px;
+              letter-spacing: 1mm;
+              margin: 3mm 0;
+              padding: 3mm 8mm;
               background: linear-gradient(135deg, #f5f5f0, #ffffff);
-              border-radius: 10px;
-              border: 2px solid #e0e0d0;
+              border-radius: 3mm;
+              border: 0.5mm solid #e0e0d0;
             }
             .url {
-              font-size: 12px;
+              font-size: 3mm;
               color: #888;
-              margin-top: 15px;
+              margin-top: 4mm;
             }
             .footer {
-              margin-top: 40px;
-              font-size: 11px;
+              margin-top: 10mm;
+              font-size: 2.8mm;
               color: #999;
-            }
-            @media print {
-              body {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              }
             }
           </style>
         </head>
@@ -154,9 +137,9 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
               <p class="cattle-name">${name}</p>
               <p class="cattle-code">${code}</p>
               <p class="url">${url}</p>
+              <p class="footer">Scan QR Code untuk melihat profil lengkap sapi ini</p>
             </div>
           </div>
-          <p class="footer">Scan QR Code untuk melihat profil lengkap sapi ini</p>
           <script>
             window.onload = function() {
               setTimeout(function() {
