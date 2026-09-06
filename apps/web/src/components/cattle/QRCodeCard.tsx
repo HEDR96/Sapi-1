@@ -41,6 +41,13 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
     const printWindow = window.open('', '_blank')
     if (!printWindow) return
 
+    const originalSvg = document.getElementById(`qr-${code}`)
+    if (!originalSvg) return
+
+    // Ambil ukuran asli SVG supaya viewBox match dan tidak gepeng/kecil saat di-scale
+    const originalSize = originalSvg.getAttribute('width') || '200'
+    const svgInnerHTML = originalSvg.innerHTML
+
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
@@ -72,6 +79,9 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
               background: white;
               border-radius: 12px;
               display: inline-block;
+            }
+            .qr-wrapper svg {
+              display: block;
             }
             .info {
               margin-top: 30px;
@@ -116,8 +126,8 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
           <div class="qr-container">
             <div class="farm-name">samadyafarm.id</div>
             <div class="qr-wrapper">
-              <svg id="qr-${code}" xmlns="http://www.w3.org/2000/svg" width="380" height="380" viewBox="0 0 380 380">
-                ${document.getElementById(`qr-${code}`)?.innerHTML || ''}
+              <svg xmlns="http://www.w3.org/2000/svg" width="380" height="380" viewBox="0 0 ${originalSize} ${originalSize}">
+                ${svgInnerHTML}
               </svg>
             </div>
             <div class="info">
@@ -148,7 +158,7 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
           <QRCodeSVG
             id={`qr-${code}`}
             value={url}
-            size={3000}
+            size={200}
             level="H"
             includeMargin
           />
