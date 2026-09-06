@@ -53,25 +53,21 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  console.log('[DELETE /api/admin/cattle/[id]/weights] request.url:', request.url)
-  console.log('[DELETE /api/admin/cattle/[id]/weights] params.id:', params.id)
+  // params.id is the cattle ID, we need to get the weight record ID from the URL path
+  const url = new URL(request.url)
+  const pathParts = url.pathname.split('/')
+  // URL: /api/admin/cattle/{cattleId}/weights/{weightId}
+  const weightId = pathParts[pathParts.length - 1]
+
+  console.log('[DELETE /api/admin/cattle/[id]/weights] weightId from path:', weightId)
 
   try {
     const admin = await getCurrentAdmin()
-    console.log('[DELETE /api/admin/cattle/[id]/weights] admin:', admin)
     if (!admin) {
-      console.log('[DELETE /api/admin/cattle/[id]/weights] Unauthorized')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Parse URL to get query params
-    const url = new URL(request.url)
-    const weightId = url.searchParams.get('id')
-    console.log('[DELETE /api/admin/cattle/[id]/weights] weightId:', weightId)
-    console.log('[DELETE /api/admin/cattle/[id]/weights] url.search:', url.search)
-
     if (!weightId) {
-      console.log('[DELETE /api/admin/cattle/[id]/weights] No weightId found')
       return NextResponse.json({ error: 'Weight ID is required' }, { status: 400 })
     }
 
@@ -79,7 +75,6 @@ export async function DELETE(
       where: { id: weightId },
     })
 
-    console.log('[DELETE /api/admin/cattle/[id]/weights] Deleted successfully')
     return NextResponse.json({ success: true, message: 'Weight deleted' })
   } catch (error) {
     console.error('Error deleting weight:', error)

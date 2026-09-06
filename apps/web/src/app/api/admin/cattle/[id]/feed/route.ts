@@ -61,7 +61,8 @@ export async function DELETE(
     }
 
     const url = new URL(request.url)
-    const feedId = url.searchParams.get('id')
+    const pathParts = url.pathname.split('/')
+    const feedId = pathParts[pathParts.length - 1]
 
     if (!feedId) {
       return NextResponse.json({ error: 'Feed record ID is required' }, { status: 400 })

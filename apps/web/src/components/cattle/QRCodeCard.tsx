@@ -46,7 +46,7 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
 
     const originalSize = originalSvg.getAttribute('width') || '200'
     const svgInnerHTML = originalSvg.innerHTML
-    const printSize = 1700
+    const printSize = 70
 
     printWindow.document.write(`
       <!DOCTYPE html>
@@ -146,7 +146,7 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
           <div class="qr-container">
             <div class="farm-name">samadyafarm.id</div>
             <div class="qr-wrapper">
-              <svg xmlns="http://www.w3.org/2000/svg" width="${printSize}" height="${printSize}" viewBox="0 0 ${originalSize} ${originalSize}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="${printSize}" height="${printSize}mm" viewBox="0 0 ${originalSize} ${originalSize}">
                 ${svgInnerHTML}
               </svg>
             </div>

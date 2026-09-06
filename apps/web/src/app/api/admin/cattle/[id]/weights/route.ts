@@ -60,7 +60,8 @@ export async function DELETE(
     }
 
     const url = new URL(request.url)
-    const weightId = url.searchParams.get('id')
+    const pathParts = url.pathname.split('/')
+    const weightId = pathParts[pathParts.length - 1]
 
     if (!weightId) {
       return NextResponse.json({ error: 'Weight ID is required' }, { status: 400 })

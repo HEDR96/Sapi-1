@@ -54,25 +54,21 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  console.log('[DELETE /api/admin/cattle/[id]/feed] request.url:', request.url)
-  console.log('[DELETE /api/admin/cattle/[id]/feed] params.id:', params.id)
+  // params.id is the cattle ID, we need to get the feed record ID from the URL path
+  const url = new URL(request.url)
+  const pathParts = url.pathname.split('/')
+  // URL: /api/admin/cattle/{cattleId}/feed/{feedId}
+  const feedId = pathParts[pathParts.length - 1]
+
+  console.log('[DELETE /api/admin/cattle/[id]/feed] feedId from path:', feedId)
 
   try {
     const admin = await getCurrentAdmin()
-    console.log('[DELETE /api/admin/cattle/[id]/feed] admin:', admin)
     if (!admin) {
-      console.log('[DELETE /api/admin/cattle/[id]/feed] Unauthorized')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Parse URL to get query params
-    const url = new URL(request.url)
-    const feedId = url.searchParams.get('id')
-    console.log('[DELETE /api/admin/cattle/[id]/feed] feedId:', feedId)
-    console.log('[DELETE /api/admin/cattle/[id]/feed] url.search:', url.search)
-
     if (!feedId) {
-      console.log('[DELETE /api/admin/cattle/[id]/feed] No feedId found')
       return NextResponse.json({ error: 'Feed record ID is required' }, { status: 400 })
     }
 
@@ -80,7 +76,6 @@ export async function DELETE(
       where: { id: feedId },
     })
 
-    console.log('[DELETE /api/admin/cattle/[id]/feed] Deleted successfully')
     return NextResponse.json({ success: true, message: 'Feed record deleted' })
   } catch (error) {
     console.error('Error deleting feed record:', error)

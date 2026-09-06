@@ -200,7 +200,8 @@ export default function CattleDetailPage() {
   const handleDelete = async (type: string, id: string) => {
     if (!confirm(`Hapus ${type} ini?`)) return
     try {
-      const url = `/api/admin/cattle/${cattleId}/${type}?id=${id}`
+      // Use path parameter instead of query parameter
+      const url = `/api/admin/cattle/${cattleId}/${type}/${id}`
       console.log('[handleDelete] URL:', url)
       const res = await fetch(url, { method: 'DELETE' })
       const data = await res.json()
