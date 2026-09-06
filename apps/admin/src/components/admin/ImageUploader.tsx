@@ -38,9 +38,9 @@ export function ImageUploader({
       return 'Format file tidak didukung. Gunakan JPG, PNG, atau MP4.'
     }
 
-    const maxSizeBytes = isVideoFile ? 500 * 1024 * 1024 : maxSize * 1024 * 1024
+    const maxSizeBytes = isVideoFile ? 100 * 1024 * 1024 : maxSize * 1024 * 1024
     if (file.size > maxSizeBytes) {
-      return `Ukuran file terlalu besar. Maksimal ${isVideoFile ? '500MB' : `${maxSize}MB`}.`
+      return `Ukuran file terlalu besar. Maksimal ${isVideoFile ? '100MB' : `${maxSize}MB`}.`
     }
     return null
   }
@@ -55,104 +55,35 @@ export function ImageUploader({
     setUploading(true)
     setUploadingIsVideo(file.type.startsWith('video/'))
     setError(null)
-    setUploadProgress(5)
+    setUploadProgress(10)
 
     try {
       const uploadFolder = file.type.startsWith('video/') ? 'video' : 'image'
-      const isVideoFile = file.type.startsWith('video/')
 
-      // For small files (<5MB), use server upload
-      // For large files, use direct-to-Google Drive upload
-      const SMALL_FILE_LIMIT = 5 * 1024 * 1024 // 5MB
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('folder', uploadFolder)
 
-      if (file.size <= SMALL_FILE_LIMIT) {
-        // Use server upload for small files
-        setUploadProgress(10)
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('folder', uploadFolder)
+      setUploadProgress(30)
 
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        })
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
 
-        setUploadProgress(80)
+      setUploadProgress(80)
 
-        const data = await response.json()
+      const data = await response.json()
 
-        if (!response.ok) {
-          throw new Error(data.error || 'Gagal mengupload file')
-        }
+      if (!response.ok) {
+        throw new Error(data.error || 'Gagal mengupload file')
+      }
 
-        if (data.url) {
-          onChange(data.url)
-          setUploadProgress(100)
-        } else {
-          throw new Error('URL tidak ditemukan')
-        }
-      } else {
-        // Use direct upload to Google Drive for large files
-        setUploadProgress(10)
-
-        // Step 1: Get resumable upload URL from server
-        const initRes = await fetch('/api/upload-init', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            fileName: file.name,
-            mimeType: file.type,
-            folder: uploadFolder,
-          }),
-        })
-
-        if (!initRes.ok) {
-          const initData = await initRes.json()
-          throw new Error(initData.error || 'Gagal inisialisasi upload')
-        }
-
-        const { fileId, uploadUrl } = await initRes.json()
-        setUploadProgress(30)
-
-        // Step 2: Upload directly to Google Drive using resumable upload
-        const xhr = new XMLHttpRequest()
-
-        await new Promise<void>((resolve, reject) => {
-          xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-              const progress = 30 + (event.loaded / event.total) * 60
-              setUploadProgress(Math.round(progress))
-            }
-          }
-
-          xhr.onload = () => {
-            if (xhr.status === 200 || xhr.status === 201) {
-              resolve()
-            } else {
-              reject(new Error(`Upload gagal: ${xhr.status}`))
-            }
-          }
-
-          xhr.onerror = () => reject(new Error('Gagal upload ke Google Drive'))
-
-          xhr.open('PUT', uploadUrl)
-          xhr.setRequestHeader('Content-Type', file.type)
-          xhr.send(file)
-        })
-
-        setUploadProgress(95)
-
-        // Step 3: Get the file URL
-        const isVideoType = isVideoFile || file.type.includes('video')
-        let publicUrl: string
-        if (isVideoType) {
-          publicUrl = `/api/stream?fileId=${fileId}&mimeType=${encodeURIComponent(file.type)}`
-        } else {
-          publicUrl = `/api/image-proxy?id=${fileId}`
-        }
-
-        onChange(publicUrl)
+      if (data.url) {
+        onChange(data.url)
         setUploadProgress(100)
+      } else {
+        throw new Error('URL tidak ditemukan')
       }
     } catch (err) {
       console.error('Upload error:', err)
