@@ -68,7 +68,7 @@ model Customer {
 model Sale {
   id          String     @id @default(cuid())
   cattleId    String
-  cattle      Cattle     @relation(fields: [cattleId], references: [id])
+  cattle      Cattle     @relation(fields: [cattleId], references: [id], onDelete: Cascade)
   customerId  String
   customer    Customer   @relation(fields: [customerId], references: [id])
   quantity    Int        @default(1)
@@ -89,7 +89,7 @@ model Testimonial {
   order         Int      @default(0)
   createdAt     DateTime @default(now())
   cattleId      String?
-  cattle        Cattle?  @relation(fields: [cattleId], references: [id])
+  cattle        Cattle?  @relation(fields: [cattleId], references: [id], onDelete: SetNull)
 }
 
 model MasterData {

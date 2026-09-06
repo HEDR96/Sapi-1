@@ -257,17 +257,20 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
 
       {/* Dynamic Tag Container - Responsive */}
       <div className="relative flex items-start justify-center lg:justify-end overflow-hidden bg-[#F1EFE2] px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 lg:px-4 lg:pr-2">
-        {/* Combined Pin Hanger + Rope - connected as one unit */}
+        {/* Combined Pin Hanger + Rope - Fully Integrated as One Unit */}
         <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-0 z-30 flex flex-col items-center">
-          {/* Pin Hanger Head */}
-          <div className="h-2 w-5 sm:h-2.5 sm:w-6 rounded-b-md bg-gradient-to-b from-[#5c4328] via-[#7a5c37] to-[#43301b] shadow-md border-x border-b border-[#302111]" />
-          {/* Integrated Rope from pin - no gap, directly connected */}
-          <svg width="4" height="20" viewBox="0 0 6 32" fill="none" className="w-1 sm:w-[6px] h-4 sm:h-8 drop-shadow-sm -mt-0.5 sm:-mt-1">
-            <line x1="3" y1="0" x2="3" y2="32" stroke="#6E5030" strokeWidth="3.5" strokeLinecap="round" />
-            <line x1="3" y1="0" x2="3" y2="32" stroke="#A88B63" strokeWidth="1.5" strokeDasharray="3 3" />
+          {/* Pin Hanger - Shifted slightly right */}
+          <div className="h-2 w-5 sm:h-2.5 sm:w-6 rounded-b-md bg-gradient-to-b from-[#5c4328] via-[#7a5c37] to-[#43301b] shadow-md border-x border-b border-[#302111]"
+               style={{ marginLeft: '4px' }} />
+
+          {/* Single Integrated SVG - Pin bottom + Rope as one continuous piece */}
+          <svg width="12" height="40" viewBox="0 0 12 40" fill="none" className="drop-shadow-sm -mt-0.5 sm:-mt-1">
+            {/* Pin bottom connector circle */}
+            <circle cx="6" cy="6" r="3" fill="#302111" stroke="#8B7355" strokeWidth="1" />
+            {/* Rope - connected directly to pin bottom, no gap */}
+            <line x1="6" y1="9" x2="6" y2="40" stroke="#6E5030" strokeWidth="3.5" strokeLinecap="round" />
+            <line x1="6" y1="9" x2="6" y2="40" stroke="#A88B63" strokeWidth="1.5" strokeDasharray="3 3" />
           </svg>
-          {/* Pin bottom connector - attached to rope */}
-          <div className="-mt-0.5 sm:-mt-1 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full border border-[#8B7355] bg-[#302111]" />
         </div>
 
         <div className="relative mr-0.5 sm:mr-1 lg:mr-0">

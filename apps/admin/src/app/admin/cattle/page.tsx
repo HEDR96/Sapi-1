@@ -85,16 +85,21 @@ export default function AdminCattlePage() {
   }, [])
 
   const handleDelete = async (id: string, code: string) => {
-    if (!confirm(`Hapus sapi ${code}?`)) return
+    if (!confirm(`Hapus sapi ${code}? Tindakan ini tidak dapat dibatalkan.`)) return
 
     setDeleting(id)
     try {
       const res = await fetch(`/api/admin/cattle/${id}`, { method: 'DELETE' })
+      const data = await res.json()
+
       if (res.ok) {
         setCattle((prev) => prev.filter((c) => c.id !== id))
+      } else {
+        alert(`Gagal menghapus sapi: ${data.error || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Failed to delete:', error)
+      alert('Terjadi kesalahan saat menghapus sapi')
     } finally {
       setDeleting(null)
     }

@@ -42,27 +42,98 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
     if (!printWindow) return
 
     printWindow.document.write(`
+      <!DOCTYPE html>
       <html>
         <head>
           <title>QR Code - ${code}</title>
           <style>
-            body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-            .qr-container { margin: 20px auto; }
-            .info { margin-top: 20px; }
+            @page { size: A4; margin: 15mm; }
+            body {
+              font-family: 'Segoe UI', Arial, sans-serif;
+              text-align: center;
+              padding: 30px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              min-height: 100vh;
+              box-sizing: border-box;
+            }
+            .qr-container {
+              background: white;
+              padding: 40px;
+              border-radius: 20px;
+              box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+              margin: 20px auto;
+              border: 3px solid #2d5016;
+            }
+            .qr-wrapper {
+              padding: 15px;
+              background: white;
+              border-radius: 12px;
+              display: inline-block;
+            }
+            .info {
+              margin-top: 30px;
+            }
+            .farm-name {
+              font-size: 14px;
+              color: #666;
+              text-transform: uppercase;
+              letter-spacing: 2px;
+              margin-bottom: 10px;
+            }
+            .cattle-name {
+              font-size: 28px;
+              font-weight: 800;
+              color: #2d5016;
+              margin: 5px 0;
+            }
+            .cattle-code {
+              font-size: 42px;
+              font-weight: 900;
+              color: #1a3009;
+              letter-spacing: 4px;
+              margin: 10px 0;
+              padding: 10px 30px;
+              background: linear-gradient(135deg, #f5f5f0, #ffffff);
+              border-radius: 10px;
+              border: 2px solid #e0e0d0;
+            }
+            .url {
+              font-size: 12px;
+              color: #888;
+              margin-top: 15px;
+            }
+            .footer {
+              margin-top: 40px;
+              font-size: 11px;
+              color: #999;
+            }
           </style>
         </head>
         <body>
           <div class="qr-container">
-            <svg id="qr-${code}" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
-              ${document.getElementById(`qr-${code}`)?.innerHTML || ''}
-            </svg>
+            <div class="farm-name">samadyafarm.id</div>
+            <div class="qr-wrapper">
+              <svg id="qr-${code}" xmlns="http://www.w3.org/2000/svg" width="380" height="380" viewBox="0 0 380 380">
+                ${document.getElementById(`qr-${code}`)?.innerHTML || ''}
+              </svg>
+            </div>
+            <div class="info">
+              <p class="cattle-name">${name}</p>
+              <p class="cattle-code">${code}</p>
+              <p class="url">${url}</p>
+            </div>
           </div>
-          <div class="info">
-            <p><strong>${name}</strong></p>
-            <p>${code}</p>
-            <p>${url}</p>
-          </div>
-          <script>window.print();</script>
+          <p class="footer">Scan QR Code untuk melihat profil lengkap sapi ini</p>
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 300);
+            };
+          </script>
         </body>
       </html>
     `)

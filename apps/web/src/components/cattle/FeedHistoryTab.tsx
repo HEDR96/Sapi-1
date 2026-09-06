@@ -40,7 +40,7 @@ export function FeedHistoryTab({ records }: FeedHistoryTabProps) {
         </div>
         <h3 className="text-lg font-semibold text-[hsl(var(--forest))] mb-2">Belum Ada Data Pakan</h3>
         <p className="text-sm text-[hsl(var(--forest))/60]">
-          Riwayat pakan sapi akan muncul setelah录入 data.
+          Riwayat pakan sapi akan muncul setelah data tersedia.
         </p>
       </div>
     )
@@ -79,7 +79,7 @@ export function FeedHistoryTab({ records }: FeedHistoryTabProps) {
                 <span className="text-sm font-semibold text-[hsl(var(--forest))]">{feedType}</span>
               </div>
               <div className="text-xs text-[hsl(var(--forest))/60]">
-                {data.count} kali录入
+                {data.count} kali
               </div>
             </div>
           )
