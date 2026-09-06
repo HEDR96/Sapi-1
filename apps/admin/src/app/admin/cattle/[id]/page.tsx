@@ -111,6 +111,13 @@ export default function CattleDetailPage() {
 
   useEffect(() => { fetchCattle(); fetchMasterData() }, [cattleId])
 
+  // Refresh master data when tab changes to summary (when user returns from master data page)
+  useEffect(() => {
+    if (activeTab === 'summary') {
+      fetchMasterData()
+    }
+  }, [activeTab])
+
   const fetchCattle = async () => {
     try {
       const res = await fetch(`/api/admin/cattle/${cattleId}`)
