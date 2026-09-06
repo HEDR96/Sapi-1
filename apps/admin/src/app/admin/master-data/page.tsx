@@ -19,7 +19,9 @@ interface MasterData {
 const CATEGORIES = [
   { value: 'JENIS_SAPI', label: 'Jenis Sapi' },
   { value: 'JENIS_PAKAN', label: 'Jenis Pakan' },
+  { value: 'JENIS_KESEHATAN', label: 'Jenis Kesehatan' },
   { value: 'STATUS_SAPI', label: 'Status Sapi' },
+  { value: 'STATUS_KESEHATAN', label: 'Status Kesehatan' },
 ]
 
 export default function MasterDataPage() {
@@ -31,7 +33,6 @@ export default function MasterDataPage() {
   const [editingItem, setEditingItem] = useState<MasterData | null>(null)
   const [form, setForm] = useState({ category: 'JENIS_SAPI', key: '', value: '', order: '0' })
   const [saving, setSaving] = useState(false)
-  const [seeding, setSeeding] = useState(false)
 
   useEffect(() => {
     fetchData()
@@ -155,10 +156,6 @@ export default function MasterDataPage() {
           <p className="text-muted-foreground">Kelola data referensi (jenis sapi, pakan, status)</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleSeed} disabled={seeding}>
-            {seeding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Seed Default
-          </Button>
           <Button onClick={() => { setEditingItem(null); setForm({ category: 'JENIS_SAPI', key: '', value: '', order: '0' }); setModalOpen(true) }}>
             <Plus className="h-4 w-4 mr-2" />
             Tambah Data
@@ -186,7 +183,7 @@ export default function MasterDataPage() {
       ) : filteredItems.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">Belum ada data. Klik &quot;Seed Default&quot; untuk mengisi data awal.</p>
+            <p className="text-muted-foreground">Belum ada data. Klik &quot;Tambah Data&quot; untuk menambahkan data master.</p>
           </CardContent>
         </Card>
       ) : (
