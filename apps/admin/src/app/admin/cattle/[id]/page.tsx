@@ -93,7 +93,11 @@ export default function CattleDetailPage() {
   const fetchMasterData = async () => {
     try {
       setLoadingMasterData(true)
-      const res = await fetch('/api/admin/master-data')
+      // Add cache-busting timestamp
+      const res = await fetch(`/api/admin/master-data?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      })
       if (res.ok) {
         const data = await res.json()
         const items = data.items || []
