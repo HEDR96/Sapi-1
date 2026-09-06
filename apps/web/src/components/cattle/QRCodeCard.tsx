@@ -146,7 +146,7 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
           <div class="qr-container">
             <div class="farm-name">samadyafarm.id</div>
             <div class="qr-wrapper">
-              <svg xmlns="http://www.w3.org/2000/svg" width="${printSize}" height="${printSize}mm" viewBox="0 0 ${originalSize} ${originalSize}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="${printSize}mm" height="${printSize}mm" viewBox="0 0 ${originalSize} ${originalSize}">
                 ${svgInnerHTML}
               </svg>
             </div>

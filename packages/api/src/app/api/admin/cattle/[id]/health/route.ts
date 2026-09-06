@@ -61,8 +61,7 @@ export async function DELETE(
     }
 
     const url = new URL(request.url)
-    const pathParts = url.pathname.split('/')
-    const healthId = pathParts[pathParts.length - 1]
+    const healthId = url.searchParams.get('recordId')
 
     if (!healthId) {
       return NextResponse.json({ error: 'Health record ID is required' }, { status: 400 })

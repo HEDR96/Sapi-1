@@ -54,19 +54,14 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  // params.id is the cattle ID, we need to get the health record ID from the URL path
-  const url = new URL(request.url)
-  const pathParts = url.pathname.split('/')
-  // URL: /api/admin/cattle/{cattleId}/health/{healthId}
-  const healthId = pathParts[pathParts.length - 1]
-
-  console.log('[DELETE /api/admin/cattle/[id]/health] healthId from path:', healthId)
-
   try {
     const admin = await getCurrentAdmin()
     if (!admin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const url = new URL(request.url)
+    const healthId = url.searchParams.get('recordId')
 
     if (!healthId) {
       return NextResponse.json({ error: 'Health record ID is required' }, { status: 400 })

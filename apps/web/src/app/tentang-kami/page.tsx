@@ -195,13 +195,40 @@ export default function TentangKamiPage() {
           </div>
         </div>
 
-        {/* Map Placeholder */}
-        <div className="mt-8 rounded-2xl overflow-hidden bg-[hsl(var(--cream))] aspect-video flex items-center justify-center">
-          <div className="text-center p-8">
-            <MapPin className="h-12 w-12 mx-auto text-[hsl(var(--forest))/40]" />
-            <p className="mt-4 text-sm text-[hsl(var(--forest))/60]">
-              Lokasi Kandang: {contactInfo.farmLocation}
-            </p>
+        {/* Interactive Google Maps */}
+        <div className="mt-8 rounded-2xl overflow-hidden bg-white shadow-md">
+          <div className="p-4 sm:p-6 border-b border-[hsl(var(--line))]">
+            <h3 className="font-display text-lg font-bold text-[hsl(var(--forest))] sm:text-xl">
+              Lokasi Kami
+            </h3>
+            <div className="mt-2 grid gap-2 text-sm text-[hsl(var(--forest))/70]">
+              <p><span className="font-semibold">Kantor:</span> {contactInfo.address}</p>
+              <p><span className="font-semibold">Kandang:</span> {contactInfo.farmLocation}</p>
+            </div>
+          </div>
+          <div className="relative w-full overflow-hidden" style={{ height: '400px' }}>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.2!2d106.7287549!3d-6.31622!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69ef007e797ac9%3A0x712dc421a5c09dda!2sPuri%20Bintaro%20Residence%202%20Cluster%20D!5e0!3m2!1sen!2sid!4v1699999999999!5m2!1sen!2sid"
+              width="100%"
+              height="400"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="absolute inset-0 w-full h-full"
+              title="Lokasi Samadya Farm"
+            />
+          </div>
+          <div className="p-4 sm:p-6 border-t border-[hsl(var(--line))]">
+            <a
+              href="https://www.google.com/maps/place/Puri+Bintaro+Residence+2+Cluster+E+No+E3+Ciputat+Tangerang+Selatan"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--forest))] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[hsl(var(--forest2))]"
+            >
+              <MapPin className="h-4 w-4" />
+              Buka di Google Maps
+            </a>
           </div>
         </div>
       </section>
