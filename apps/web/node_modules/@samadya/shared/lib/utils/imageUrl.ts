@@ -50,24 +50,23 @@ export function getDirectImageUrl(path: string | null | undefined): string {
 
 /**
  * Get direct video URL for display
- * Automatically proxies Google Drive videos to bypass CORS
+ * Automatically proxies Google Drive videos to bypass ORB blocking
  */
 export function getVideoUrl(path: string | null | undefined): string {
   if (!path) return ''
+
+  // If it's a stream URL (like /api/stream?fileId=xxx), return as-is
+  if (path.startsWith('/api/stream') || path.startsWith('/api/videos')) {
+    return path
+  }
 
   // If it's already an absolute URL (external), check if it's Google Drive
   if (path.startsWith('http://') || path.startsWith('https://')) {
     const driveFileId = extractDriveFileId(path)
     if (driveFileId) {
-      // For videos, use a different proxy or direct URL
-      // Google Drive videos need special handling
-      return `https://drive.google.com/uc?export=download&id=${driveFileId}`
+      // Use /api/stream proxy for Google Drive videos to bypass ORB
+      return `/api/stream?fileId=${driveFileId}`
     }
-    return path
-  }
-
-  // If it's a stream URL (like /api/stream?fileId=xxx), return as-is
-  if (path.startsWith('/api/stream') || path.startsWith('/api/videos')) {
     return path
   }
 
