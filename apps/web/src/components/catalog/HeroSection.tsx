@@ -148,29 +148,32 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
 
   return (
     <section ref={heroRef} className="reveal mx-auto grid max-w-full grid-cols-1 items-stretch md:grid-cols-[3.3fr_2.1fr_.9fr]">
-      {/* Image Slider - Responsive height */}
-      <div className="hero-photo relative min-h-[140px] xs:min-h-[160px] sm:min-h-[200px] md:min-h-[280px] lg:min-h-[350px] xl:min-h-[450px] 2xl:min-h-[520px] overflow-hidden">
-        {/* Loading Placeholder - Shows when data is being fetched */}
-        {showLoading ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[hsl(var(--cream))]">
-            <Loader2 className="h-6 w-6 xs:h-8 xs:w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 animate-spin text-[hsl(var(--forest))] mb-1 sm:mb-2 md:mb-3" />
-            <p className="text-[8px] xs:text-[9px] sm:text-xs font-semibold text-[hsl(var(--forest))]">Memuat...</p>
-          </div>
-        ) : currentCattle?.mainImage ? (
-          <div
-            className="absolute inset-0 transition-opacity duration-500"
-            style={{
-              background: `url('${getDirectImageUrl(currentCattle.mainImage)}') center/cover no-repeat`,
-            }}
-          />
-        ) : (
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `url('https://images.unsplash.com/photo-1551750590-90f231373f73?auto=format&fit=crop&w=1600&q=85') center/cover no-repeat`,
-            }}
-          />
-        )}
+      {/* Image Slider - Mobile uses aspect ratio, desktop uses height */}
+      <div className="hero-photo relative w-full md:min-h-[280px] lg:min-h-[350px] xl:min-h-[450px] 2xl:min-h-[520px] overflow-hidden">
+        {/* Mobile: Aspect ratio container */}
+        <div className="relative w-full aspect-[16/10] md:aspect-auto md:absolute md:inset-0">
+          {/* Image */}
+          {showLoading ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[hsl(var(--cream))]">
+              <Loader2 className="h-6 w-6 xs:h-8 xs:w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 animate-spin text-[hsl(var(--forest))] mb-1 sm:mb-2 md:mb-3" />
+              <p className="text-[8px] xs:text-[9px] sm:text-xs font-semibold text-[hsl(var(--forest))]">Memuat...</p>
+            </div>
+          ) : currentCattle?.mainImage ? (
+            <div
+              className="absolute inset-0 transition-opacity duration-500"
+              style={{
+                background: `url('${getDirectImageUrl(currentCattle.mainImage)}') center/cover no-repeat`,
+              }}
+            />
+          ) : (
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `url('https://images.unsplash.com/photo-1551750590-90f231373f73?auto=format&fit=crop&w=1600&q=85') center/cover no-repeat`,
+              }}
+            />
+          )}
+        </div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/12 via-transparent to-transparent" />
 
         {/* Slider Arrows - Only show when not loading and has multiple cattle */}
@@ -262,21 +265,21 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
           {/* Pin Hanger - Wooden board at top */}
           <div className="h-2.5 w-6 sm:h-3 sm:w-7 rounded-b-lg bg-gradient-to-b from-[#5c4328] via-[#7a5c37] to-[#43301b] shadow-md" />
 
-          {/* Single SVG: Pin Circle + Rope as ONE CONTINUOUS piece - NO GAP */}
-          <svg width="10" height="50" viewBox="0 0 10 50" fill="none" className="drop-shadow-sm">
-            {/* Pin Circle - directly attached to hanger bottom, no gap */}
+          {/* Single SVG: Pin Circle + Long Rope - extends to card */}
+          <svg width="10" height="140" viewBox="0 0 10 140" fill="none" className="drop-shadow-sm">
+            {/* Pin Circle - directly attached to hanger */}
             <circle cx="5" cy="5" r="5" fill="#302111" stroke="#8B7355" strokeWidth="1.5" />
-            {/* Rope - starts exactly where circle ends (y=10), completely connected */}
-            <rect x="2" y="10" width="6" height="40" rx="3" fill="#6E5030" />
+            {/* Long Rope - extends all the way down to card */}
+            <rect x="2" y="10" width="6" height="130" rx="3" fill="#6E5030" />
             {/* Rope texture line */}
-            <line x1="5" y1="10" x2="5" y2="50" stroke="#A88B63" strokeWidth="1.5" strokeDasharray="3 3" />
+            <line x1="5" y1="10" x2="5" y2="140" stroke="#A88B63" strokeWidth="1.5" strokeDasharray="3 3" />
           </svg>
         </div>
 
         <div className="relative mr-0.5 sm:mr-1 lg:mr-0">
           <div
             key={currentCattle?.id || 'default'}
-            className="paper-pull-up relative z-10 flex flex-col items-center mt-[-6px]"
+            className="paper-pull-up relative z-10 flex flex-col items-center mt-[-10px]"
           >
 
             {/* Tag Card - Fully Responsive, attached to rope */}

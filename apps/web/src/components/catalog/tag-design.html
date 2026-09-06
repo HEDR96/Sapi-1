@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pin Hanger + Rope + Card - Seamless Design</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #F1EFE2;
+      min-height: 100vh;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+    h2 { color: #2d5016; margin-bottom: 10px; }
+    h3 { color: #444; font-weight: 500; margin-bottom: 5px; }
+
+    .container {
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 300px;
+    }
+
+    .seamless-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .pin-hanger {
+      width: 36px;
+      height: 16px;
+      background: linear-gradient(to bottom, #5c4328, #7a5c37, #43301b);
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .integrated-rope {
+      width: 10px;
+      height: 120px;
+      display: block;
+    }
+
+    .tag-card {
+      width: 150px;
+      background: linear-gradient(to bottom, #F7F3E9, #F0EAD8, #E3D9C2);
+      border: 1.5px solid #D4C9B0;
+      border-radius: 18px;
+      padding: 12px 14px 16px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(40,30,15,0.2);
+      margin-top: -8px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .eyelet {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, #D4AF37, #AA7C11, #5B430B);
+      border-radius: 50%;
+      border: 2px solid #9E7B4F;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+
+    .eyelet-inner {
+      width: 10px;
+      height: 10px;
+      background: #302111;
+      border-radius: 50%;
+    }
+
+    .rope-through-eyelet {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 20px;
+      background: linear-gradient(to bottom, #6E5030, #8B7355);
+      border-radius: 4px;
+      z-index: 5;
+    }
+
+    .tag-website {
+      font-size: 11px;
+      font-weight: 800;
+      color: #2d5016;
+      letter-spacing: 0.02em;
+      margin-top: 4px;
+    }
+
+    .tag-subtitle {
+      font-size: 6px;
+      font-weight: 600;
+      color: #2d5016;
+      opacity: 0.7;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .tag-code {
+      background: linear-gradient(to bottom, #fff, #F4EFE2);
+      border: 1px solid #D4C9B0;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 18px;
+      font-weight: 900;
+      color: #2d5016;
+      margin: 8px 0;
+    }
+
+    .tag-breed {
+      font-size: 10px;
+      font-weight: 700;
+      color: #2d5016;
+      text-transform: uppercase;
+    }
+
+    .tag-gender {
+      font-size: 9px;
+      font-weight: 600;
+      color: #2d5016;
+      opacity: 0.8;
+      text-transform: uppercase;
+    }
+
+    .tag-qr {
+      width: 65px;
+      height: 65px;
+      background: white;
+      border: 1px solid #D4C9B0;
+      border-radius: 4px;
+      margin: 8px auto 0;
+      padding: 3px;
+    }
+
+    .tag-qr img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .tag-footer {
+      font-size: 6px;
+      font-weight: 700;
+      color: #2d5016;
+      opacity: 0.75;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    .instructions {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+      max-width: 350px;
+    }
+
+    .instructions h4 {
+      color: #856404;
+      margin-bottom: 8px;
+    }
+
+    .instructions ul {
+      color: #856404;
+      font-size: 13px;
+      padding-left: 20px;
+      line-height: 1.6;
+    }
+
+    .instructions li strong {
+      color: #155724;
+    }
+  </style>
+</head>
+<body>
+  <h2>DESIGN: Pin Hanger + Rope + Card (SEAMLESS)</h2>
+
+  <div class="container">
+    <h3>The Seamless Design</h3>
+
+    <div class="seamless-unit">
+      <div class="pin-hanger"></div>
+
+      <svg class="integrated-rope" viewBox="0 0 10 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="5" cy="5" r="5" fill="#302111" stroke="#8B7355" stroke-width="1.5"/>
+        <rect x="2" y="10" width="6" height="110" rx="3" fill="#6E5030"/>
+        <line x1="5" y1="10" x2="5" y2="120" stroke="#A88B63" stroke-width="1.5" stroke-dasharray="3 3"/>
+      </svg>
+
+      <div class="tag-card">
+        <div class="eyelet">
+          <div class="eyelet-inner"></div>
+        </div>
+        <div class="rope-through-eyelet"></div>
+
+        <div class="tag-website">samadyafarm.id</div>
+        <div class="tag-subtitle">Sapi Pilihan</div>
+        <div class="tag-code">NF-0001</div>
+        <div class="tag-breed">Limousin</div>
+        <div class="tag-gender">Jantan</div>
+        <div class="tag-qr">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=/sapi/NF-0001" alt="QR">
+        </div>
+        <div class="tag-footer">Scan untuk Profil</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <h4>Key Design Points:</h4>
+    <ul>
+      <li><strong>Rope extends FULL length</strong> - from hanger to bottom of card</li>
+      <li><strong>Tag card uses margin-top: -8px</strong> - overlaps with rope, NO GAP</li>
+      <li><strong>Eyelet positioned ABOVE card</strong> with top: -12px</li>
+      <li><strong>Rope passes THROUGH eyelet</strong> - visual connection</li>
+      <li><strong>All z-index properly set</strong> - rope behind eyelet behind card</li>
+    </ul>
+  </div>
+</body>
+</html>

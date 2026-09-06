@@ -49,3 +49,31 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to create health record' }, { status: 500 })
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const admin = await getCurrentAdmin()
+    if (!admin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { searchParams } = new URL(request.url)
+    const healthId = searchParams.get('id')
+
+    if (!healthId) {
+      return NextResponse.json({ error: 'Health record ID is required' }, { status: 400 })
+    }
+
+    await prisma.cattleHealthRecord.delete({
+      where: { id: healthId },
+    })
+
+    return NextResponse.json({ success: true, message: 'Health record deleted' })
+  } catch (error) {
+    console.error('Error deleting health record:', error)
+    return NextResponse.json({ error: 'Failed to delete health record' }, { status: 500 })
+  }
+}
