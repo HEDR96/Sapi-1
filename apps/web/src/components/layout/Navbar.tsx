@@ -7,7 +7,7 @@ import { ShieldCheck, Phone, Menu, X } from 'lucide-react'
 const navLinks = [
   { href: '/', label: 'Beranda' },
   { href: '/katalog', label: 'Katalog' },
-  { href: '/#tentang', label: 'Tentang Kami' },
+  { href: '/tentang-kami', label: 'Tentang Kami' },
 ]
 
 export function Navbar() {
@@ -43,11 +43,11 @@ export function Navbar() {
         {/* Desktop Actions - Phone only */}
         <div className="hidden items-center gap-2 md:flex">
           <a
-            href="tel:0812-3456-7890"
+            href="tel:0859-3561-0197"
             className="flex items-center gap-1.5 rounded-md border border-white/30 bg-white/10 px-3 py-2 text-[10px] font-semibold text-white transition-colors hover:bg-white/20"
           >
             <Phone className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">0812-3456-7890</span>
+            <span className="hidden sm:inline">0859-3561-0197</span>
           </a>
         </div>
 
@@ -79,11 +79,11 @@ export function Navbar() {
           ))}
           <div className="mt-2">
             <a
-              href="tel:0812-3456-7890"
+              href="https://api.whatsapp.com/send?phone=6285935610197&text=Halo%2C%20saya%20ingin%20bertanya%20mengenai%20sapi"
               className="flex items-center justify-center gap-2 rounded-md border border-white/30 bg-white/10 px-3 py-2 text-center text-[11px] font-semibold text-white"
             >
               <Phone className="h-3.5 w-3.5" />
-              0812-3456-7890
+              0859-3561-0197
             </a>
           </div>
         </nav>

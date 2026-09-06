@@ -8,16 +8,16 @@ const menuLinks = [
 ]
 
 const infoLinks = [
-  { href: '/#tentang', label: 'Tentang Kami' },
+  { href: '/tentang-kami', label: 'Tentang Kami' },
   { href: '/#blog', label: 'Blog' },
   { href: '/#kontak', label: 'Kontak' },
 ]
 
 const socialLinks = [
-  { icon: Instagram, href: '#', label: 'Instagram' },
-  { icon: Facebook, href: '#', label: 'Facebook' },
+  { icon: Instagram, href: 'https://instagram.com/samadyafarm.id', label: 'Instagram' },
+  { icon: Facebook, href: 'https://www.facebook.com/samadyafarm.id', label: 'Facebook' },
   { icon: Play, href: '#', label: 'YouTube' },
-  { icon: Music2, href: '#', label: 'TikTok' },
+  { icon: Music2, href: 'https://www.tiktok.com/@samadyafarm.id', label: 'TikTok' },
 ]
 
 export function Footer() {
@@ -74,11 +74,11 @@ export function Footer() {
         <div>
           <h4 className="mb-2 text-[11px] font-bold text-[hsl(var(--forest))]">Kontak Kami</h4>
           <ul className="space-y-1.5 text-[10px] text-[hsl(var(--forest))/65]">
-            <li>0812-3456-7890</li>
-            <li>halo@nusafarm.id</li>
+            <li>0859-3561-0197</li>
+            <li>samadyafarm@gmail.com</li>
             <li>
-              Kandang Utama samadyafarm.id,<br />
-              Kab. Bogor, Jawa Barat
+              Puri Bintaro Residence 2 Cluster E No E3 Ciputat Tangerang Selatan<br />
+              Cimpaeun, Tapos, Depok
             </li>
           </ul>
         </div>
