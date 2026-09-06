@@ -34,6 +34,7 @@ export function ImageUploader({
   const [uploadingIsVideo, setUploadingIsVideo] = useState(false)
   const [compressing, setCompressing] = useState(false)
   const [statusText, setStatusText] = useState('')
+  const [ffmpegReady, setFfmpegReady] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const ffmpegRef = useRef<FFmpeg | null>(null)
@@ -66,6 +67,7 @@ export function ImageUploader({
             wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
           })
           ffmpegLoaded.current = true
+          setFfmpegReady(true)
           console.log('[ImageUploader] FFmpeg loaded from:', baseURL)
           return
         } catch (err) {
@@ -75,6 +77,7 @@ export function ImageUploader({
 
       console.error('[ImageUploader] All CDNs failed')
       ffmpegLoaded.current = false
+      setFfmpegReady(false)
     }
 
     loadFFmpeg()
@@ -123,6 +126,7 @@ export function ImageUploader({
           })
           ffmpegLoaded.current = true
           loaded = true
+          setFfmpegReady(true)
           console.log('[ImageUploader] FFmpeg loaded from:', baseURL)
           break
         } catch (cdnErr) {
@@ -233,6 +237,20 @@ export function ImageUploader({
 
       // Compress video if it's larger than 4MB (Vercel limit)
       if (isVideoFile && file.size > MAX_DIRECT_UPLOAD_SIZE) {
+        // Wait for FFmpeg to be ready (max 10 seconds)
+        if (!ffmpegReady && !ffmpegLoaded.current) {
+          setStatusText('Memuat compressor...')
+          const startTime = Date.now()
+          while (!ffmpegLoaded.current && Date.now() - startTime < 10000) {
+            await new Promise(resolve => setTimeout(resolve, 500))
+          }
+        }
+
+        if (!ffmpegLoaded.current) {
+          // FFmpeg failed to load - show manual compression message
+          throw new Error('Video compressor belum siap. Silakan kompres video terlebih dahulu (maksimal 4MB) atau coba lagi dalam beberapa saat.')
+        }
+
         try {
           fileToUpload = await compressVideo(file)
         } catch (compressErr) {
@@ -463,6 +481,16 @@ export function ImageUploader({
             <p className="text-xs text-[hsl(var(--forest))/40] mt-1">
               JPG, PNG - Maksimal {maxSize}MB | Video - Maksimal 4MB (otomatis compress jika lebih besar)
             </p>
+            {!ffmpegReady && (
+              <p className="text-xs text-yellow-600 mt-1">
+                Memuat compressor video...
+              </p>
+            )}
+            {ffmpegReady && (
+              <p className="text-xs text-green-600 mt-1">
+                ✓ Compressor siap
+              </p>
+            )}
           </>
         )}
         <input
