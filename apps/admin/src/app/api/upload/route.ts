@@ -36,16 +36,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check content-length header for size validation
-    const contentLength = request.headers.get('content-length')
-    const maxSizeBytes = 100 * 1024 * 1024 // 100MB max
-    if (contentLength && parseInt(contentLength) > maxSizeBytes) {
-      return NextResponse.json(
-        { error: 'Ukuran file terlalu besar. Maksimal 100MB.' },
-        { status: 413 }
-      )
-    }
-
     // Note: Token refresh happens automatically in uploadToGoogleDrive()
     // If token is expired, it will be refreshed automatically
 
