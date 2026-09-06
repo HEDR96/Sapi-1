@@ -85,7 +85,7 @@ export function ImageUploader({
       } else {
         // Non-JSON response (like HTML error page) - create error from status
         if (response.status === 413) {
-          setError('Ukuran file terlalu besar. Maksimal 100MB.')
+          setError('Ukuran file terlalu besar. Periksa ukuran file atau coba kompres video.')
         } else if (response.status === 401) {
           setError('Tidak authorized. Silakan login ulang.')
         } else {

@@ -2,13 +2,21 @@
   "framework": "nextjs",
   "buildCommand": "npm run generate --workspace=@samadya/prisma && npm run build --workspace=@samadya/admin",
   "devCommand": "npm run dev --workspace=@samadya/admin",
+  "functions": {
+    "**/api/upload": {
+      "maxDuration": 300
+    },
+    "**/api/admin/media": {
+      "maxDuration": 300
+    }
+  },
   "headers": [
     {
       "source": "/api/upload",
       "headers": [
         {
           "key": "Body-Size-Limit",
-          "value": "209715200"
+          "value": "524288000"
         }
       ]
     },
@@ -17,7 +25,7 @@
       "headers": [
         {
           "key": "Body-Size-Limit",
-          "value": "209715200"
+          "value": "524288000"
         }
       ]
     }
