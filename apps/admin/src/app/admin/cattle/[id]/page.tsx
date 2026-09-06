@@ -200,7 +200,14 @@ export default function CattleDetailPage() {
   const handleDelete = async (type: string, id: string) => {
     if (!confirm(`Hapus ${type} ini?`)) return
     try {
-      await fetch(`/api/admin/cattle/${cattleId}/${type}?id=${id}`, { method: 'DELETE' })
+      const url = `/api/admin/cattle/${cattleId}/${type}?id=${id}`
+      console.log('[handleDelete] URL:', url)
+      const res = await fetch(url, { method: 'DELETE' })
+      const data = await res.json()
+      console.log('[handleDelete] Response:', data)
+      if (!res.ok) {
+        alert(`Gagal hapus: ${data.error}`)
+      }
       fetchCattle()
     } catch (error) { console.error('Failed to delete:', error) }
   }

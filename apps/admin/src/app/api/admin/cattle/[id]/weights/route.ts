@@ -53,17 +53,24 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  console.log('[DELETE /api/admin/cattle/[id]/weights] Called')
+  console.log('[DELETE /api/admin/cattle/[id]/weights] request.url:', request.url)
+
   try {
     const admin = await getCurrentAdmin()
     if (!admin) {
+      console.log('[DELETE /api/admin/cattle/[id]/weights] Unauthorized')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Parse URL to get query params
     const url = new URL(request.url)
     const weightId = url.searchParams.get('id')
+    console.log('[DELETE /api/admin/cattle/[id]/weights] weightId:', weightId)
+    console.log('[DELETE /api/admin/cattle/[id]/weights] url.searchParams:', url.searchParams.toString())
 
     if (!weightId) {
+      console.log('[DELETE /api/admin/cattle/[id]/weights] No weightId found')
       return NextResponse.json({ error: 'Weight ID is required' }, { status: 400 })
     }
 
@@ -71,6 +78,7 @@ export async function DELETE(
       where: { id: weightId },
     })
 
+    console.log('[DELETE /api/admin/cattle/[id]/weights] Success')
     return NextResponse.json({ success: true, message: 'Weight deleted' })
   } catch (error) {
     console.error('Error deleting weight:', error)
