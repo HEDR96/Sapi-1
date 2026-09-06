@@ -148,7 +148,7 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
           <QRCodeSVG
             id={`qr-${code}`}
             value={url}
-            size={200}
+            size={3000}
             level="H"
             includeMargin
           />
