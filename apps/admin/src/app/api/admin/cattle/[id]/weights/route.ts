@@ -53,11 +53,12 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  console.log('[DELETE /api/admin/cattle/[id]/weights] Called')
   console.log('[DELETE /api/admin/cattle/[id]/weights] request.url:', request.url)
+  console.log('[DELETE /api/admin/cattle/[id]/weights] params.id:', params.id)
 
   try {
     const admin = await getCurrentAdmin()
+    console.log('[DELETE /api/admin/cattle/[id]/weights] admin:', admin)
     if (!admin) {
       console.log('[DELETE /api/admin/cattle/[id]/weights] Unauthorized')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -67,7 +68,7 @@ export async function DELETE(
     const url = new URL(request.url)
     const weightId = url.searchParams.get('id')
     console.log('[DELETE /api/admin/cattle/[id]/weights] weightId:', weightId)
-    console.log('[DELETE /api/admin/cattle/[id]/weights] url.searchParams:', url.searchParams.toString())
+    console.log('[DELETE /api/admin/cattle/[id]/weights] url.search:', url.search)
 
     if (!weightId) {
       console.log('[DELETE /api/admin/cattle/[id]/weights] No weightId found')
@@ -78,7 +79,7 @@ export async function DELETE(
       where: { id: weightId },
     })
 
-    console.log('[DELETE /api/admin/cattle/[id]/weights] Success')
+    console.log('[DELETE /api/admin/cattle/[id]/weights] Deleted successfully')
     return NextResponse.json({ success: true, message: 'Weight deleted' })
   } catch (error) {
     console.error('Error deleting weight:', error)

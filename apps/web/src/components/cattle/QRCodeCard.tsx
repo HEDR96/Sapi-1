@@ -46,7 +46,7 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
 
     const originalSize = originalSvg.getAttribute('width') || '200'
     const svgInnerHTML = originalSvg.innerHTML
-    const printSize = 2000 // ukuran QR saat dicetak (px)
+    const printSize = 1700
 
     printWindow.document.write(`
       <!DOCTYPE html>
