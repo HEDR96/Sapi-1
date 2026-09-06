@@ -44,6 +44,10 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
 
   const isAvailable = cattle.status === 'AVAILABLE'
 
+  // WhatsApp messages
+  const whatsappInquiryText = `Halo,%20saya%20ingin%20bertanya%20mengenai%20sapi%20dengan%20ID%20${cattle.code}%20(${cattle.name})`
+  const whatsappBookingText = `Halo,%20saya%20ingin%20melakukan%20booking%20untuk%20sapi%20ID%20${cattle.code}%20(${cattle.name})`
+
   // Collect all images (excluding video URLs from mainImage)
   const allImages = [
     cattle.mainImage,
@@ -210,7 +214,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
               {/* Action Buttons */}
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <a
-                  href={`https://wa.me/6281234567890?text=Halo,%20saya%20tertarik%20dengan%20sapi%20${cattle.name}%20(${cattle.code})`}
+                  href={`https://wa.me/6281234567890?text=${whatsappInquiryText}`}
                   className="flex items-center justify-center gap-1.5 rounded-lg bg-[hsl(var(--forest))] px-2 py-2.5 text-[11px] font-semibold text-white hover:bg-[hsl(var(--forest2))] transition-colors"
                 >
                   <MessageCircle className="h-4 w-4" />
@@ -226,13 +230,13 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
               </div>
 
               {isAvailable && (
-                <button
-                  onClick={handleBookingClick}
+                <a
+                  href={`https://wa.me/6281234567890?text=${whatsappBookingText}`}
                   className="mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg bg-[hsl(var(--gold))] px-2 py-2.5 text-[11px] font-semibold text-[hsl(var(--forest))] hover:bg-[hsl(var(--gold))/90] transition-colors"
                 >
                   <Check className="h-4 w-4" />
                   Booking Sekarang
-                </button>
+                </a>
               )}
 
               {/* Quick Details - Compact */}
@@ -435,7 +439,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
               {/* Action Buttons */}
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <a
-                  href={`https://wa.me/6281234567890?text=Halo,%20saya%20tertarik%20dengan%20sapi%20${cattle.name}%20(${cattle.code})`}
+                  href={`https://wa.me/6281234567890?text=${whatsappInquiryText}`}
                   className="flex items-center justify-center gap-2 rounded-lg bg-[hsl(var(--forest))] px-3 py-3 text-[12px] font-semibold text-white hover:bg-[hsl(var(--forest2))] transition-colors"
                 >
                   <MessageCircle className="h-4 w-4" />
@@ -449,13 +453,13 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
                   Bagikan
                 </button>
                 {isAvailable && (
-                  <button
-                    onClick={handleBookingClick}
+                  <a
+                    href={`https://wa.me/6281234567890?text=${whatsappBookingText}`}
                     className="col-span-2 flex items-center justify-center gap-2 rounded-lg bg-[hsl(var(--gold))] px-3 py-3 text-[12px] font-semibold text-[hsl(var(--forest))] hover:bg-[hsl(var(--gold))/90] transition-colors"
                   >
                     <Check className="h-4 w-4" />
                     Booking Sekarang
-                  </button>
+                  </a>
                 )}
               </div>
             </aside>
