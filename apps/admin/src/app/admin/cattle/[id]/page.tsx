@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { ArrowLeft, Loader2, Plus, Pencil, Trash2, Scale, Heart, UtensilsCrossed, Image as ImageIcon } from 'lucide-react'
+import { ArrowLeft, Loader2, Plus, Pencil, Trash2, Scale, Heart, UtensilsCrossed, Image as ImageIcon, X } from 'lucide-react'
 import { Button } from '@samadya/shared/components/ui/button'
 import { Input } from '@samadya/shared/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@samadya/shared/components/ui/card'
@@ -66,7 +66,7 @@ export default function CattleDetailPage() {
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({ code: '', name: '', breed: '', status: 'AVAILABLE', birthDate: '', height: '', price: '', targetWeight: '', description: '', mainImage: '', buyPrice: '', sellPrice: '', healthCost: '', feedCost: '' })
-  const [uploadedMediaUrl, setUploadedMediaUrl] = useState<string>('')
+  const [uploadedMediaUrls, setUploadedMediaUrls] = useState<string[]>([])
   const [mediaSaving, setMediaSaving] = useState(false)
 
   // Master data states
@@ -420,42 +420,79 @@ export default function CattleDetailPage() {
           <Card>
             <CardHeader><CardTitle>Dokumentasi</CardTitle><CardDescription>Foto dan video dokumentasi sapi</CardDescription></CardHeader>
             <CardContent>
-              <div className="mb-6">
+              <div className="mb-6 space-y-4">
                 <Label>Upload Foto/Video</Label>
-                <ImageUploader
-                  folder="cattle"
-                  value={uploadedMediaUrl}
-                  onChange={async (url) => {
-                    if (url) {
-                      setMediaSaving(true)
-                      try {
-                        const isVideo = url.includes('/api/stream')
-                        const res = await fetch('/api/admin/media', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            cattleId: cattleId,
-                            fileUrl: url,
-                            fileType: isVideo ? 'VIDEO' : 'IMAGE',
-                            category: 'GENERAL',
-                          }),
-                        })
-                        if (res.ok) {
-                          setUploadedMediaUrl('')
+                {uploadedMediaUrls.map((url, index) => (
+                  <div key={index} className="relative">
+                    <ImageUploader
+                      folder="cattle"
+                      value={url}
+                      onChange={(newUrl) => {
+                        const updated = [...uploadedMediaUrls]
+                        updated[index] = newUrl
+                        setUploadedMediaUrls(updated)
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setUploadedMediaUrls(uploadedMediaUrls.filter((_, i) => i !== index))}
+                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      title="Hapus"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setUploadedMediaUrls([...uploadedMediaUrls, ''])}
+                  className="w-full"
+                >
+                  <Plus className="h-4 w-4 mr-2" />Tambah Foto/Video Lain
+                </Button>
+                {uploadedMediaUrls.filter(u => u).length > 0 && (
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={async () => {
+                        const validUrls = uploadedMediaUrls.filter(u => u)
+                        if (validUrls.length === 0) return
+                        setMediaSaving(true)
+                        try {
+                          for (const url of validUrls) {
+                            const isVideo = url.includes('/api/stream')
+                            const res = await fetch('/api/admin/media', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                cattleId: cattleId,
+                                fileUrl: url,
+                                fileType: isVideo ? 'VIDEO' : 'IMAGE',
+                                category: 'GENERAL',
+                              }),
+                            })
+                            if (!res.ok) {
+                              const data = await res.json()
+                              throw new Error(data.error || 'Gagal menyimpan media')
+                            }
+                          }
+                          setUploadedMediaUrls([])
                           fetchCattle()
-                        } else {
-                          const data = await res.json()
-                          alert(data.error || 'Gagal menyimpan media')
+                          alert('Media berhasil disimpan!')
+                        } catch (err: any) {
+                          console.error('Failed to save media:', err)
+                          alert(err.message || 'Terjadi kesalahan saat menyimpan media')
+                        } finally {
+                          setMediaSaving(false)
                         }
-                      } catch (err) {
-                        console.error('Failed to save media:', err)
-                        alert('Terjadi kesalahan saat menyimpan media')
-                      } finally {
-                        setMediaSaving(false)
-                      }
-                    }
-                  }}
-                />
+                      }}
+                      disabled={mediaSaving}
+                    >
+                      {mediaSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Simpan Semua Media
+                    </Button>
+                  </div>
+                )}
               </div>
               {cattle.media && cattle.media.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{cattle.media.map((m) => (

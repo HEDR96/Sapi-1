@@ -76,7 +76,23 @@ export function ImageUploader({
 
       setUploadProgress(80)
 
-      const data = await response.json()
+      // Try to parse as JSON, but handle non-JSON responses gracefully
+      let data: { error?: string; url?: string }
+      const contentType = response.headers.get('content-type')
+
+      if (contentType?.includes('application/json')) {
+        data = await response.json()
+      } else {
+        // Non-JSON response (like HTML error page) - create error from status
+        if (response.status === 413) {
+          setError('Ukuran file terlalu besar. Maksimal 100MB.')
+        } else if (response.status === 401) {
+          setError('Tidak authorized. Silakan login ulang.')
+        } else {
+          setError(`Upload gagal (${response.status})`)
+        }
+        return
+      }
 
       if (!response.ok) {
         setError(data.error || 'Gagal mengupload file')
@@ -91,8 +107,13 @@ export function ImageUploader({
       }
     } catch (err) {
       console.error('Upload error:', err)
+      // Check if it's a network error (like "Failed to fetch")
       const errorMessage = err instanceof Error ? err.message : 'Terjadi kesalahan saat mengupload'
-      setError(`Upload gagal: ${errorMessage}`)
+      if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
+        setError('Tidak dapat terhubung ke server. Periksa koneksi internet Anda.')
+      } else {
+        setError(`Upload gagal: ${errorMessage}`)
+      }
     } finally {
       setUploading(false)
       setUploadingIsVideo(false)
