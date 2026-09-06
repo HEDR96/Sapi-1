@@ -4,29 +4,28 @@
   "devCommand": "npm run dev --workspace=@samadya/admin",
   "functions": {
     "**/api/upload": {
-      "maxDuration": 300
+      "maxDuration": 300,
+      "memorySize": 3008
+    },
+    "**/api/upload-init": {
+      "maxDuration": 60
     },
     "**/api/admin/media": {
-      "maxDuration": 300
+      "maxDuration": 300,
+      "memorySize": 3008
     }
   },
   "headers": [
     {
       "source": "/api/upload",
       "headers": [
-        {
-          "key": "Body-Size-Limit",
-          "value": "524288000"
-        }
+        { "key": "Body-Size-Limit", "value": "104857600" }
       ]
     },
     {
       "source": "/api/admin/media",
       "headers": [
-        {
-          "key": "Body-Size-Limit",
-          "value": "524288000"
-        }
+        { "key": "Body-Size-Limit", "value": "104857600" }
       ]
     }
   ]
