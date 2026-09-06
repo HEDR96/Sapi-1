@@ -59,8 +59,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { searchParams } = new URL(request.url)
-    const weightId = searchParams.get('id')
+    const weightId = request.nextUrl.searchParams.get('id')
 
     if (!weightId) {
       return NextResponse.json({ error: 'Weight ID is required' }, { status: 400 })

@@ -261,7 +261,7 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
       {/* Dynamic Tag Container - Responsive */}
       <div className="relative flex items-start justify-center lg:justify-end overflow-hidden bg-[#F1EFE2] px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 lg:px-4 lg:pr-2">
         {/* Pin Hanger - Wooden board at top */}
-        <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 ml-2 top-0 z-300">
+        <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 ml-4 top-0 z-30">
           <div className="h-2.5 w-6 sm:h-3 sm:w-7 rounded-b-lg bg-gradient-to-b from-[#5c4328] via-[#7a5c37] to-[#43301b] shadow-md" />
         </div>
 
