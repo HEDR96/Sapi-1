@@ -117,9 +117,6 @@ export function RecentComments() {
               {/* Placeholder Badge */}
               {testimonial.id.startsWith('placeholder-') && (
                 <div className="absolute top-2 right-2">
-                  <span className="text-[8px] px-1.5 py-0.5 bg-[hsl(var(--cream))] rounded text-[hsl(var(--forest))/50]">
-                    Contoh
-                  </span>
                 </div>
               )}
             </div>

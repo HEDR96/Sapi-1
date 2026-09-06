@@ -22,7 +22,8 @@ const formatNumber = (num: number): string => {
 }
 
 // Format float with max 2 decimal places
-const formatFloat = (num: number): string => {
+const formatFloat = (num: number | null | undefined): string => {
+  if (num === null || num === undefined) return '-'
   return Number(num.toFixed(2)).toLocaleString('id-ID')
 }
 

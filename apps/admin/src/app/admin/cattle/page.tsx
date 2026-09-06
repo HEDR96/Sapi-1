@@ -18,6 +18,12 @@ import { EmptyState } from '@samadya/shared/components/EmptyState'
 import { formatCurrency, formatDate } from '@samadya/shared/lib/utils/formatters'
 import { getDirectImageUrl } from '@samadya/shared/lib/utils/imageUrl'
 
+// Format float with max 2 decimal places
+const formatFloat = (num: number | null | undefined): string => {
+  if (num === null || num === undefined) return '-'
+  return Number(num.toFixed(2)).toLocaleString('id-ID')
+}
+
 interface CattleWithRelations {
   id: string
   code: string
@@ -185,7 +191,7 @@ export default function AdminCattlePage() {
                   <TableCell>
                     <StatusBadge status={c.status as any} />
                   </TableCell>
-                  <TableCell>{c.lastWeight ? `${c.lastWeight} Kg` : '-'}</TableCell>
+                  <TableCell>{c.lastWeight ? `${formatFloat(c.lastWeight)} Kg` : '-'}</TableCell>
                   <TableCell className="text-right text-muted-foreground">
                     {c.buyPrice ? formatCurrency(c.buyPrice) : '-'}
                   </TableCell>
