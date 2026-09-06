@@ -265,7 +265,7 @@ export default function NewCattlePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="sellPrice">Harga Jual Custom (Rp)</Label>
+                <Label htmlFor="sellPrice">Harga Jual 2 (Rp)</Label>
                 <Input
                   id="sellPrice"
                   name="sellPrice"
