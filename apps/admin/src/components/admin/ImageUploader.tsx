@@ -74,13 +74,14 @@ export function ImageUploader({
       setUploadProgress(80)
 
       let data
+      const responseText = await response.text()
+
       try {
-        data = await response.json()
+        data = JSON.parse(responseText)
       } catch (jsonError) {
         // Server returned non-JSON response (e.g., "Request Entity Too Large")
-        const text = await response.text()
-        console.error('Server response (not JSON):', text)
-        throw new Error(text || 'Server error: ' + response.status)
+        console.error('Server response (not JSON):', responseText)
+        throw new Error(responseText || 'Server error: ' + response.status)
       }
 
       if (!response.ok) {
