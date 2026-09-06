@@ -44,9 +44,9 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
     const originalSvg = document.getElementById(`qr-${code}`)
     if (!originalSvg) return
 
-    // Ambil ukuran asli SVG supaya viewBox match dan tidak gepeng/kecil saat di-scale
     const originalSize = originalSvg.getAttribute('width') || '200'
     const svgInnerHTML = originalSvg.innerHTML
+    const printSize = 2000 // ukuran QR saat dicetak (px)
 
     printWindow.document.write(`
       <!DOCTYPE html>
@@ -55,36 +55,49 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
           <title>QR Code - ${code}</title>
           <style>
             @page { size: A4; margin: 15mm; }
+            * { box-sizing: border-box; }
+            html, body {
+              width: 100%;
+              height: 100%;
+              margin: 0;
+              padding: 0;
+            }
             body {
               font-family: 'Segoe UI', Arial, sans-serif;
               text-align: center;
-              padding: 30px;
               display: flex;
               flex-direction: column;
               align-items: center;
               justify-content: center;
               min-height: 100vh;
-              box-sizing: border-box;
+              padding: 30px;
             }
             .qr-container {
               background: white;
               padding: 40px;
               border-radius: 20px;
               box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-              margin: 20px auto;
               border: 3px solid #2d5016;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
             }
             .qr-wrapper {
               padding: 15px;
               background: white;
               border-radius: 12px;
-              display: inline-block;
+              display: flex;
+              align-items: center;
+              justify-content: center;
             }
             .qr-wrapper svg {
               display: block;
             }
             .info {
               margin-top: 30px;
+              text-align: center;
+              width: 100%;
             }
             .farm-name {
               font-size: 14px;
@@ -120,13 +133,20 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
               font-size: 11px;
               color: #999;
             }
+            @media print {
+              body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
+            }
           </style>
         </head>
         <body>
           <div class="qr-container">
             <div class="farm-name">samadyafarm.id</div>
             <div class="qr-wrapper">
-              <svg xmlns="http://www.w3.org/2000/svg" width="380" height="380" viewBox="0 0 ${originalSize} ${originalSize}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="${printSize}" height="${printSize}" viewBox="0 0 ${originalSize} ${originalSize}">
                 ${svgInnerHTML}
               </svg>
             </div>
