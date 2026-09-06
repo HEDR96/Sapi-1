@@ -60,7 +60,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const healthId = request.nextUrl.searchParams.get('id')
+    const url = new URL(request.url)
+    const healthId = url.searchParams.get('id')
 
     if (!healthId) {
       return NextResponse.json({ error: 'Health record ID is required' }, { status: 400 })

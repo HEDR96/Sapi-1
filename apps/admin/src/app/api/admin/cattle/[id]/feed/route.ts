@@ -54,15 +54,23 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  console.log('[DELETE /api/admin/cattle/[id]/feed] params.id:', params.id)
+  console.log('[DELETE /api/admin/cattle/[id]/feed] full URL:', request.url)
+
   try {
     const admin = await getCurrentAdmin()
     if (!admin) {
+      console.log('[DELETE /api/admin/cattle/[id]/feed] Unauthorized')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const feedId = request.nextUrl.searchParams.get('id')
+    // Parse URL to get query params
+    const url = new URL(request.url)
+    const feedId = url.searchParams.get('id')
+    console.log('[DELETE /api/admin/cattle/[id]/feed] feedId from URL:', feedId)
 
     if (!feedId) {
+      console.log('[DELETE /api/admin/cattle/[id]/feed] No feedId found in URL')
       return NextResponse.json({ error: 'Feed record ID is required' }, { status: 400 })
     }
 

@@ -60,7 +60,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const feedId = request.nextUrl.searchParams.get('id')
+    const url = new URL(request.url)
+    const feedId = url.searchParams.get('id')
 
     if (!feedId) {
       return NextResponse.json({ error: 'Feed record ID is required' }, { status: 400 })

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { useState } from 'react'
 import { Columns3, Check, Film } from 'lucide-react'
 import { Status } from '@samadya/shared/types'
 import { StatusBadge } from './CattleStatusBadge'
@@ -37,8 +38,12 @@ export function CattleCard({
   onClick,
   onCompare,
 }: CattleCardProps) {
+  const [imageError, setImageError] = useState(false)
   const isSold = status === 'SOLD'
   const isBooked = status === 'BOOKED'
+
+  // Use fallback image URL if optimized URL fails
+  const imageSrc = imageError ? mainImage : getDirectImageUrl(mainImage)
 
   return (
     <article
@@ -53,13 +58,18 @@ export function CattleCard({
         {mainImage && !isVideoUrl(mainImage) ? (
           <>
             <Image
-              src={getDirectImageUrl(mainImage)}
+              src={imageSrc || '/placeholder-cattle.png'}
               alt={name}
               fill
               className={`object-cover transition-transform duration-300 ${
                 isSold || isBooked ? '' : 'group-hover:scale-105'
               }`}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              onError={() => {
+                if (!imageError) {
+                  setImageError(true)
+                }
+              }}
             />
             {isSold && (
               <>

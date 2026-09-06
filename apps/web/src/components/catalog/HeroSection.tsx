@@ -68,13 +68,6 @@ function AnimatedCounter({ end, suffix, duration = 1200 }: CounterProps) {
   )
 }
 
-const stats = [
-  { value: 10, suffix: '', label: 'Sapi Terdaftar' },
-  { value: 90, suffix: '%', label: 'Kepuasan %' },
-  { value: 24, suffix: '/7', label: 'Jam Monitoring' },
-  { value: 100, suffix: '%', label: 'Transparan %' },
-]
-
 const trustFeatures = [
   { icon: BadgeCheck, text: 'Sapi Pilihan Berkualitas' },
   { icon: Clock3, text: 'Dipantau Secara Berkala' },
@@ -85,7 +78,32 @@ const trustFeatures = [
 export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading }: HeroSectionProps) {
   const heroRef = useRef<HTMLElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [cattleCount, setCattleCount] = useState(0)
   const isSliderChange = useRef(false)
+
+  // Fetch cattle count from API
+  useEffect(() => {
+    async function fetchCattleCount() {
+      try {
+        const res = await fetch('/api/cattle/count')
+        if (res.ok) {
+          const data = await res.json()
+          setCattleCount(data.count || 0)
+        }
+      } catch (error) {
+        console.error('Failed to fetch cattle count:', error)
+      }
+    }
+    fetchCattleCount()
+  }, [])
+
+  // Dynamic stats with real cattle count
+  const stats = [
+    { value: cattleCount, suffix: '', label: 'Sapi Terdaftar' },
+    { value: 90, suffix: '%', label: 'Kepuasan %' },
+    { value: 24, suffix: '/7', label: 'Jam Monitoring' },
+    { value: 100, suffix: '%', label: 'Transparan %' },
+  ]
 
   // Get available cattle with images
   const displayCattle = cattle.filter(c => c.mainImage)
