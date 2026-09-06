@@ -9,9 +9,9 @@ interface StatusBadgeProps {
 
 const statusConfig: Record<Status, { bg: string; label: string; dotColor?: string; textColor?: string; showDot?: boolean }> = {
   AVAILABLE: { bg: 'bg-emerald-100', label: 'TERSEDIA', dotColor: 'bg-emerald-500', textColor: 'text-emerald-700' },
-  SOLD: { bg: 'bg-[#FADCE0]', label: 'SOLD', dotColor: 'bg-red-600', textColor: 'text-red-700', showDot: true },
+  SOLD: { bg: 'bg-[#FADCE0]', label: 'TERJUAL', dotColor: 'bg-red-600', textColor: 'text-red-700', showDot: true },
   BOOKED: { bg: 'bg-amber-100', label: 'BOOKING', dotColor: 'bg-amber-500', textColor: 'text-amber-700', showDot: true },
-  ARCHIVED: { bg: 'bg-gray-100', label: 'DIARCHIVE', dotColor: 'bg-gray-500', textColor: 'text-gray-600', showDot: true },
+  MENINGGAL: { bg: 'bg-gray-100', label: 'MENINGGAL', dotColor: 'bg-gray-500', textColor: 'text-gray-600', showDot: true },
 }
 
 export function CattleStatusBadge({ status, className, showDot }: StatusBadgeProps) {
