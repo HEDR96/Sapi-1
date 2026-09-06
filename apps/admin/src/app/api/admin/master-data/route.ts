@@ -34,6 +34,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { category, key, value } = body
 
+    console.log('[POST /api/admin/master-data] Received:', { category, key, value })
+
     if (!category || !key || !value) {
       return NextResponse.json({ error: 'category, key, and value are required' }, { status: 400 })
     }
@@ -58,6 +60,7 @@ export async function POST(request: NextRequest) {
       data: { category, key, value, order: newOrder },
     })
 
+    console.log('[POST /api/admin/master-data] Created:', item)
     return NextResponse.json({ item })
   } catch (error: any) {
     console.error('[POST /api/admin/master-data] Error:', error)

@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Phone, Menu, X } from 'lucide-react'
-
-const LOGO_URL = 'https://claude-opus-4-52%2F2026-09-06%2Fclaude-opus-4-5%2F2044935622187037182%2Fb55cb642ca266f68183727a39a758fc970a55afa6d237274570c64ea889c046d..jpeg?Expires=1788786249&OSSAccessKeyId=LTAI5tCpJNKCf5EkQHSuL9xg&Signature=OTk9QgeZyy7emy%2BggvNB00%2FYgRA%3D'
+import Logo from '../../app/logo.jpeg'
 
 const navLinks = [
   { href: '/', label: 'Beranda' },
@@ -21,7 +20,7 @@ export function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex shrink-0 items-center gap-2 text-white sm:gap-3">
           <img
-            src={LOGO_URL}
+            src={Logo.src}
             alt="Samadya Farm Logo"
             className="h-8 w-8 rounded-full object-cover border border-white/30"
           />

@@ -1,13 +1,93 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
-import { X, ChevronLeft, ChevronRight, Download, Play, Grid, Maximize2, Film } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight, Download, Play, Grid, Maximize2, Film, Loader2 } from 'lucide-react'
 import { CattleMedia } from '@samadya/shared/types'
 import { getDirectImageUrl, getVideoUrl } from '@samadya/shared/lib/utils/imageUrl'
 
 interface MediaTabProps {
   media: CattleMedia[]
+}
+
+// Component to capture video thumbnail
+function VideoThumbnail({ videoUrl, itemId }: { videoUrl: string; itemId: string }) {
+  const [thumbnail, setThumbnail] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const captureThumbnail = async () => {
+      if (!videoRef.current) return
+
+      try {
+        videoRef.current.src = videoUrl
+        videoRef.current.currentTime = 1 // Seek to 1 second
+      } catch (e) {
+        console.warn('Failed to load video for thumbnail')
+        setLoading(false)
+      }
+    }
+
+    captureThumbnail()
+  }, [videoUrl])
+
+  const handleSeeked = () => {
+    if (!videoRef.current) return
+
+    try {
+      const canvas = document.createElement('canvas')
+      canvas.width = 320
+      canvas.height = 180
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height)
+        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.7)
+        setThumbnail(thumbnailUrl)
+      }
+    } catch (e) {
+      console.warn('Failed to capture thumbnail')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (thumbnail) {
+    return (
+      <img
+        src={thumbnail}
+        alt="Video thumbnail"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+    )
+  }
+
+  return (
+    <>
+      <video
+        ref={videoRef}
+        src={videoUrl}
+        className="hidden"
+        onSeeked={handleSeeked}
+        onLoadedData={() => {
+          if (videoRef.current) {
+            videoRef.current.currentTime = 1
+          }
+        }}
+        onError={() => setLoading(false)}
+        crossOrigin="anonymous"
+      />
+      {loading ? (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[hsl(var(--forest))/30] to-[hsl(var(--forest))/50]">
+          <Loader2 className="h-8 w-8 text-white/70 animate-spin" />
+        </div>
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[hsl(var(--forest))/30] to-[hsl(var(--forest))/50]">
+          <Film className="h-12 w-12 text-white/70" />
+        </div>
+      )}
+    </>
+  )
 }
 
 export function MediaTab({ media }: MediaTabProps) {
@@ -135,9 +215,7 @@ export function MediaTab({ media }: MediaTabProps) {
                 <div className="relative aspect-square">
                   {itemIsVideo ? (
                     <>
-                      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--forest))/30] to-[hsl(var(--forest))/50] flex items-center justify-center">
-                        <Film className="h-12 w-12 text-white/70" />
-                      </div>
+                      <VideoThumbnail videoUrl={getVideoUrl(item.fileUrl)} itemId={item.id} />
                       <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
                         <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center group-hover:scale-110 transition-transform">
                           <Play className="h-7 w-7 text-[hsl(var(--forest))] fill-current ml-1" />

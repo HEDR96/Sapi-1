@@ -54,12 +54,21 @@ export default function MasterDataPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validate form.category is set
+    if (!form.category || !form.key || !form.value) {
+      alert('Semua field harus diisi!')
+      return
+    }
+
+    console.log('[MasterData] Submitting with:', { category: form.category, key: form.key, value: form.value })
+
     setSaving(true)
     try {
       const url = editingItem ? '/api/admin/master-data' : '/api/admin/master-data'
       const method = editingItem ? 'PUT' : 'POST'
 
-      const body: any = { category: form.category, key: form.key, value: form.value }
+      const body = { category: form.category, key: form.key, value: form.value }
       if (editingItem) body.id = editingItem.id
 
       const res = await fetch(url, {
@@ -68,17 +77,20 @@ export default function MasterDataPage() {
         body: JSON.stringify(body),
       })
 
+      const data = await res.json()
+      console.log('[MasterData] Response:', data)
+
       if (res.ok) {
         setModalOpen(false)
         setEditingItem(null)
         setForm({ category: 'JENIS_SAPI', key: '', value: '' })
         fetchData()
       } else {
-        const data = await res.json()
-        alert(data.error || 'Gagal menyimpan')
+        alert(data.error || data.details || 'Gagal menyimpan')
       }
     } catch (error) {
       console.error('Failed to save:', error)
+      alert('Terjadi kesalahan saat menyimpan')
     } finally {
       setSaving(false)
     }
