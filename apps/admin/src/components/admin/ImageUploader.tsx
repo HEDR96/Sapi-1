@@ -73,7 +73,15 @@ export function ImageUploader({
 
       setUploadProgress(80)
 
-      const data = await response.json()
+      let data
+      try {
+        data = await response.json()
+      } catch (jsonError) {
+        // Server returned non-JSON response (e.g., "Request Entity Too Large")
+        const text = await response.text()
+        console.error('Server response (not JSON):', text)
+        throw new Error(text || 'Server error: ' + response.status)
+      }
 
       if (!response.ok) {
         throw new Error(data.error || 'Gagal mengupload file')

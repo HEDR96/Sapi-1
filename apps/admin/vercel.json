@@ -6,13 +6,13 @@
     {
       "source": "/api/upload",
       "headers": [
-        { "key": "Body-Size-Limit", "value": "104857600" }
+        { "key": "Body-Size-Limit", "value": "524288000" }
       ]
     },
     {
       "source": "/api/admin/media",
       "headers": [
-        { "key": "Body-Size-Limit", "value": "104857600" }
+        { "key": "Body-Size-Limit", "value": "524288000" }
       ]
     }
   ]
