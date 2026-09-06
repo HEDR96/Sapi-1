@@ -46,7 +46,7 @@ export function QRCodeCard({ code, name }: QRCodeCardProps) {
 
     const originalSize = originalSvg.getAttribute('width') || '200'
     const svgInnerHTML = originalSvg.innerHTML
-    const printSize = 70
+    const printSize = 300
 
     printWindow.document.write(`
       <!DOCTYPE html>
