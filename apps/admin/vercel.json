@@ -4,15 +4,13 @@
   "devCommand": "npm run dev --workspace=@samadya/admin",
   "functions": {
     "**/api/upload": {
-      "maxDuration": 300,
-      "memorySize": 3008
+      "maxDuration": 300
     },
     "**/api/upload-init": {
       "maxDuration": 60
     },
     "**/api/admin/media": {
-      "maxDuration": 300,
-      "memorySize": 3008
+      "maxDuration": 300
     }
   },
   "headers": [
