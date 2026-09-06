@@ -30,9 +30,15 @@ export function MediaTab({ media }: MediaTabProps) {
     )
   }
 
-  // Separate images and videos - use toUpperCase for case-insensitive comparison
-  const images = media.filter(m => !m.fileType.toUpperCase().includes('VIDEO'))
-  const videos = media.filter(m => m.fileType.toUpperCase().includes('VIDEO'))
+  // Separate images and videos - check multiple ways to identify video
+  const images = media.filter(m => {
+    const type = (m.fileType || '').toUpperCase()
+    return !type.includes('VIDEO') && !m.fileUrl?.includes('/api/stream') && !m.fileUrl?.match(/\.(mp4|webm|mov)$/i)
+  })
+  const videos = media.filter(m => {
+    const type = (m.fileType || '').toUpperCase()
+    return type.includes('VIDEO') || m.fileUrl?.includes('/api/stream') || m.fileUrl?.match(/\.(mp4|webm|mov)$/i)
+  })
 
   const openLightbox = (index: number) => {
     setLightboxType('image')
@@ -286,7 +292,7 @@ export function MediaTab({ media }: MediaTabProps) {
           )}
 
           {/* Video Lightbox */}
-          {lightboxType === 'video' && videos.length > 0 && (
+          {lightboxType === 'video' && videos.length > 0 && videos[currentIndex] && (
             <>
               {/* Navigation for videos */}
               {videos.length > 1 && (

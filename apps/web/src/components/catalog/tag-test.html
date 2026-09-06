@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pin Hanger Design Test</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #F1EFE2;
+      min-height: 100vh;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+    h2 { color: #2d5016; margin-bottom: 10px; }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* THE FIXED DESIGN - Everything as ONE unit */
+    .pin-rope-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Pin Hanger - The wooden board */
+    .pin-hanger {
+      width: 40px;
+      height: 18px;
+      background: linear-gradient(to bottom, #5c4328, #7a5c37, #43301b);
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    /* Single SVG that contains BOTH the pin bottom circle AND the rope - no gap! */
+    .integrated-rope {
+      width: 8px;
+      height: 60px;
+      display: block;
+    }
+
+    /* The Tag Card */
+    .tag-card {
+      width: 140px;
+      background: linear-gradient(to bottom, #F7F3E9, #F0EAD8, #E3D9C2);
+      border: 1.5px solid #D4C9B0;
+      border-radius: 18px;
+      padding: 20px 12px 15px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(40,30,15,0.2);
+      margin-top: -5px;
+    }
+
+    .tag-website {
+      font-size: 10px;
+      font-weight: 800;
+      color: #2d5016;
+      letter-spacing: 0.02em;
+    }
+
+    .tag-subtitle {
+      font-size: 6px;
+      font-weight: 600;
+      color: #2d5016;
+      opacity: 0.7;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .tag-code {
+      background: linear-gradient(to bottom, #fff, #F4EFE2);
+      border: 1px solid #D4C9B0;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #2d5016;
+      margin: 6px 0;
+    }
+
+    .tag-breed {
+      font-size: 9px;
+      font-weight: 700;
+      color: #2d5016;
+      text-transform: uppercase;
+    }
+
+    .tag-gender {
+      font-size: 8px;
+      font-weight: 600;
+      color: #2d5016;
+      opacity: 0.8;
+      text-transform: uppercase;
+    }
+
+    .tag-qr {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border: 1px solid #D4C9B0;
+      border-radius: 4px;
+      margin: 6px auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px;
+    }
+
+    .tag-qr img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .tag-footer {
+      font-size: 5px;
+      font-weight: 700;
+      color: #2d5016;
+      opacity: 0.75;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Code preview */
+    .code-preview {
+      background: #1a1a2e;
+      color: #a8dadc;
+      padding: 20px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 12px;
+      white-space: pre;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h2>DESIGN: Pin Hanger + Rope (MENYATU)</h2>
+
+  <div class="container">
+    <p style="color:#666;margin-bottom:20px;">Tampilan tag card dengan hanger dan tali yang MENYATU:</p>
+
+    <!-- THE FIXED DESIGN -->
+    <div class="pin-rope-unit">
+      <!-- Pin Hanger (wooden board at top) -->
+      <div class="pin-hanger"></div>
+
+      <!-- Integrated Rope - NO GAP, directly attached -->
+      <svg class="integrated-rope" viewBox="0 0 8 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Pin bottom circle (attached directly to hanger) -->
+        <circle cx="4" cy="4" r="4" fill="#302111" stroke="#8B7355" stroke-width="1"/>
+        <!-- Rope - starts exactly where circle ends, no gap -->
+        <rect x="1" y="8" width="6" height="52" rx="3" fill="#6E5030"/>
+        <!-- Rope texture lines -->
+        <line x1="4" y1="8" x2="4" y2="60" stroke="#A88B63" stroke-width="1" stroke-dasharray="3 3"/>
+      </svg>
+
+      <!-- Tag Card -->
+      <div class="tag-card">
+        <div class="tag-website">samadyafarm.id</div>
+        <div class="tag-subtitle">Sapi Pilihan</div>
+        <div class="tag-code">NF-0001</div>
+        <div class="tag-breed">Limousin</div>
+        <div class="tag-gender">Jantan</div>
+        <div class="tag-qr">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=/sapi/NF-0001" alt="QR">
+        </div>
+        <div class="tag-footer">Scan untuk Profil</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <p style="color:#666;margin-bottom:15px;">Key Points:</p>
+    <ul style="color:#444;line-height:1.8;font-size:14px;">
+      <li>Pin hanger (kayu) di paling atas</li>
+      <li>Circle (lubang pin) langsung MENEMPEL di bawah hanger - <strong>tanpa gap</strong></li>
+      <li>Rope (tali) langsung MENEMPEL di bawah circle - <strong>tanpa gap</strong></li>
+      <li>Semua dalam 1 SVG container - <strong>100% menyatu</strong></li>
+      <li>Tag card menggunakan margin-top negatif (-5px) agar menempel ke tali</li>
+    </ul>
+  </div>
+</body>
+</html>

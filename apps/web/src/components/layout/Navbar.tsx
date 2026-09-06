@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ShieldCheck, Phone, Menu, X } from 'lucide-react'
+import { Phone, Menu, X } from 'lucide-react'
+
+const LOGO_URL = 'https://claude-opus-4-52%2F2026-09-06%2Fclaude-opus-4-5%2F2044935622187037182%2Fb55cb642ca266f68183727a39a758fc970a55afa6d237274570c64ea889c046d..jpeg?Expires=1788786249&OSSAccessKeyId=LTAI5tCpJNKCf5EkQHSuL9xg&Signature=OTk9QgeZyy7emy%2BggvNB00%2FYgRA%3D'
 
 const navLinks = [
   { href: '/', label: 'Beranda' },
@@ -18,9 +20,11 @@ export function Navbar() {
       <div className="mx-auto flex h-14 max-w-[1500px] items-center justify-between px-3 sm:px-5 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex shrink-0 items-center gap-2 text-white sm:gap-3">
-          <div className="grid h-8 w-8 place-items-center rounded-full border border-white/30 bg-white/10">
-            <ShieldCheck className="h-4 w-4" />
-          </div>
+          <img
+            src={LOGO_URL}
+            alt="Samadya Farm Logo"
+            className="h-8 w-8 rounded-full object-cover border border-white/30"
+          />
           <div className="leading-tight">
             <div className="text-[12px] font-extrabold tracking-[.08em] sm:text-[14px]">samadyafarm.id</div>
             <div className="text-[8px] text-white/60">KURBAN BERKUALITAS</div>

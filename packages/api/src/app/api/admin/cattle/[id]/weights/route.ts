@@ -48,3 +48,31 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to create weight' }, { status: 500 })
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const admin = await getCurrentAdmin()
+    if (!admin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { searchParams } = new URL(request.url)
+    const weightId = searchParams.get('id')
+
+    if (!weightId) {
+      return NextResponse.json({ error: 'Weight ID is required' }, { status: 400 })
+    }
+
+    await prisma.cattleWeight.delete({
+      where: { id: weightId },
+    })
+
+    return NextResponse.json({ success: true, message: 'Weight deleted' })
+  } catch (error) {
+    console.error('Error deleting weight:', error)
+    return NextResponse.json({ error: 'Failed to delete weight' }, { status: 500 })
+  }
+}

@@ -257,29 +257,29 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
 
       {/* Dynamic Tag Container - Responsive */}
       <div className="relative flex items-start justify-center lg:justify-end overflow-hidden bg-[#F1EFE2] px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 lg:px-4 lg:pr-2">
-        {/* Combined Pin Hanger + Rope - Fully Integrated as One Unit */}
+        {/* Single Integrated Unit: Pin Hanger + Pin Circle + Rope - ALL CONNECTED */}
         <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-0 z-30 flex flex-col items-center">
-          {/* Pin Hanger - Shifted slightly right */}
-          <div className="h-2 w-5 sm:h-2.5 sm:w-6 rounded-b-md bg-gradient-to-b from-[#5c4328] via-[#7a5c37] to-[#43301b] shadow-md border-x border-b border-[#302111]"
-               style={{ marginLeft: '4px' }} />
+          {/* Pin Hanger - Wooden board at top */}
+          <div className="h-2.5 w-6 sm:h-3 sm:w-7 rounded-b-lg bg-gradient-to-b from-[#5c4328] via-[#7a5c37] to-[#43301b] shadow-md" />
 
-          {/* Single Integrated SVG - Pin bottom + Rope as one continuous piece */}
-          <svg width="12" height="40" viewBox="0 0 12 40" fill="none" className="drop-shadow-sm -mt-0.5 sm:-mt-1">
-            {/* Pin bottom connector circle */}
-            <circle cx="6" cy="6" r="3" fill="#302111" stroke="#8B7355" strokeWidth="1" />
-            {/* Rope - connected directly to pin bottom, no gap */}
-            <line x1="6" y1="9" x2="6" y2="40" stroke="#6E5030" strokeWidth="3.5" strokeLinecap="round" />
-            <line x1="6" y1="9" x2="6" y2="40" stroke="#A88B63" strokeWidth="1.5" strokeDasharray="3 3" />
+          {/* Single SVG: Pin Circle + Rope as ONE CONTINUOUS piece - NO GAP */}
+          <svg width="10" height="50" viewBox="0 0 10 50" fill="none" className="drop-shadow-sm">
+            {/* Pin Circle - directly attached to hanger bottom, no gap */}
+            <circle cx="5" cy="5" r="5" fill="#302111" stroke="#8B7355" strokeWidth="1.5" />
+            {/* Rope - starts exactly where circle ends (y=10), completely connected */}
+            <rect x="2" y="10" width="6" height="40" rx="3" fill="#6E5030" />
+            {/* Rope texture line */}
+            <line x1="5" y1="10" x2="5" y2="50" stroke="#A88B63" strokeWidth="1.5" strokeDasharray="3 3" />
           </svg>
         </div>
 
         <div className="relative mr-0.5 sm:mr-1 lg:mr-0">
           <div
             key={currentCattle?.id || 'default'}
-            className="paper-pull-up relative z-10 flex flex-col items-center pt-1 xs:pt-1.5 sm:pt-2"
+            className="paper-pull-up relative z-10 flex flex-col items-center mt-[-6px]"
           >
 
-            {/* Tag Card - Fully Responsive */}
+            {/* Tag Card - Fully Responsive, attached to rope */}
             <div
               className="relative w-[80px] xs:w-[90px] sm:w-[110px] md:w-[130px] lg:w-[145px] xl:w-[155px] rounded-[12px] xs:rounded-[14px] sm:rounded-[16px] md:rounded-[18px] lg:rounded-[20px] bg-gradient-to-b from-[#F7F3E9] via-[#F0EAD8] to-[#E3D9C2] px-1.5 xs:px-2 sm:px-3 md:px-3.5 pb-1.5 xs:pb-2 sm:pb-3 md:pb-3.5 pt-3 xs:pt-4 sm:pt-5 md:pt-5.5 shadow-2xl"
               style={{

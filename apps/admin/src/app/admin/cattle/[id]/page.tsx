@@ -411,12 +411,14 @@ export default function CattleDetailPage() {
                         <SelectTrigger><SelectValue placeholder="Pilih jenis pakan" /></SelectTrigger>
                         <SelectContent>
                           {feedTypes.map((f) => (
-                            <SelectItem key={f.key} value={f.value}>{f.value}</SelectItem>
+                            <SelectItem key={f.id} value={f.key}>{f.value}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     ) : (
-                      <Input value={feedForm.feedType} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedForm({ ...feedForm, feedType: e.target.value })} placeholder="Rumput Gajah" />
+                      <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                        Tambahkan data di menu Master Data
+                      </div>
                     )}
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -512,7 +514,7 @@ export default function CattleDetailPage() {
               </div>
               {cattle.media && cattle.media.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{cattle.media.map((m) => (
-                  <div key={m.id} className="relative aspect-square border rounded-lg overflow-hidden">
+                  <div key={m.id} className="relative aspect-square border rounded-lg overflow-hidden group">
                     {m.fileType === 'VIDEO' || m.fileUrl.includes('/api/stream') || m.fileUrl.includes('/api/videos') ? (
                       <video
                         src={getVideoUrl(m.fileUrl)}
@@ -524,6 +526,28 @@ export default function CattleDetailPage() {
                       <img src={getDirectImageUrl(m.fileUrl)} alt="" className="w-full h-full object-cover" />
                     )}
                     <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1">{m.fileType}</div>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (!confirm('Hapus media ini?')) return
+                        try {
+                          const res = await fetch(`/api/admin/media?id=${m.id}`, { method: 'DELETE' })
+                          if (res.ok) {
+                            fetchCattle()
+                          } else {
+                            const data = await res.json()
+                            alert(data.error || 'Gagal hapus media')
+                          }
+                        } catch (err) {
+                          console.error('Delete media error:', err)
+                          alert('Gagal hapus media')
+                        }
+                      }}
+                      className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                      title="Hapus media"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                 ))}</div>
               ) : <p className="text-muted-foreground text-center py-8">Belum ada dokumentasi</p>}

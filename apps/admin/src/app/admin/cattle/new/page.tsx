@@ -41,6 +41,7 @@ export default function NewCattlePage() {
 
   // Master data
   const [cattleBreeds, setCattleBreeds] = useState<MasterData[]>([])
+  const [cattleStatuses, setCattleStatuses] = useState<MasterData[]>([])
   const [loadingMasterData, setLoadingMasterData] = useState(true)
 
   useEffect(() => {
@@ -69,6 +70,7 @@ export default function NewCattlePage() {
         const data = await res.json()
         const items = data.items || []
         setCattleBreeds(items.filter((m: MasterData) => m.category === 'JENIS_SAPI'))
+        setCattleStatuses(items.filter((m: MasterData) => m.category === 'STATUS_SAPI'))
       }
     } catch (error) {
       console.error('Failed to fetch master data:', error)
@@ -195,17 +197,26 @@ export default function NewCattlePage() {
 
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
-                <Select value={form.status} onValueChange={(v: string) => setForm({ ...form, status: v as any })}>
-                  <SelectTrigger className="bg-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="AVAILABLE">Tersedia</SelectItem>
-                    <SelectItem value="BOOKED">Dibooking</SelectItem>
-                    <SelectItem value="SOLD">Terjual</SelectItem>
-                    <SelectItem value="ARCHIVED">Diarchive</SelectItem>
-                  </SelectContent>
-                </Select>
+                {loadingMasterData ? (
+                  <Input disabled placeholder="Memuat..." />
+                ) : (
+                  <Select value={form.status} onValueChange={(v: string) => setForm({ ...form, status: v })}>
+                    <SelectTrigger className="bg-white">
+                      <SelectValue placeholder={cattleStatuses.length === 0 ? "Tidak ada data master" : "Pilih status"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cattleStatuses.length > 0 ? (
+                        cattleStatuses.map((s) => (
+                          <SelectItem key={s.id} value={s.key}>{s.value}</SelectItem>
+                        ))
+                      ) : (
+                        <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                          Tambahkan data di menu Master Data
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               <div className="space-y-2">

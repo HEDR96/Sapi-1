@@ -11,7 +11,7 @@ enum Status {
   AVAILABLE
   SOLD
   BOOKED
-  ARCHIVED
+  MENINGGAL
 }
 
 enum HealthStatus {

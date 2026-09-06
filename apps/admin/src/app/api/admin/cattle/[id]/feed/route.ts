@@ -49,3 +49,31 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to create feed record' }, { status: 500 })
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const admin = await getCurrentAdmin()
+    if (!admin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { searchParams } = new URL(request.url)
+    const feedId = searchParams.get('id')
+
+    if (!feedId) {
+      return NextResponse.json({ error: 'Feed record ID is required' }, { status: 400 })
+    }
+
+    await prisma.cattleFeedRecord.delete({
+      where: { id: feedId },
+    })
+
+    return NextResponse.json({ success: true, message: 'Feed record deleted' })
+  } catch (error) {
+    console.error('Error deleting feed record:', error)
+    return NextResponse.json({ error: 'Failed to delete feed record' }, { status: 500 })
+  }
+}
