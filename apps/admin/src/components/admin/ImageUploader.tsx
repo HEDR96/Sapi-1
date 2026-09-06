@@ -17,7 +17,7 @@ export function ImageUploader({
   onChange,
   folder = 'cattle',
   accept = 'image/jpeg,image/png,image/jpg,video/mp4,video/webm',
-  maxSize = 5,
+  maxSize = 20,
 }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)

@@ -78,11 +78,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate file size before compression
-    const maxSizeBefore = isVideo ? 100 * 1024 * 1024 : 10 * 1024 * 1024 // 100MB video, 10MB image before compression
+    // Validate file size before compression (500MB for videos, 20MB for images)
+    const maxSizeBefore = isVideo ? 500 * 1024 * 1024 : 20 * 1024 * 1024
     if (file.size > maxSizeBefore) {
       return NextResponse.json(
-        { error: `Ukuran file terlalu besar. Maksimal ${isVideo ? '100MB' : '10MB'}.` },
+        { error: `Ukuran file terlalu besar. Maksimal ${isVideo ? '500MB' : '20MB'}.` },
         { status: 400 }
       )
     }
