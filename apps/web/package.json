@@ -10,8 +10,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@samadya/prisma": "workspace:*",
-    "@samadya/shared": "workspace:*",
+    "@samadya/prisma": "file:../../packages/prisma",
+    "@samadya/shared": "file:../../packages/shared",
     "bcryptjs": "^2.4.3",
     "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.0",
