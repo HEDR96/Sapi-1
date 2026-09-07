@@ -10,8 +10,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@samadya/prisma": "workspace:*",
-    "@samadya/shared": "workspace:*",
+    "@samadya/prisma": "file:../../packages/prisma",
+    "@samadya/shared": "file:../../packages/shared",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
     "@radix-ui/react-accordion": "^1.2.20",

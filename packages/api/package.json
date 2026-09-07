@@ -10,8 +10,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@samadya/prisma": "workspace:*",
-    "@samadya/shared": "workspace:*",
+    "@samadya/prisma": "file:../prisma",
+    "@samadya/shared": "file:../shared",
     "bcryptjs": "^2.4.3",
     "googleapis": "^176.0.0",
     "jsonwebtoken": "^9.0.2",
