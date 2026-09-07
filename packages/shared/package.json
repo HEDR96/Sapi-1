@@ -4,6 +4,9 @@
   "private": true,
   "main": "./index.ts",
   "types": "./index.ts",
+  "peerDependencies": {
+    "react": ">=18.2.0"
+  },
   "dependencies": {
     "@samadya/prisma": "file:../prisma",
     "@radix-ui/react-label": "^2.1.0",
@@ -12,7 +15,6 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
     "clsx": "^2.1.1",
-    "react": "^18.3.1",
     "class-variance-authority": "^0.7.0",
     "date-fns": "^3.6.0",
     "lucide-react": "^0.395.0",
