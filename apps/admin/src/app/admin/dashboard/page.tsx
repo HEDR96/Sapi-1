@@ -276,7 +276,7 @@ export default function DashboardPage() {
             ) : (
               <div className="text-center py-8">
                 <p className="text-gray-400 mb-3">Belum ada penjualan</p>
-                <Link href="/admin/sales/new">
+                <Link href="/admin/sales">
                   <Button variant="outline" size="sm" className="border-emerald-300 text-emerald-600 hover:bg-emerald-50">
                     Tambah Penjualan
                   </Button>
