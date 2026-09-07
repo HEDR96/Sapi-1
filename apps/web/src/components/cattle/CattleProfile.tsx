@@ -214,7 +214,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
               {/* Action Buttons */}
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <a
-                  href={`https://wa.me/6281234567890?text=${whatsappInquiryText}`}
+                  href={`https://wa.me/6285935610197?text=${whatsappInquiryText}`}
                   className="flex items-center justify-center gap-1.5 rounded-lg bg-[hsl(var(--forest))] px-2 py-2.5 text-[11px] font-semibold text-white hover:bg-[hsl(var(--forest2))] transition-colors"
                 >
                   <MessageCircle className="h-4 w-4" />
