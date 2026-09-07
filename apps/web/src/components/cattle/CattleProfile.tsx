@@ -231,7 +231,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
 
               {isAvailable && (
                 <a
-                  href={`https://wa.me/6281234567890?text=${whatsappBookingText}`}
+                  href={`https://wa.me/6285935610197?text=${whatsappBookingText}`}
                   className="mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg bg-[hsl(var(--gold))] px-2 py-2.5 text-[11px] font-semibold text-[hsl(var(--forest))] hover:bg-[hsl(var(--gold))/90] transition-colors"
                 >
                   <Check className="h-4 w-4" />
@@ -439,7 +439,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
               {/* Action Buttons */}
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <a
-                  href={`https://wa.me/6281234567890?text=${whatsappInquiryText}`}
+                  href={`https://wa.me/6285935610197?text=${whatsappInquiryText}`}
                   className="flex items-center justify-center gap-2 rounded-lg bg-[hsl(var(--forest))] px-3 py-3 text-[12px] font-semibold text-white hover:bg-[hsl(var(--forest2))] transition-colors"
                 >
                   <MessageCircle className="h-4 w-4" />
@@ -454,7 +454,7 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
                 </button>
                 {isAvailable && (
                   <a
-                    href={`https://wa.me/6281234567890?text=${whatsappBookingText}`}
+                    href={`https://wa.me/6285935610197?text=${whatsappBookingText}`}
                     className="col-span-2 flex items-center justify-center gap-2 rounded-lg bg-[hsl(var(--gold))] px-3 py-3 text-[12px] font-semibold text-[hsl(var(--forest))] hover:bg-[hsl(var(--gold))/90] transition-colors"
                   >
                     <Check className="h-4 w-4" />
