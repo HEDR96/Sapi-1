@@ -50,7 +50,7 @@ export function validateGoogleDriveConfig(): void {
 /**
  * Get OAuth2 client configuration
  */
-function getOAuth2Client() {
+export function getOAuth2Client() {
   validateGoogleDriveConfig()
 
   return new google.auth.OAuth2(
