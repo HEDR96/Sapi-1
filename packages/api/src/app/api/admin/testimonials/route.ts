@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
-import { getCurrentAdmin } from '@/lib/auth/admin'
+import { getCurrentAdmin } from '@/lib/auth/jwt'
 
 // GET /api/admin/testimonials
 export async function GET(request: NextRequest) {
