@@ -12,6 +12,7 @@ import {
   UserCheck,
   Database,
   ChevronDown,
+  MessageSquareQuote,
 } from 'lucide-react'
 
 // Consolidated nav - per redesign plan
@@ -21,6 +22,7 @@ const navItems = [
   { href: '/admin/cattle', icon: Beef, label: 'Manajemen Sapi', hasSubmenu: true },
   { href: '/admin/sales', icon: TrendingUp, label: 'Penjualan' },
   { href: '/admin/customers', icon: UserCheck, label: 'Pelanggan' },
+  { href: '/admin/testimonials', icon: MessageSquareQuote, label: 'Testimoni' },
   { href: '/admin/master-data', icon: Database, label: 'Master Data' },
 ]
 
