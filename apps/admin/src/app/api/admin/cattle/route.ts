@@ -21,7 +21,7 @@ async function generateCattleCode(): Promise<string> {
     return `${prefix}${String(lastNum + 1).padStart(7, '0')}`
   }
 
-  return `${prefix}0000001`
+  return `${prefix}001`
 }
 
 export async function GET() {

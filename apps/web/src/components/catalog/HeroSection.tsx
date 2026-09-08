@@ -77,6 +77,7 @@ const trustFeatures = [
 
 export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading }: HeroSectionProps) {
   const heroRef = useRef<HTMLElement>(null)
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const [currentIndex, setCurrentIndex] = useState(0)
   const [cattleCount, setCattleCount] = useState(0)
   const isSliderChange = useRef(false)
@@ -335,7 +336,7 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
                 ) : currentCattle ? (
                   <div className="flex h-full items-center justify-center">
                     <img
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`/sapi/${currentCattle.code}`)}`}
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`${baseUrl}/sapi/${currentCattle.code}`)}`}
                       alt="QR Code"
                       className="h-full w-full object-contain"
                     />

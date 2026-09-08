@@ -12,6 +12,7 @@
   "dependencies": {
     "@samadya/prisma": "file:../prisma",
     "@samadya/shared": "file:../shared",
+    "@vercel/kv": "^1.0.0",
     "bcryptjs": "^2.4.3",
     "googleapis": "^176.0.0",
     "jsonwebtoken": "^9.0.2",

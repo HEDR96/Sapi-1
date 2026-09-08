@@ -138,7 +138,11 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
 
                   <div className="rounded-lg border border-[hsl(var(--line))] bg-[hsl(var(--cream))/20] p-2.5 text-xs">
                     <div className="text-[hsl(var(--forest))/60] text-[10px]">Status Kesehatan</div>
-                    <div className="text-sm font-bold text-[hsl(var(--forest))]">{latestHealth?.status || 'Sehat'}</div>
+                    <div className="truncate text-sm font-bold text-[hsl(var(--forest))]">
+                      {latestHealth?.status
+                        ? latestHealth.status.charAt(0).toUpperCase() + latestHealth.status.slice(1).toLowerCase()
+                        : 'Sehat'}
+                    </div>
                     <div className="mt-0.5 text-[10px] text-[hsl(var(--forest))/50]">Kondisi Aktif</div>
                   </div>
                 </div>

@@ -49,3 +49,8 @@ next-env.d.ts
 /public/uploads/*
 !/public/uploads/.gitkeep
 .env*
+
+# sensitive data - Google OAuth credentials
+data/*.json
+data/client_secret_*.json
+data/silken-*.json
