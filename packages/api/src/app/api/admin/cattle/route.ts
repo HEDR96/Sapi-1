@@ -4,7 +4,7 @@ import { getCurrentUser } from '@/lib/auth/jwt'
 
 export const dynamic = 'force-dynamic'
 
-// Auto-generate cattle code with sequential numbering
+// Auto-generate cattle code with sequential numbering (format: NF-YYYY-NNN)
 async function generateCattleCode(): Promise<string> {
   const year = new Date().getFullYear()
   const prefix = `NF-${year}`
@@ -25,15 +25,15 @@ async function generateCattleCode(): Promise<string> {
   })
 
   if (lastCattle) {
-    // Extract the number from the last code (e.g., "NF-20260001" -> 1)
+    // Extract the number from the last code (e.g., "NF-2026-001" -> 1)
     const parts = lastCattle.code.split('-')
     const lastNum = parseInt(parts[parts.length - 1], 10)
     const newNum = lastNum + 1
-    return `${prefix}${String(newNum).padStart(4, '0')}`
+    return `${prefix}-${String(newNum).padStart(3, '0')}`
   }
 
   // First cattle of the year
-  return `${prefix}0001`
+  return `${prefix}-001`
 }
 
 export async function GET() {

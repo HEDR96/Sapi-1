@@ -4,7 +4,7 @@ import { getCurrentAdmin } from '@/lib/auth/jwt'
 
 export const dynamic = 'force-dynamic'
 
-// Auto-generate cattle code with sequential numbering (7 digits: NF-xxxxxxx)
+// Auto-generate cattle code with sequential numbering (format: SP-YYYY-NNN)
 async function generateCattleCode(): Promise<string> {
   const year = new Date().getFullYear()
   const prefix = `SP-${year}`
@@ -16,12 +16,13 @@ async function generateCattleCode(): Promise<string> {
   })
 
   if (lastCattle) {
+    // Expected format: SP-YYYY-NNN (e.g., SP-2026-001)
     const parts = lastCattle.code.split('-')
     const lastNum = parseInt(parts[parts.length - 1], 10)
-    return `${prefix}${String(lastNum + 1).padStart(7, '0')}`
+    return `${prefix}-${String(lastNum + 1).padStart(3, '0')}`
   }
 
-  return `${prefix}001`
+  return `${prefix}-001`
 }
 
 export async function GET() {
