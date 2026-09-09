@@ -108,7 +108,13 @@ export async function loadTokens(): Promise<StoredToken | null> {
   const envToken = process.env.GOOGLE_TOKEN_JSON
   if (envToken) {
     try {
-      const tokens = JSON.parse(envToken) as StoredToken
+      const parsed = JSON.parse(envToken)
+      // Handle both formats: with expiry_date (timestamp) or expires_in (seconds)
+      const tokens: StoredToken = {
+        access_token: parsed.access_token,
+        refresh_token: parsed.refresh_token,
+        expiry_date: parsed.expiry_date || (Date.now() + (parsed.expires_in || 3600) * 1000),
+      }
       console.log('[TokenStore] Tokens loaded from environment variable')
       return tokens
     } catch (error: any) {

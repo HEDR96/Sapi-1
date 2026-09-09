@@ -50,6 +50,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate file has type
+    if (!file.type) {
+      return NextResponse.json(
+        { error: 'File type tidak valid' },
+        { status: 400 }
+      )
+    }
+
     // Determine file category based on type
     const isVideo = file.type.startsWith('video/')
     const isImage = file.type.startsWith('image/')
