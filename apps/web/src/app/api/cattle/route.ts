@@ -71,8 +71,10 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Remove weights/media from response (only needed for filtering / fallback thumbnail)
-    const items = filteredCattle.map(({ weights, media, ...c }) => ({
+    // Remove weights/media from response (only needed for filtering / fallback thumbnail).
+    // This is a public unauthenticated route - never include internal
+    // cost/margin fields in the response.
+    const items = filteredCattle.map(({ weights, media, buyPrice, sellPrice, healthCost, feedCost, ...c }) => ({
       ...c,
       lastWeight: weights[0]?.weight || null,
       // Fall back to the first gallery item when no dedicated mainImage was set

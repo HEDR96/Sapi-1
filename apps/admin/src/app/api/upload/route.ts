@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import imageCompression from 'browser-image-compression'
 import { uploadToGoogleDrive, validateGoogleDriveConfig } from '@/lib/storage/google-drive-oauth'
+import { getCurrentAdmin } from '@/lib/auth/jwt'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,6 +25,11 @@ const IMAGE_COMPRESSION_OPTIONS = {
 }
 
 export async function POST(request: NextRequest) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     // First validate configuration
     try {

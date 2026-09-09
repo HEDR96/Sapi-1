@@ -67,8 +67,9 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Remove weights from response (only needed for filtering)
-    const items = filteredCattle.map(({ weights, ...c }) => ({
+    // Remove weights from response (only needed for filtering). This is a
+    // public unauthenticated route - never include internal cost fields.
+    const items = filteredCattle.map(({ weights, buyPrice, sellPrice, healthCost, feedCost, ...c }) => ({
       ...c,
       lastWeight: weights[0]?.weight || null,
     }))
