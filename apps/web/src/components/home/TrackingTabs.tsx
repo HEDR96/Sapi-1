@@ -7,7 +7,7 @@ import { formatWeight, formatDate } from '@samadya/shared/lib/utils/formatters'
 import { calculateWeightStats } from '@samadya/shared/lib/utils/calculations'
 import { WeightChart } from './WeightChart'
 import { Sprout, Wheat, Pill, Droplets } from 'lucide-react'
-import { getDirectImageUrl } from '@samadya/shared/lib/utils/imageUrl'
+import { MediaTab } from '../cattle/MediaTab'
 
 interface TrackingTabsProps {
   cattle: CattleWithRelations | null
@@ -427,43 +427,7 @@ export function TrackingTabs({ cattle }: TrackingTabsProps) {
         {/* DOKUMENTASI TAB */}
         {activeTab === 'dokumentasi' && (
           <div className="rounded-xl border border-[hsl(var(--line))] bg-white p-4 shadow-sm">
-            <div className="mb-3">
-              <div className="text-xs font-bold text-[hsl(var(--forest))]">Dokumentasi Foto & Video</div>
-              <p className="text-[10px] text-[hsl(var(--forest))/55]">Galeri riwayat perkembangan visual sapi</p>
-            </div>
-
-            {media.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                {media.map((item) => (
-                  <button
-                    key={item.id}
-                    className="group relative aspect-square overflow-hidden rounded-lg border border-[hsl(var(--line))]"
-                  >
-                    <img
-                      src={getDirectImageUrl(item.fileUrl)}
-                      alt={item.title || 'Dokumentasi'}
-                      className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
-                    />
-                    {item.fileType.toUpperCase() === 'VIDEO' && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow">
-                          <span className="text-[hsl(var(--forest))] text-xs">▶</span>
-                        </div>
-                      </div>
-                    )}
-                    {item.category && (
-                      <div className="absolute top-1 left-1 rounded bg-[hsl(var(--forest))]/80 px-1.5 py-0.5 text-[8px] font-medium text-white backdrop-blur-xs">
-                        {item.category}
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-lg border border-dashed border-[hsl(var(--line))] p-8 text-center">
-                <p className="text-xs text-[hsl(var(--forest))/50]">Belum ada dokumentasi media</p>
-              </div>
-            )}
+            <MediaTab media={media} />
           </div>
         )}
       </div>
