@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Beef, Eye, TrendingUp, Users, ArrowUpRight, ChevronRight } from 'lucide-react'
+import { Beef, Eye, TrendingUp, Users, ArrowUpRight, ChevronRight, HardDrive, AlertTriangle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@samadya/shared/components/ui/card'
 import { Button } from '@samadya/shared/components/ui/button'
 import { formatCurrency } from '@samadya/shared/lib/utils/formatters'
@@ -18,12 +18,25 @@ interface DashboardStats {
   recentCattle: any[]
 }
 
+interface StorageStatus {
+  usageBytes: number
+  limitBytes: number
+  percentUsed: number
+}
+
+function formatBytes(bytes: number): string {
+  const gb = bytes / (1024 * 1024 * 1024)
+  return `${gb.toFixed(gb < 10 ? 2 : 1)} GB`
+}
+
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [storage, setStorage] = useState<StorageStatus | null>(null)
 
   useEffect(() => {
     fetchDashboardData()
+    fetchStorageStatus()
   }, [])
 
   const fetchDashboardData = async () => {
@@ -37,6 +50,18 @@ export default function DashboardPage() {
       console.error('Failed to fetch dashboard data:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchStorageStatus = async () => {
+    try {
+      const res = await fetch('/api/admin/storage-status')
+      const json = await res.json()
+      if (res.ok) {
+        setStorage(json)
+      }
+    } catch (error) {
+      console.error('Failed to fetch storage status:', error)
     }
   }
 
@@ -227,6 +252,39 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Storage Usage */}
+      {storage && (
+        <Card className={`border-gray-200 shadow-sm ${storage.percentUsed >= 100 ? 'border-red-300' : storage.percentUsed >= 85 ? 'border-amber-300' : ''}`}>
+          <CardContent className="pt-5">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <HardDrive className="h-4 w-4 text-gray-500" />
+                <span className="text-sm font-semibold text-gray-700">Penyimpanan (Google Drive)</span>
+              </div>
+              <span className="text-sm font-bold text-gray-900">
+                {formatBytes(storage.usageBytes)} / {formatBytes(storage.limitBytes)}
+              </span>
+            </div>
+            <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className={`h-full transition-all ${
+                  storage.percentUsed >= 100 ? 'bg-red-500' : storage.percentUsed >= 85 ? 'bg-amber-500' : 'bg-emerald-500'
+                }`}
+                style={{ width: `${Math.min(100, storage.percentUsed)}%` }}
+              />
+            </div>
+            {storage.percentUsed >= 85 && (
+              <p className={`mt-2 text-xs flex items-center gap-1.5 ${storage.percentUsed >= 100 ? 'text-red-600' : 'text-amber-600'}`}>
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                {storage.percentUsed >= 100
+                  ? 'Kapasitas penuh! Upload foto/video baru akan gagal. Hubungi developer untuk upgrade kapasitas.'
+                  : `Kapasitas hampir penuh (${storage.percentUsed}%). Segera hubungi developer untuk upgrade sebelum penuh.`}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

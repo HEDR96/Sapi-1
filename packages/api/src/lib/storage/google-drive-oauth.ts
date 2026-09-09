@@ -17,6 +17,45 @@ const DRIVE_FOLDERS = {
   video: process.env.GOOGLE_DRIVE_VIDEO_FOLDER_ID || '',
 }
 
+// App-level storage cap (independent of whatever raw quota the connected
+// Google account has) - once reached, uploads are blocked until upgraded.
+export const STORAGE_LIMIT_BYTES = 10 * 1024 * 1024 * 1024 // 10 GB
+export const STORAGE_QUOTA_MESSAGE =
+  'Kapasitas penyimpanan sudah penuh (10GB). Silakan hubungi developer untuk upgrade kapasitas penyimpanan.'
+
+export interface DriveStorageStatus {
+  usageBytes: number
+  limitBytes: number
+}
+
+/**
+ * Get real storage usage from the connected Google Drive account.
+ */
+export async function getDriveStorageStatus(): Promise<DriveStorageStatus> {
+  const drive = await getAuthenticatedDriveClient()
+  const about = await drive.about.get({ fields: 'storageQuota' })
+  const usageBytes = parseInt(about.data.storageQuota?.usage || '0', 10)
+  return { usageBytes, limitBytes: STORAGE_LIMIT_BYTES }
+}
+
+/**
+ * Throws if uploading `additionalBytes` more would exceed the app's storage
+ * cap. Fails open (allows the upload) if the quota check itself errors out -
+ * a transient Drive API issue here shouldn't take down uploads entirely.
+ */
+export async function assertStorageAvailable(additionalBytes: number): Promise<void> {
+  let status: DriveStorageStatus
+  try {
+    status = await getDriveStorageStatus()
+  } catch (error: any) {
+    console.warn('[Google Drive OAuth] Storage quota check failed, allowing upload:', error.message)
+    return
+  }
+  if (status.usageBytes + additionalBytes > status.limitBytes) {
+    throw new Error(STORAGE_QUOTA_MESSAGE)
+  }
+}
+
 /**
  * Validate Google Drive configuration
  */
@@ -214,6 +253,8 @@ export async function uploadToGoogleDrive(
   if (!folderId) {
     throw new Error(`Invalid folder type: ${folder}. Use 'image' or 'video'.`)
   }
+
+  await assertStorageAvailable(buffer.length)
 
   console.log('[Google Drive OAuth] Starting upload:', {
     fileName,

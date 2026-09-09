@@ -3,6 +3,7 @@ import {
   validateGoogleDriveConfig,
   getValidAccessToken,
   DRIVE_FOLDERS,
+  assertStorageAvailable,
 } from '@/lib/storage/google-drive-oauth'
 import { saveUploadSession } from '@/lib/storage/upload-session-store'
 
@@ -27,6 +28,12 @@ export async function POST(request: NextRequest) {
     const folderId = DRIVE_FOLDERS[driveFolder]
     if (!folderId) {
       return NextResponse.json({ error: `Invalid folder type: ${driveFolder}` }, { status: 400 })
+    }
+
+    try {
+      await assertStorageAvailable(fileSize)
+    } catch (err: any) {
+      return NextResponse.json({ error: err.message }, { status: 507 })
     }
 
     const accessToken = await getValidAccessToken()
