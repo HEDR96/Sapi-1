@@ -29,10 +29,41 @@ export interface DriveStorageStatus {
 /**
  * Get real storage usage from the connected Google Drive account.
  */
+/**
+ * Sum the size of every file inside one Drive folder (paginated).
+ */
+async function getFolderUsageBytes(drive: drive_v3.Drive, folderId: string): Promise<number> {
+  let totalBytes = 0
+  let pageToken: string | undefined
+
+  do {
+    const res = await drive.files.list({
+      q: `'${folderId}' in parents and trashed = false`,
+      fields: 'nextPageToken, files(size)',
+      pageSize: 1000,
+      pageToken,
+    })
+    for (const file of res.data.files || []) {
+      totalBytes += parseInt(file.size || '0', 10)
+    }
+    pageToken = res.data.nextPageToken || undefined
+  } while (pageToken)
+
+  return totalBytes
+}
+
+/**
+ * Get storage usage scoped to THIS app's own upload folders (image + video),
+ * not the connected Google account's overall Drive usage - the account may
+ * hold unrelated personal files that have nothing to do with this project.
+ */
 export async function getDriveStorageStatus(): Promise<DriveStorageStatus> {
   const drive = await getAuthenticatedDriveClient()
-  const about = await drive.about.get({ fields: 'storageQuota' })
-  const usageBytes = parseInt(about.data.storageQuota?.usage || '0', 10)
+  const folderIds = [DRIVE_FOLDERS.image, DRIVE_FOLDERS.video].filter(Boolean)
+
+  const usages = await Promise.all(folderIds.map((id) => getFolderUsageBytes(drive, id)))
+  const usageBytes = usages.reduce((sum, bytes) => sum + bytes, 0)
+
   return { usageBytes, limitBytes: STORAGE_LIMIT_BYTES }
 }
 
