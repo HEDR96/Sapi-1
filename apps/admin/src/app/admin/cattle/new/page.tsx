@@ -104,6 +104,10 @@ export default function NewCattlePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // Extra guard against double-submit (e.g. Enter key + button click both
+    // firing, or a click landing before the disabled state re-renders) -
+    // don't rely on the button's disabled prop alone.
+    if (loading) return
     setError('')
     setLoading(true)
 
