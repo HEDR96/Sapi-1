@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Breadcrumb } from '../../components/shared/Breadcrumb'
 import { CattleCard } from '../../components/catalog/CattleCard'
 import { CattleWithRelations } from '@samadya/shared/types'
+import { calculateWeightStats, estimateTargetCompletion } from '@samadya/shared/lib/utils/calculations'
 import { Search, SlidersHorizontal, Grid3X3, LayoutGrid } from 'lucide-react'
 
 export default function KatalogPage() {
@@ -13,14 +14,18 @@ export default function KatalogPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [selectedStatus, setSelectedStatus] = useState<string>('all')
   const [selectedBreed, setSelectedBreed] = useState<string>('all')
+  const [fetchError, setFetchError] = useState(false)
 
   useEffect(() => {
     fetchCattle()
   }, [])
 
   const fetchCattle = async () => {
+    setLoading(true)
+    setFetchError(false)
     try {
       const res = await fetch('/api/admin/cattle?limit=100')
+      if (!res.ok) throw new Error(`Request failed with status ${res.status}`)
       const data = await res.json()
       const items = Array.isArray(data) ? data : data.items || data.data?.items || []
       // Sold cattle no longer have anything to offer buyers - keep them out
@@ -28,6 +33,7 @@ export default function KatalogPage() {
       setCattle(items.filter((c: CattleWithRelations) => c.status !== 'SOLD'))
     } catch (err) {
       console.error('Failed to fetch cattle:', err)
+      setFetchError(true)
     } finally {
       setLoading(false)
     }
@@ -148,6 +154,19 @@ export default function KatalogPage() {
               </div>
             ))}
           </div>
+        ) : fetchError ? (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-red-200 bg-red-50 py-16 text-center">
+            <h3 className="text-lg font-semibold text-red-700">Gagal memuat data sapi</h3>
+            <p className="mt-2 text-sm text-red-600/80">
+              Terjadi masalah koneksi ke server. Silakan coba lagi.
+            </p>
+            <button
+              onClick={fetchCattle}
+              className="mt-4 rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition-colors"
+            >
+              Coba Lagi
+            </button>
+          </div>
         ) : filteredCattle.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[hsl(var(--line))] bg-white py-16 text-center">
             <img src="/images/cow-seeklogo.png" alt="Sapi" className="w-20 h-20 mb-4 opacity-30" />
@@ -162,7 +181,12 @@ export default function KatalogPage() {
               ? 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
               : 'grid-cols-1'
           }`}>
-            {filteredCattle.map(c => (
+            {filteredCattle.map(c => {
+              const weightStats = calculateWeightStats(c.weights || [])
+              const targetEstimation = c.targetWeight && weightStats.lastWeight
+                ? estimateTargetCompletion(c.targetWeight, weightStats.lastWeight, weightStats.adg)
+                : null
+              return (
               <CattleCard
                 key={c.id}
                 id={c.id}
@@ -171,11 +195,14 @@ export default function KatalogPage() {
                 breed={c.breed}
                 status={c.status}
                 price={Number(c.price)}
-                lastWeight={c.weights?.[c.weights.length - 1]?.weight || null}
+                lastWeight={c.lastWeight ?? c.weights?.[0]?.weight ?? null}
                 mainImage={c.mainImage || c.media?.[0]?.fileUrl || null}
                 quantity={c.quantity}
+                adg={weightStats.adg}
+                progressPercentage={targetEstimation?.progressPercentage ?? null}
               />
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

@@ -34,6 +34,7 @@ export default function TestimonialsPage() {
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [draggedId, setDraggedId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchTestimonials()
@@ -130,13 +131,59 @@ export default function TestimonialsPage() {
 
   const activeCount = testimonials.filter(t => t.isActive).length
 
+  const handleDrop = async (targetId: string) => {
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null)
+      return
+    }
+
+    const current = [...testimonials]
+    const fromIndex = current.findIndex(t => t.id === draggedId)
+    const toIndex = current.findIndex(t => t.id === targetId)
+    if (fromIndex === -1 || toIndex === -1) {
+      setDraggedId(null)
+      return
+    }
+
+    const [moved] = current.splice(fromIndex, 1)
+    current.splice(toIndex, 0, moved)
+
+    // Re-number order sequentially and reflect it immediately in the UI
+    const reordered = current.map((t, i) => ({ ...t, order: i }))
+    setTestimonials(reordered)
+    setDraggedId(null)
+
+    // Persist the new sequential order for every item (the list is small,
+    // simplest to just re-save all of them rather than diffing positions)
+    try {
+      await Promise.all(
+        reordered.map(t =>
+          fetch(`/api/admin/testimonials?id=${t.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              customerName: t.customerName,
+              content: t.content,
+              rating: t.rating,
+              isActive: t.isActive,
+              order: t.order,
+            }),
+          })
+        )
+      )
+    } catch (err) {
+      console.error('Failed to persist testimonial order:', err)
+      fetchTestimonials()
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Testimoni</h2>
           <p className="text-muted-foreground">
-            Kelola testimoni yang ditampilkan di website ({activeCount}/3 aktif)
+            Kelola testimoni yang ditampilkan di website ({activeCount} aktif)
           </p>
         </div>
         <Button
@@ -146,20 +193,11 @@ export default function TestimonialsPage() {
             setError('')
             setModalOpen(true)
           }}
-          disabled={activeCount >= 3}
         >
           <Plus className="h-4 w-4 mr-2" />
           Tambah Testimoni
         </Button>
       </div>
-
-      {activeCount >= 3 && (
-        <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-          <p className="text-amber-800 text-sm">
-            Maksimal 3 testimoni aktif. Nonaktifkan salah satu untuk menambahkan yang baru.
-          </p>
-        </div>
-      )}
 
       {loading ? (
         <div className="space-y-2">
@@ -179,12 +217,22 @@ export default function TestimonialsPage() {
           {testimonials.map((testimonial) => (
             <Card
               key={testimonial.id}
-              className={`relative ${!testimonial.isActive ? 'opacity-60' : ''}`}
+              draggable
+              onDragStart={() => setDraggedId(testimonial.id)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault()
+                handleDrop(testimonial.id)
+              }}
+              onDragEnd={() => setDraggedId(null)}
+              className={`relative transition-opacity ${!testimonial.isActive ? 'opacity-60' : ''} ${
+                draggedId === testimonial.id ? 'opacity-40' : ''
+              }`}
             >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <GripVertical className="h-4 w-4 text-muted-foreground/50" />
+                    <GripVertical className="h-4 w-4 text-muted-foreground/50 cursor-grab active:cursor-grabbing" />
                     <div className="flex gap-0.5">
                       {[...Array(5)].map((_, i) => (
                         <Star

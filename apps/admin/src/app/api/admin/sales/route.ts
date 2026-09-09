@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
+import { getCurrentAdmin } from '@/lib/auth/jwt'
 
 // GET /api/admin/sales - List all sales
 export async function GET(request: NextRequest) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams
     const search = searchParams.get('search') || ''
@@ -63,6 +69,11 @@ export async function GET(request: NextRequest) {
 
 // POST /api/admin/sales - Create sale
 export async function POST(request: NextRequest) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const body = await request.json()
     const { cattleId, customerIds, quantity, price, notes } = body
@@ -76,15 +87,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get cattle buyPrice to calculate margin
+    // Get cattle costs to calculate net margin
     const cattle = await prisma.cattle.findUnique({
       where: { id: cattleId },
-      select: { buyPrice: true },
+      select: { buyPrice: true, healthCost: true, feedCost: true },
     })
 
-    // Calculate margin: price - buyPrice
+    // Net margin: price - (buy price + health cost + feed cost)
     const buyPrice = cattle?.buyPrice ? Number(cattle.buyPrice) : 0
-    const margin = parseFloat(price) - buyPrice
+    const healthCost = cattle?.healthCost ? Number(cattle.healthCost) : 0
+    const feedCost = cattle?.feedCost ? Number(cattle.feedCost) : 0
+    const margin = parseFloat(price) - buyPrice - healthCost - feedCost
 
     // Create sales for each customer
     const saleData = customerIds.map((customerId: string) => ({

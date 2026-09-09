@@ -47,8 +47,13 @@ async function getCattle(code: string) {
       recordDate: new Date(fr.recordDate),
     }))
 
+    // This object is passed as a prop into the client-side CattleProfile
+    // component, which serializes it into the page payload sent to every
+    // visitor's browser - internal cost/margin fields must never ride along.
+    const { buyPrice, sellPrice, healthCost, feedCost, ...publicCattle } = cattle
+
     return {
-      ...cattle,
+      ...publicCattle,
       birthDate: new Date(cattle.birthDate),
       weights,
       healthRecords,

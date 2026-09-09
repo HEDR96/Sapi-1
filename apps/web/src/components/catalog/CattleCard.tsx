@@ -3,7 +3,6 @@ import Image from 'next/image'
 import { useState, useRef } from 'react'
 import { Columns3, Check, Film } from 'lucide-react'
 import { Status } from '@samadya/shared/types'
-import { StatusBadge } from './CattleStatusBadge'
 import { formatCurrency, formatWeight } from '@samadya/shared/lib/utils/formatters'
 import { getDirectImageUrl, getVideoUrl, isVideoUrl } from '@samadya/shared/lib/utils/imageUrl'
 
@@ -66,6 +65,8 @@ interface CattleCardProps {
   lastWeight: number | null
   mainImage: string | null
   quantity?: number
+  adg?: number | null
+  progressPercentage?: number | null
   isSelected?: boolean
   isComparing?: boolean
   onClick?: () => void
@@ -82,6 +83,8 @@ export function CattleCard({
   lastWeight,
   mainImage,
   quantity = 1,
+  adg,
+  progressPercentage,
   isSelected = false,
   isComparing = false,
   onClick,
@@ -100,6 +103,12 @@ export function CattleCard({
         isSold || isBooked ? 'opacity-75' : ''
       } ${isSelected ? 'border-[hsl(var(--gold))] ring-2 ring-[hsl(var(--gold))]' : 'border-[hsl(var(--line))]'}`}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault()
+          onClick()
+        }
+      }}
       role="button"
       tabIndex={0}
     >
@@ -158,9 +167,9 @@ export function CattleCard({
             <span className="text-[10px] text-[hsl(var(--forest))/50]">Tidak Ada Foto</span>
           </div>
         )}
-        {lastWeight && !isSold && !isBooked && (
+        {progressPercentage != null && !isSold && !isBooked && (
           <div className="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[7px] font-bold text-[hsl(var(--forest))] shadow-sm">
-            85%
+            {Math.round(progressPercentage)}%
           </div>
         )}
       </div>
@@ -190,7 +199,7 @@ export function CattleCard({
           </div>
           <div className="rounded bg-[hsl(var(--cream))] px-2 py-1.5">
             <span className="text-[hsl(var(--forest))/45]">ADG</span>
-            <div className="font-bold text-[hsl(var(--forest))]">1.05 kg</div>
+            <div className="font-bold text-[hsl(var(--forest))]">{adg != null ? `${adg.toFixed(2)} kg` : '-'}</div>
           </div>
         </div>
 

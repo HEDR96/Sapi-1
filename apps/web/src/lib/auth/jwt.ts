@@ -2,7 +2,10 @@ import jwt, { SignOptions } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
 import { JWTPayload } from '@samadya/shared/types'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-change-in-production'
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET environment variable must be set in production')
+}
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-only-insecure-secret'
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h'
 
 export function generateToken(payload: Omit<JWTPayload, 'iat' | 'exp'>): string {

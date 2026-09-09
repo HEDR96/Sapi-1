@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
+import { getCurrentAdmin } from '@/lib/auth/jwt'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     console.log('[Dashboard Stats] Starting...')
 

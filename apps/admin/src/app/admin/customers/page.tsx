@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, Search, Pencil, Trash2, Phone, Mail, X } from 'lucide-react'
+import { Plus, Search, Pencil, Trash2, Phone, Mail, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@samadya/shared/components/ui/button'
 import { Input } from '@samadya/shared/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@samadya/shared/components/ui/card'
@@ -27,10 +27,22 @@ export default function CustomersPage() {
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', purchasePercentage: '' })
   const [saving, setSaving] = useState(false)
+  const [page, setPage] = useState(1)
+  const ITEMS_PER_PAGE = 10
 
   useEffect(() => {
     fetchCustomers()
   }, [search])
+
+  useEffect(() => {
+    setPage(1)
+  }, [search])
+
+  const totalPages = Math.max(1, Math.ceil(customers.length / ITEMS_PER_PAGE))
+  // Clamp so deleting the last item on the last page doesn't strand the
+  // view on a page number that no longer exists.
+  const safePage = Math.min(page, totalPages)
+  const paginatedCustomers = customers.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE)
 
   const fetchCustomers = async () => {
     try {
@@ -88,10 +100,16 @@ export default function CustomersPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Hapus pelanggan ini?')) return
     try {
-      await fetch(`/api/admin/customers/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/admin/customers/${id}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (!res.ok) {
+        alert(data.error || 'Gagal menghapus pelanggan')
+        return
+      }
       fetchCustomers()
     } catch (error) {
       console.error('Failed to delete customer:', error)
+      alert('Gagal menghapus pelanggan')
     }
   }
 
@@ -132,7 +150,7 @@ export default function CustomersPage() {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {customers.map((customer) => (
+          {paginatedCustomers.map((customer) => (
             <Card key={customer.id}>
               <CardContent className="p-4">
                 <div className="flex items-start justify-between">
@@ -178,6 +196,18 @@ export default function CustomersPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage === 1}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm text-muted-foreground">Halaman {safePage} dari {totalPages}</span>
+          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
       )}
 

@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
+import { getCurrentAdmin } from '@/lib/auth/jwt'
 
 // GET /api/admin/customers/[id]
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const customer = await prisma.customer.findUnique({
       where: { id: params.id },
@@ -41,6 +47,11 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const body = await request.json()
     const { name, email, phone, address, purchasePercentage } = body
@@ -68,7 +79,20 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
+    const salesCount = await prisma.sale.count({ where: { customerId: params.id } })
+    if (salesCount > 0) {
+      return NextResponse.json(
+        { error: `Tidak bisa menghapus: pelanggan ini memiliki ${salesCount} riwayat penjualan. Hapus penjualan terkait terlebih dahulu.` },
+        { status: 400 }
+      )
+    }
+
     await prisma.customer.delete({
       where: { id: params.id },
     })

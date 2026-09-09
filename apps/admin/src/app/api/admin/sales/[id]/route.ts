@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
+import { getCurrentAdmin } from '@/lib/auth/jwt'
 
 // GET /api/admin/sales/[id]
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const sale = await prisma.sale.findUnique({
       where: { id: params.id },
@@ -31,6 +37,11 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const body = await request.json()
     const { quantity, price, margin, status, notes } = body
@@ -66,10 +77,21 @@ export async function PUT(
         data: { status: 'SOLD' },
       })
     } else if (status === 'CANCELLED') {
-      await prisma.cattle.update({
-        where: { id: currentSale.cattleId },
-        data: { status: 'AVAILABLE' },
+      // Only free the cattle up if no OTHER active sale still claims it
+      // (e.g. a shared/qurban-patungan cattle with several sale rows).
+      const otherActiveSales = await prisma.sale.count({
+        where: {
+          cattleId: currentSale.cattleId,
+          id: { not: params.id },
+          status: { in: ['CONFIRMED', 'COMPLETED'] },
+        },
       })
+      if (otherActiveSales === 0) {
+        await prisma.cattle.update({
+          where: { id: currentSale.cattleId },
+          data: { status: 'AVAILABLE' },
+        })
+      }
     }
 
     return NextResponse.json({ sale })
@@ -84,6 +106,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const sale = await prisma.sale.findUnique({
       where: { id: params.id },
@@ -93,12 +120,23 @@ export async function DELETE(
       return NextResponse.json({ error: 'Sale not found' }, { status: 404 })
     }
 
-    // If sale was confirmed/completed, make cattle available again
+    // If sale was confirmed/completed, make cattle available again - but
+    // only if no OTHER active sale still claims the same cattle (e.g. a
+    // shared/qurban-patungan cattle with several sale rows).
     if (sale.status === 'CONFIRMED' || sale.status === 'COMPLETED') {
-      await prisma.cattle.update({
-        where: { id: sale.cattleId },
-        data: { status: 'AVAILABLE' },
+      const otherActiveSales = await prisma.sale.count({
+        where: {
+          cattleId: sale.cattleId,
+          id: { not: params.id },
+          status: { in: ['CONFIRMED', 'COMPLETED'] },
+        },
       })
+      if (otherActiveSales === 0) {
+        await prisma.cattle.update({
+          where: { id: sale.cattleId },
+          data: { status: 'AVAILABLE' },
+        })
+      }
     }
 
     await prisma.sale.delete({

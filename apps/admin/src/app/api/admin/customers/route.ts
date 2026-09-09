@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
+import { getCurrentAdmin } from '@/lib/auth/jwt'
 
 // GET /api/admin/customers - List all customers
 export async function GET(request: NextRequest) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams
     const search = searchParams.get('search') || ''
@@ -44,6 +50,11 @@ export async function GET(request: NextRequest) {
 
 // POST /api/admin/customers - Create customer
 export async function POST(request: NextRequest) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const body = await request.json()
     const { name, email, phone, address, purchasePercentage } = body

@@ -271,13 +271,13 @@ export default function CattleDetailPage() {
                     <div className="space-y-2"><Label>Kode</Label><Input value={form.code} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, code: e.target.value })} /></div>
                     <div className="space-y-2"><Label>Nama</Label><Input value={form.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })} /></div>
                     <div className="space-y-2"><Label>Jenis</Label>
-                      <Select value={form.breed} onValueChange={(v: string) => setForm({ ...form, breed: v })} disabled={loadingMasterData || editing}>
+                      <Select value={form.breed} onValueChange={(v: string) => setForm({ ...form, breed: v })} disabled={loadingMasterData}>
                         <SelectTrigger><SelectValue placeholder={loadingMasterData ? 'Memuat...' : 'Pilih jenis sapi'} /></SelectTrigger>
                         <SelectContent>{cattleBreeds.map((b) => <SelectItem key={b.id} value={b.key}>{b.value}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2"><Label>Status</Label>
-                      <Select value={form.status} onValueChange={(v: string) => setForm({ ...form, status: v })} disabled={loadingMasterData || editing}>
+                      <Select value={form.status} onValueChange={(v: string) => setForm({ ...form, status: v })} disabled={loadingMasterData}>
                         <SelectTrigger><SelectValue placeholder={loadingMasterData ? 'Memuat...' : 'Pilih status'} /></SelectTrigger>
                         <SelectContent>{cattleStatuses.map((s) => <SelectItem key={s.id} value={s.key}>{s.value}</SelectItem>)}</SelectContent>
                       </Select>
@@ -286,6 +286,7 @@ export default function CattleDetailPage() {
                     <div className="space-y-2"><Label>Tinggi (cm)</Label><Input type="number" value={form.height} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, height: e.target.value })} /></div>
                     <div className="space-y-2"><Label>Harga Jual (Rp)</Label><Input type="number" value={form.price} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, price: e.target.value })} /></div>
                     <div className="space-y-2"><Label>Harga Beli (Rp)</Label><Input type="number" value={form.buyPrice} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, buyPrice: e.target.value })} placeholder="0" /></div>
+                    <div className="space-y-2"><Label>Harga Jual 2 (Rp)</Label><Input type="number" value={form.sellPrice} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, sellPrice: e.target.value })} placeholder="0" /></div>
                     <div className="space-y-2"><Label>Target Bobot (Kg)</Label><Input type="number" value={form.targetWeight} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, targetWeight: e.target.value })} /></div>
                     <div className="space-y-2"><Label>Biaya Kesehatan (Rp)</Label><Input type="number" value={form.healthCost} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, healthCost: e.target.value })} placeholder="0" /></div>
                     <div className="space-y-2"><Label>Biaya Pakan (Rp)</Label><Input type="number" value={form.feedCost} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, feedCost: e.target.value })} placeholder="0" /></div>
@@ -298,6 +299,7 @@ export default function CattleDetailPage() {
                     <div><p className="text-xs text-muted-foreground">Tinggi</p><p className="font-medium">{cattle.height ? `${formatFloat(cattle.height)} cm` : '-'}</p></div>
                     <div><p className="text-xs text-muted-foreground">Harga Jual</p><p className="font-medium">{formatCurrency(cattle.price)}</p></div>
                     <div><p className="text-xs text-muted-foreground">Harga Beli</p><p className="font-medium">{cattle.buyPrice ? formatCurrency(cattle.buyPrice) : '-'}</p></div>
+                    <div><p className="text-xs text-muted-foreground">Harga Jual 2</p><p className="font-medium">{cattle.sellPrice ? formatCurrency(cattle.sellPrice) : '-'}</p></div>
                     <div><p className="text-xs text-muted-foreground">Target Bobot</p><p className="font-medium">{cattle.targetWeight ? `${formatFloat(cattle.targetWeight)} Kg` : '-'}</p></div>
                     <div><p className="text-xs text-muted-foreground">Bobot Terakhir</p><p className="font-medium">{cattle.lastWeight ? `${formatFloat(cattle.lastWeight)} Kg` : '-'}</p></div>
                     <div><p className="text-xs text-muted-foreground">Biaya Kesehatan</p><p className="font-medium">{cattle.healthCost ? formatCurrency(cattle.healthCost) : '-'}</p></div>
