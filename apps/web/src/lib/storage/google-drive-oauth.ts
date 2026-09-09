@@ -66,40 +66,79 @@ export function getOAuth2Client() {
 export function getAuthorizationUrl(): string {
   const oauth2Client = getOAuth2Client()
 
+  const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI
+  console.log('[Google OAuth] Using redirect_uri:', redirectUri)
+  console.log('[Google OAuth] Using client_id:', process.env.GOOGLE_OAUTH_CLIENT_ID)
+
   return oauth2Client.generateAuthUrl({
-    access_type: 'offline', // Important: get refresh token
+    access_type: 'offline',
     scope: SCOPES,
-    prompt: 'consent', // Force consent screen to get refresh token
+    prompt: 'consent',
   })
 }
 
 /**
- * Handle OAuth callback - exchange code for tokens
+ * Stored token interface
  */
-export async function handleOAuthCallback(code: string): Promise<void> {
+interface StoredToken {
+  access_token: string
+  refresh_token: string
+  expiry_date: number
+}
+
+/**
+ * Handle OAuth callback - exchange code for tokens
+ * Returns the token so it can be saved as environment variable in production
+ */
+export async function handleOAuthCallback(code: string): Promise<StoredToken> {
   const oauth2Client = getOAuth2Client()
 
   console.log('[Google OAuth] Exchanging code for tokens...')
+  console.log('[Google OAuth] Code type:', typeof code)
+  console.log('[Google OAuth] Code length:', code?.length)
 
-  const { tokens } = await oauth2Client.getToken(code)
+  let tokens: { tokens: any }
+  try {
+    tokens = await oauth2Client.getToken(code)
+  } catch (tokenError: any) {
+    console.error('[Google OAuth] Token exchange failed:', tokenError.message)
+    console.error('[Google OAuth] Token error details:', {
+      code: tokenError.code,
+      status: tokenError.status,
+      errors: tokenError.errors,
+      response: tokenError.response?.data
+    })
+    throw new Error(`Token exchange failed: ${tokenError.message}`)
+  }
 
+  if (!tokens || !tokens.tokens) {
+    throw new Error('Invalid response from Google OAuth')
+  }
+
+  const tokenData = tokens.tokens
   console.log('[Google OAuth] Tokens received:', {
-    hasAccessToken: !!tokens.access_token,
-    hasRefreshToken: !!tokens.refresh_token,
-    expiryDate: tokens.expiry_date,
+    hasAccessToken: !!tokenData.access_token,
+    hasRefreshToken: !!tokenData.refresh_token,
+    expiryDate: tokenData.expiry_date,
   })
 
   // Calculate actual expiry date if not provided (default: 1 hour from now)
-  const expiryDate = tokens.expiry_date || (Date.now() + 3600 * 1000)
+  const expiryDate = tokenData.expiry_date || (Date.now() + 3600 * 1000)
 
-  // Save tokens
-  await saveTokens({
-    access_token: tokens.access_token!,
-    refresh_token: tokens.refresh_token!,
+  // Build stored token object
+  const storedToken: StoredToken = {
+    access_token: tokenData.access_token!,
+    refresh_token: tokenData.refresh_token!,
     expiry_date: expiryDate,
-  })
+  }
+
+  // Save tokens to file (for local development)
+  await saveTokens(storedToken)
 
   console.log('[Google OAuth] Tokens saved successfully')
+
+  // Return token so it can be used/set as environment variable
+  return storedToken
 }
 
 /**
@@ -162,11 +201,6 @@ export async function getAuthenticatedDriveClient(): Promise<drive_v3.Drive> {
 
 /**
  * Upload a file to Google Drive using OAuth
- * @param buffer - File buffer
- * @param fileName - Original file name
- * @param mimeType - MIME type of the file
- * @param folder - 'image' or 'video'
- * @returns Object containing file ID and public URL
  */
 export async function uploadToGoogleDrive(
   buffer: Buffer,
@@ -288,7 +322,6 @@ async function makeFilePublic(drive: drive_v3.Drive, fileId: string): Promise<vo
     console.log('[Google Drive OAuth] File made public:', fileId)
   } catch (error: any) {
     console.error('[Google Drive OAuth] Failed to make file public:', error.message)
-    // Don't throw - file is uploaded, just not public
   }
 }
 
@@ -326,13 +359,11 @@ function bufferToStream(buffer: Buffer): NodeJS.ReadableStream {
 }
 
 /**
- * Check if user is authorized (has tokens, even if expired - refresh will happen on use)
+ * Check if user is authorized
  */
 export async function isAuthorized(): Promise<boolean> {
   try {
     const tokens = await loadTokens()
-    // Return true if we have tokens, even if expired
-    // The actual refresh will happen in getAuthenticatedDriveClient()
     return tokens !== null
   } catch {
     return false
