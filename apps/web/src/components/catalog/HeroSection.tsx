@@ -277,19 +277,17 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
         </div>
       </div>
 
-      {/* Dynamic Tag Container - Responsive */}
+      {/* Dynamic Tag Container - Unified unit: Pin + Rope + Card */}
       <div className="relative flex items-start justify-center lg:justify-end overflow-hidden bg-[#F1EFE2] px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 lg:px-4 lg:pr-2">
-        {/* Pin Hanger - Wooden board at top */}
-        <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 -ml-[2px] md:ml-[22px] top-0 z-30">
-          <div className="h-2.5 w-6 sm:h-3 sm:w-7 rounded-b-lg bg-gradient-to-b from-[#5c4328] via-[#7a5c37] to-[#43301b] shadow-md" />
-        </div>
-
-        {/* Single unit: Rope + Card connected */}
+        {/* Unified tag unit: Pin + Rope + Card stays together on all screen sizes */}
         <div className="relative mr-0.5 sm:mr-1 lg:mr-0">
           <div
             key={currentCattle?.id || 'default'}
             className="paper-pull-up relative z-10 flex flex-col items-center"
           >
+            {/* Pin Hanger - Wooden board at top, integrated with unit */}
+            <div className="pointer-events-none h-2.5 w-6 sm:h-3 sm:w-7 rounded-b-lg bg-gradient-to-b from-[#5c4328] via-[#7a5c37] to-[#43301b] shadow-md" />
+
             {/* Integrated Rope - pin circle + rope segment */}
             <svg width="10" height="30" viewBox="0 0 10 30" fill="none" className="drop-shadow-sm">
               <circle cx="5" cy="5" r="5" fill="#302111" stroke="#8B7355" strokeWidth="1.5" />
