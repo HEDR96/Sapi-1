@@ -6,10 +6,16 @@ import {
   assertStorageAvailable,
 } from '@/lib/storage/google-drive-oauth'
 import { saveUploadSession } from '@/lib/storage/upload-session-store'
+import { getCurrentAdmin } from '@/lib/auth/jwt'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const body = await request.json()
     const { fileName, fileSize, mimeType, folder, uploadId } = body
