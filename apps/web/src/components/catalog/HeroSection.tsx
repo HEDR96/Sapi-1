@@ -89,7 +89,9 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
         const res = await fetch('/api/cattle/count')
         if (res.ok) {
           const data = await res.json()
-          setCattleCount(data.count || 0)
+          // Ensure count is a valid number (handles undefined, null, or string)
+          const countValue = typeof data.count === 'number' ? data.count : parseInt(data.count, 10)
+          setCattleCount(isNaN(countValue) ? 0 : countValue)
         }
       } catch (error) {
         console.error('Failed to fetch cattle count:', error)
@@ -166,7 +168,7 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
   }, [])
 
   return (
-    <section ref={heroRef} className="reveal mx-auto grid max-w-full grid-cols-1 items-stretch md:grid-cols-[3.3fr_2.1fr_.9fr]">
+    <section ref={heroRef} className="reveal mx-auto grid max-w-full grid-cols-1 items-stretch md:grid-cols-[3.3fr_2.1fr_.9fr] overflow-visible">
       {/* Image Slider - Mobile uses aspect ratio, desktop uses height */}
       <div className="hero-photo relative w-full md:min-h-[280px] lg:min-h-[350px] xl:min-h-[450px] 2xl:min-h-[520px] overflow-hidden">
         {/* Mobile: Aspect ratio container */}
@@ -278,28 +280,39 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
       </div>
 
       {/* Dynamic Tag Container - Unified unit: Pin + Rope + Card */}
-      <div className="relative flex items-start justify-center lg:justify-end overflow-hidden bg-[#F1EFE2] px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 lg:px-4 lg:pr-2">
+      <div className="relative flex items-start justify-center lg:justify-end overflow-visible bg-[#F1EFE2] px-2 sm:px-3 md:px-4 py-0 sm:py-0 md:py-0 lg:px-4 lg:pr-2">
         {/* Unified tag unit: Pin + Rope + Card stays together on all screen sizes */}
         <div className="relative mr-0.5 sm:mr-1 lg:mr-0">
           <div
             key={currentCattle?.id || 'default'}
             className="paper-pull-up relative z-10 flex flex-col items-center"
           >
-            {/* Pin Hanger - Wooden board at top, integrated with unit */}
-            <div className="pointer-events-none h-2.5 w-6 sm:h-3 sm:w-7 rounded-b-lg bg-gradient-to-b from-[#5c4328] via-[#7a5c37] to-[#43301b] shadow-md" />
+            {/* Pin Hanger - Unified with rope, positioned at absolute top */}
+            <div className="absolute -top-1 sm:top-0 left-1/2 -translate-x-1/2">
+              {/* Unified SVG: Pin circle + rope as one continuous piece */}
+              <svg width="12" height="38" viewBox="0 0 12 38" fill="none" className="drop-shadow-md">
+                {/* Pin nail head - at very top */}
+                <circle cx="6" cy="3" r="2.5" fill="#302111" />
+                <circle cx="6" cy="3" r="1.8" fill="#1a1208" />
+                {/* Rope - continuous from pin */}
+                <rect x="5" y="5" width="2" height="33" rx="1" fill="#6E5030" />
+                {/* Rope texture lines */}
+                <line x1="5.3" y1="8" x2="6.7" y2="8" stroke="#5a4020" strokeWidth="0.5" />
+                <line x1="5.3" y1="12" x2="6.7" y2="12" stroke="#5a4020" strokeWidth="0.5" />
+                <line x1="5.3" y1="16" x2="6.7" y2="16" stroke="#5a4020" strokeWidth="0.5" />
+                <line x1="5.3" y1="20" x2="6.7" y2="20" stroke="#5a4020" strokeWidth="0.5" />
+                <line x1="5.3" y1="24" x2="6.7" y2="24" stroke="#5a4020" strokeWidth="0.5" />
+                <line x1="5.3" y1="28" x2="6.7" y2="28" stroke="#5a4020" strokeWidth="0.5" />
+                <line x1="5.3" y1="32" x2="6.7" y2="32" stroke="#5a4020" strokeWidth="0.5" />
+              </svg>
+            </div>
 
-            {/* Integrated Rope - pin circle + rope segment */}
-            <svg width="10" height="30" viewBox="0 0 10 30" fill="none" className="drop-shadow-sm">
-              <circle cx="5" cy="5" r="5" fill="#302111" stroke="#8B7355" strokeWidth="1.5" />
-              <rect x="3.5" y="10" width="3" height="20" rx="1.5" fill="#6E5030" />
-            </svg>
-
-            {/* Tag Card - connected to rope */}
-            <div className="relative -mt-px w-[80px] xs:w-[90px] sm:w-[110px] md:w-[130px] lg:w-[145px] xl:w-[155px] rounded-[12px] xs:rounded-[14px] sm:rounded-[16px] md:rounded-[18px] lg:rounded-[20px] bg-gradient-to-b from-[#F7F3E9] via-[#F0EAD8] to-[#E3D9C2] px-1.5 xs:px-2 sm:px-3 md:px-3.5 pb-1.5 xs:pb-2 sm:pb-3 md:pb-3.5 pt-4 sm:pt-5 md:pt-5.5 shadow-2xl border border-[#D4C9B0]">
-              {/* Eyelet - golden ring */}
-              <div className="absolute -top-1.5 sm:-top-2 left-1/2 -translate-x-1/2 z-30">
-                <div className="relative flex h-3 w-3 sm:h-4 sm:w-4 items-center justify-center rounded-full border-[2px] sm:border-[2.5px] border-[#9E7B4F] bg-gradient-to-br from-[#D4AF37] via-[#AA7C11] to-[#5B430B] shadow-md">
-                  <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#302111] shadow-inner" />
+            {/* Tag Card - connected to rope with no gap */}
+            <div className="relative w-[80px] xs:w-[90px] sm:w-[110px] md:w-[130px] lg:w-[145px] xl:w-[155px] rounded-[12px] xs:rounded-[14px] sm:rounded-[16px] md:rounded-[18px] lg:rounded-[20px] bg-gradient-to-b from-[#F7F3E9] via-[#F0EAD8] to-[#E3D9C2] px-1.5 xs:px-2 sm:px-3 md:px-3.5 pb-1.5 xs:pb-2 sm:pb-3 md:pb-3.5 pt-5 sm:pt-6 md:pt-6.5 shadow-2xl border border-[#D4C9B0] -mt-[2px]">
+              {/* Eyelet - golden ring at top, connects to rope */}
+              <div className="absolute -top-1 sm:-top-0.5 left-1/2 -translate-x-1/2 z-30">
+                <div className="relative flex h-3 w-3 sm:h-3.5 sm:w-3.5 items-center justify-center rounded-full border-[2px] sm:border-[2px] border-[#9E7B4F] bg-gradient-to-br from-[#D4AF37] via-[#AA7C11] to-[#5B430B] shadow-md">
+                  <div className="h-1.5 w-1.5 sm:h-1.8 sm:w-1.8 rounded-full bg-[#302111] shadow-inner" />
                 </div>
               </div>
 

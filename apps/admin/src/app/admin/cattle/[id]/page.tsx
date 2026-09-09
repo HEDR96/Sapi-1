@@ -148,6 +148,7 @@ export default function CattleDetailPage() {
   }
 
   const handleSave = async () => {
+    if (saving) return
     setSaving(true)
     try {
       const res = await fetch(`/api/admin/cattle/${cattleId}`, {
