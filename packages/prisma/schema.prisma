@@ -3,8 +3,16 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  // DATABASE_URL should be Neon's pooled (PgBouncer) connection string -
+  // the host contains "-pooler" - so serverless function invocations reuse
+  // a connection instead of each one opening a fresh direct Postgres
+  // connection (a common cause of slow first-load on Vercel + Neon).
+  // DIRECT_URL is only used by `prisma migrate`/`db push` and should be
+  // Neon's non-pooled connection string. It's optional for `generate` and
+  // normal app queries, so leaving it unset doesn't break the build.
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Status {

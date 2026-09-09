@@ -85,12 +85,13 @@ export function isVideoUrl(url: string | null | undefined): boolean {
   if (!url) return false
   const lower = url.toLowerCase()
   return (
+    lower.includes('/api/stream') ||
     lower.includes('/api/videos') ||
     lower.includes('/videos/') ||
     lower.endsWith('.mp4') ||
     lower.endsWith('.webm') ||
     lower.endsWith('.mov') ||
-    lower.includes('mimeType=video')
+    lower.includes('mimetype=video')
   )
 }
 

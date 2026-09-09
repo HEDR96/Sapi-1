@@ -22,23 +22,41 @@ export async function GET(request: NextRequest) {
     })
     const fileSize = parseInt(meta.data.size || '0', 10)
 
+    // Honor Range requests (needed for video seeking and for browsers that
+    // only request a small byte range to grab a thumbnail frame) by
+    // forwarding the same Range header to Google Drive's media endpoint,
+    // which supports it, instead of always downloading/returning the whole
+    // file with a 200 regardless of what the client asked for.
+    const rangeHeader = request.headers.get('range')
+    const driveRequestConfig: Record<string, unknown> = { responseType: 'stream' }
+
+    let status = 200
+    const headers: Record<string, string> = {
+      'Content-Type': mimeType,
+      'Accept-Ranges': 'bytes',
+      'Cache-Control': 'public, max-age=31536000, immutable',
+    }
+
+    const rangeMatch = rangeHeader?.match(/bytes=(\d*)-(\d*)/)
+    if (rangeMatch && fileSize > 0) {
+      const start = rangeMatch[1] ? parseInt(rangeMatch[1], 10) : 0
+      const end = rangeMatch[2] ? Math.min(parseInt(rangeMatch[2], 10), fileSize - 1) : fileSize - 1
+
+      driveRequestConfig.headers = { Range: `bytes=${start}-${end}` }
+      status = 206
+      headers['Content-Range'] = `bytes ${start}-${end}/${fileSize}`
+      headers['Content-Length'] = (end - start + 1).toString()
+    } else {
+      headers['Content-Length'] = fileSize.toString()
+    }
+
     // Stream from Google Drive
-    const response = await drive.files.get(
-      { fileId, alt: 'media' },
-      { responseType: 'stream' }
-    )
+    const response = await drive.files.get({ fileId, alt: 'media' }, driveRequestConfig)
 
     // Convert Node.js Readable to Web ReadableStream
     const stream = response.data as unknown as ReadableStream
 
-    return new Response(stream, {
-      headers: {
-        'Content-Type': mimeType,
-        'Content-Length': fileSize.toString(),
-        'Accept-Ranges': 'bytes',
-        'Cache-Control': 'public, max-age=31536000, immutable',
-      },
-    })
+    return new Response(stream, { status, headers })
   } catch (error: any) {
     console.error('[Stream API] Error:', error.message)
     return NextResponse.json({ error: 'Failed to stream file' }, { status: 500 })

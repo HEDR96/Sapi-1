@@ -4,42 +4,41 @@ import { getCurrentUser } from '@/lib/auth/jwt'
 
 export const dynamic = 'force-dynamic'
 
-// Auto-generate cattle code with sequential numbering (format: NF-YYYY-NNN)
+// Auto-generate cattle code as SP-<year><month>-<sequence>, e.g. SP-202602-001
 async function generateCattleCode(): Promise<string> {
-  const year = new Date().getFullYear()
-  const prefix = `NF-${year}`
+  const now = new Date()
+  const yearMonth = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`
+  const prefix = `SP-${yearMonth}-`
 
-  // Get the last cattle code with this year's prefix
   const lastCattle = await prisma.cattle.findFirst({
-    where: {
-      code: {
-        startsWith: prefix,
-      },
-    },
-    orderBy: {
-      code: 'desc',
-    },
-    select: {
-      code: true,
-    },
+    where: { code: { startsWith: prefix } },
+    orderBy: { code: 'desc' },
+    select: { code: true },
   })
 
+  let nextNum = 1
   if (lastCattle) {
-    // Extract the number from the last code (e.g., "NF-2026-001" -> 1)
-    const parts = lastCattle.code.split('-')
-    const lastNum = parseInt(parts[parts.length - 1], 10)
-    const newNum = lastNum + 1
-    return `${prefix}-${String(newNum).padStart(3, '0')}`
+    // Slice off the known prefix rather than splitting on '-' so the
+    // extracted sequence can't accidentally swallow the year/month too
+    // (that mistake previously produced codes like "SP-20262026002").
+    const lastNum = parseInt(lastCattle.code.slice(prefix.length), 10)
+    if (!isNaN(lastNum)) nextNum = lastNum + 1
   }
 
-  // First cattle of the year
-  return `${prefix}-001`
+  return `${prefix}${String(nextNum).padStart(3, '0')}`
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const status = searchParams.get('status')
+    const limitParam = searchParams.get('limit')
+    const limit = limitParam ? parseInt(limitParam, 10) : undefined
+
     const cattle = await prisma.cattle.findMany({
+      where: status ? { status: status as any } : undefined,
       orderBy: { createdAt: 'desc' },
+      take: limit,
       include: {
         weights: {
           orderBy: { measurementDate: 'desc' },

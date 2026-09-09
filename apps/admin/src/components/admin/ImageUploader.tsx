@@ -92,6 +92,8 @@ export function ImageUploader({
       formData.append('chunk', chunk)
       formData.append('sessionId', sessionId)
       formData.append('chunkIndex', i.toString())
+      formData.append('start', start.toString())
+      formData.append('end', (end - 1).toString())
 
       const chunkRes = await fetch('/api/upload-chunked', {
         method: 'POST',

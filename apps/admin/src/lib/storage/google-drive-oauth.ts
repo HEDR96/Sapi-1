@@ -12,9 +12,80 @@ import { loadTokens, saveTokens } from './token-store'
 const SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
 // Folder IDs from environment
-const DRIVE_FOLDERS = {
+export const DRIVE_FOLDERS = {
   image: process.env.GOOGLE_DRIVE_IMAGE_FOLDER_ID || '',
   video: process.env.GOOGLE_DRIVE_VIDEO_FOLDER_ID || '',
+}
+
+// App-level storage cap (independent of whatever raw quota the connected
+// Google account has) - once reached, uploads are blocked until upgraded.
+export const STORAGE_LIMIT_BYTES = 10 * 1024 * 1024 * 1024 // 10 GB
+
+export interface DriveStorageStatus {
+  usageBytes: number
+  limitBytes: number
+}
+
+/**
+ * Get real storage usage from the connected Google Drive account.
+ */
+/**
+ * Sum the size of every file inside one Drive folder (paginated).
+ */
+async function getFolderUsageBytes(drive: drive_v3.Drive, folderId: string): Promise<number> {
+  let totalBytes = 0
+  let pageToken: string | undefined
+
+  do {
+    const res = await drive.files.list({
+      q: `'${folderId}' in parents and trashed = false`,
+      fields: 'nextPageToken, files(size)',
+      pageSize: 1000,
+      pageToken,
+    })
+    for (const file of res.data.files || []) {
+      totalBytes += parseInt(file.size || '0', 10)
+    }
+    pageToken = res.data.nextPageToken || undefined
+  } while (pageToken)
+
+  return totalBytes
+}
+
+/**
+ * Get storage usage scoped to THIS app's own upload folders (image + video),
+ * not the connected Google account's overall Drive usage - the account may
+ * hold unrelated personal files that have nothing to do with this project.
+ */
+export async function getDriveStorageStatus(): Promise<DriveStorageStatus> {
+  const drive = await getAuthenticatedDriveClient()
+  const folderIds = [DRIVE_FOLDERS.image, DRIVE_FOLDERS.video].filter(Boolean)
+
+  const usages = await Promise.all(folderIds.map((id) => getFolderUsageBytes(drive, id)))
+  const usageBytes = usages.reduce((sum, bytes) => sum + bytes, 0)
+
+  return { usageBytes, limitBytes: STORAGE_LIMIT_BYTES }
+}
+
+/**
+ * Throws if uploading `additionalBytes` more would exceed the app's storage
+ * cap. Fails open (allows the upload) if the quota check itself errors out -
+ * a transient Drive API issue here shouldn't take down uploads entirely.
+ */
+export const STORAGE_QUOTA_MESSAGE =
+  'Kapasitas penyimpanan sudah penuh (10GB). Silakan hubungi developer untuk upgrade kapasitas penyimpanan.'
+
+export async function assertStorageAvailable(additionalBytes: number): Promise<void> {
+  let status: DriveStorageStatus
+  try {
+    status = await getDriveStorageStatus()
+  } catch (error: any) {
+    console.warn('[Google Drive OAuth] Storage quota check failed, allowing upload:', error.message)
+    return
+  }
+  if (status.usageBytes + additionalBytes > status.limitBytes) {
+    throw new Error(STORAGE_QUOTA_MESSAGE)
+  }
 }
 
 /**
@@ -142,10 +213,9 @@ export async function handleOAuthCallback(code: string): Promise<StoredToken> {
 }
 
 /**
- * Get authenticated Google Drive client
- * Automatically refreshes token if expired
+ * Get an authenticated OAuth2 client, refreshing the access token if expired.
  */
-export async function getAuthenticatedDriveClient(): Promise<drive_v3.Drive> {
+export async function getAuthenticatedOAuth2Client() {
   validateGoogleDriveConfig()
 
   const oauth2Client = getOAuth2Client()
@@ -196,7 +266,30 @@ export async function getAuthenticatedDriveClient(): Promise<drive_v3.Drive> {
     }
   }
 
+  return oauth2Client
+}
+
+/**
+ * Get authenticated Google Drive client
+ * Automatically refreshes token if expired
+ */
+export async function getAuthenticatedDriveClient(): Promise<drive_v3.Drive> {
+  const oauth2Client = await getAuthenticatedOAuth2Client()
   return google.drive({ version: 'v3', auth: oauth2Client })
+}
+
+/**
+ * Get a valid (non-expired) access token string, refreshing if needed.
+ * Used for raw HTTP calls (e.g. Google Drive resumable upload) that can't
+ * go through the googleapis client library.
+ */
+export async function getValidAccessToken(): Promise<string> {
+  const oauth2Client = await getAuthenticatedOAuth2Client()
+  const accessToken = oauth2Client.credentials.access_token
+  if (!accessToken) {
+    throw new Error('Failed to obtain a valid access token')
+  }
+  return accessToken
 }
 
 /**
@@ -207,13 +300,15 @@ export async function uploadToGoogleDrive(
   fileName: string,
   mimeType: string,
   folder: 'image' | 'video' = 'image'
-): Promise<{ fileId: string; webViewLink: string; webContentLink: string; thumbnailLink: string; directUrl: string }> {
+): Promise<{ fileId: string; webViewLink: string; webContentLink: string; thumbnailLink: string; directUrl: string; isPublic: boolean }> {
   const drive = await getAuthenticatedDriveClient()
   const folderId = DRIVE_FOLDERS[folder]
 
   if (!folderId) {
     throw new Error(`Invalid folder type: ${folder}. Use 'image' or 'video'.`)
   }
+
+  await assertStorageAvailable(buffer.length)
 
   console.log('[Google Drive OAuth] Starting upload:', {
     fileName,
@@ -257,11 +352,12 @@ export async function uploadToGoogleDrive(
     })
 
     // Make file publicly accessible
-    await makeFilePublic(drive, fileId)
+    const isPublic = await makeFilePublic(drive, fileId)
 
     console.log('[Google Drive OAuth] Upload successful:', {
       fileId,
       webViewLink,
+      isPublic,
     })
 
     // Generate direct download URL for images
@@ -273,6 +369,7 @@ export async function uploadToGoogleDrive(
       webContentLink,
       thumbnailLink,
       directUrl,
+      isPublic,
     }
   } catch (error: any) {
     console.error('[Google Drive OAuth] Upload failed:', {
@@ -310,7 +407,7 @@ export async function uploadToGoogleDrive(
 /**
  * Make a file publicly accessible
  */
-async function makeFilePublic(drive: drive_v3.Drive, fileId: string): Promise<void> {
+export async function makeFilePublic(drive: drive_v3.Drive, fileId: string): Promise<boolean> {
   try {
     await drive.permissions.create({
       fileId,
@@ -320,8 +417,10 @@ async function makeFilePublic(drive: drive_v3.Drive, fileId: string): Promise<vo
       },
     })
     console.log('[Google Drive OAuth] File made public:', fileId)
+    return true
   } catch (error: any) {
     console.error('[Google Drive OAuth] Failed to make file public:', error.message)
+    return false
   }
 }
 

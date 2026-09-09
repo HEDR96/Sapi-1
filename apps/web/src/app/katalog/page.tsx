@@ -23,7 +23,9 @@ export default function KatalogPage() {
       const res = await fetch('/api/admin/cattle?limit=100')
       const data = await res.json()
       const items = Array.isArray(data) ? data : data.items || data.data?.items || []
-      setCattle(items)
+      // Sold cattle no longer have anything to offer buyers - keep them out
+      // of the public catalog entirely rather than just badging them.
+      setCattle(items.filter((c: CattleWithRelations) => c.status !== 'SOLD'))
     } catch (err) {
       console.error('Failed to fetch cattle:', err)
     } finally {
@@ -37,7 +39,6 @@ export default function KatalogPage() {
     { value: 'all', label: 'Semua' },
     { value: 'AVAILABLE', label: 'Tersedia' },
     { value: 'BOOKED', label: 'Dipesan' },
-    { value: 'SOLD', label: 'Terjual' },
   ]
 
   // Filter cattle
@@ -171,7 +172,7 @@ export default function KatalogPage() {
                 status={c.status}
                 price={Number(c.price)}
                 lastWeight={c.weights?.[c.weights.length - 1]?.weight || null}
-                mainImage={c.mainImage}
+                mainImage={c.mainImage || c.media?.[0]?.fileUrl || null}
                 quantity={c.quantity}
               />
             ))}

@@ -27,7 +27,14 @@ export default function HomePage() {
       .then(res => res.json())
       .then(data => {
         // API returns { items: [...], total: number } directly
-        const items = Array.isArray(data) ? data : data.items || data.data?.items || []
+        const rawItems = Array.isArray(data) ? data : data.items || data.data?.items || []
+
+        // Fall back to the first gallery item when no dedicated mainImage was
+        // set (e.g. photos/videos added only via the Dokumentasi tab)
+        const items = rawItems.map((c: any) => ({
+          ...c,
+          mainImage: c.mainImage || c.media?.[0]?.fileUrl || null,
+        }))
 
         // Map to CattleWithLatestWeight
         const mapped: CattleWithLatestWeight[] = items.map((c: any) => ({

@@ -10,7 +10,6 @@ export async function GET() {
         cattle: { select: { id: true, code: true, name: true } },
       },
       orderBy: { order: 'asc' },
-      take: 3,
     })
 
     return NextResponse.json({ testimonials })

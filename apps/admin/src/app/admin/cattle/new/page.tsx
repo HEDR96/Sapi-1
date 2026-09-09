@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft, Loader2, Plus, X, Trash2, CheckCircle2, Star } from 'lucide-react'
 import { Button } from '@samadya/shared/components/ui/button'
 import { Input } from '@samadya/shared/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@samadya/shared/components/ui/card'
@@ -10,12 +10,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@samadya/shared/components/ui/label'
 import Link from 'next/link'
 import { ImageUploader } from '@/components/admin/ImageUploader'
+import { MultiMediaUploader } from '@/components/admin/MultiMediaUploader'
+import { getDirectImageUrl, getVideoUrl } from '@samadya/shared/lib/utils/imageUrl'
 
 interface MasterData {
   id: string
   category: string
   key: string
   value: string
+}
+
+interface CattleMediaItem {
+  id: string
+  fileUrl: string
+  fileType: string
 }
 
 export default function NewCattlePage() {
@@ -43,6 +51,13 @@ export default function NewCattlePage() {
   const [cattleBreeds, setCattleBreeds] = useState<MasterData[]>([])
   const [cattleStatuses, setCattleStatuses] = useState<MasterData[]>([])
   const [loadingMasterData, setLoadingMasterData] = useState(true)
+
+  // Set after the cattle record itself is created - unlocks the media gallery step
+  const [createdCattle, setCreatedCattle] = useState<{ id: string; code: string; name: string; mainImage: string | null } | null>(null)
+  const [media, setMedia] = useState<CattleMediaItem[]>([])
+  const [uploadedMediaUrls, setUploadedMediaUrls] = useState<string[]>([''])
+  const [mediaSaving, setMediaSaving] = useState(false)
+  const [settingMainImageId, setSettingMainImageId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchMasterData()
@@ -117,12 +132,98 @@ export default function NewCattlePage() {
         return
       }
 
-      router.push('/admin/cattle')
+      // Cattle record now exists - reveal the media gallery step instead of
+      // navigating away immediately, so photos/videos can be added right away.
+      setCreatedCattle({ id: data.data.id, code: data.data.code, name: data.data.name, mainImage: data.data.mainImage || null })
       router.refresh()
     } catch {
       setError('Terjadi kesalahan')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchMedia = async (cattleId: string) => {
+    try {
+      const res = await fetch(`/api/admin/media?cattleId=${cattleId}`)
+      if (res.ok) {
+        const data = await res.json()
+        setMedia(data.media || [])
+      }
+    } catch (err) {
+      console.error('Failed to fetch media:', err)
+    }
+  }
+
+  const handleSaveMedia = async () => {
+    if (!createdCattle) return
+    const validUrls = uploadedMediaUrls.filter((u) => u)
+    if (validUrls.length === 0) return
+
+    setMediaSaving(true)
+    try {
+      for (const url of validUrls) {
+        const isVideo = url.includes('/api/stream')
+        const res = await fetch('/api/admin/media', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            cattleId: createdCattle.id,
+            fileUrl: url,
+            fileType: isVideo ? 'VIDEO' : 'IMAGE',
+            category: 'GENERAL',
+          }),
+        })
+        if (!res.ok) {
+          const data = await res.json()
+          throw new Error(data.error || 'Gagal menyimpan media')
+        }
+      }
+      setUploadedMediaUrls([''])
+      await fetchMedia(createdCattle.id)
+    } catch (err: any) {
+      console.error('Failed to save media:', err)
+      alert(err.message || 'Terjadi kesalahan saat menyimpan media')
+    } finally {
+      setMediaSaving(false)
+    }
+  }
+
+  const handleDeleteMedia = async (mediaId: string) => {
+    if (!confirm('Hapus media ini?')) return
+    try {
+      const res = await fetch(`/api/admin/media?id=${mediaId}`, { method: 'DELETE' })
+      if (res.ok && createdCattle) {
+        await fetchMedia(createdCattle.id)
+      } else {
+        const data = await res.json()
+        alert(data.error || 'Gagal hapus media')
+      }
+    } catch (err) {
+      console.error('Delete media error:', err)
+      alert('Gagal hapus media')
+    }
+  }
+
+  const handleSetMainImage = async (mediaId: string, fileUrl: string) => {
+    if (!createdCattle) return
+    setSettingMainImageId(mediaId)
+    try {
+      const res = await fetch(`/api/admin/cattle/${createdCattle.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mainImage: fileUrl }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Gagal menjadikan foto/video utama')
+      }
+      setCreatedCattle({ ...createdCattle, mainImage: fileUrl })
+    } catch (err: any) {
+      console.error('Failed to set main image:', err)
+      alert(err.message || 'Gagal menjadikan foto/video utama')
+    } finally {
+      setSettingMainImageId(null)
     }
   }
 
@@ -140,6 +241,14 @@ export default function NewCattlePage() {
         </div>
       </div>
 
+      {createdCattle && (
+        <div className="bg-green-50 border border-green-200 text-green-800 p-3 rounded-md text-sm flex items-center gap-2">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          Data sapi <strong>{createdCattle.name}</strong> ({createdCattle.code}) berhasil disimpan. Sekarang tambahkan foto/video dokumentasi di bawah.
+        </div>
+      )}
+
+      {!createdCattle && (
       <Card>
         <CardHeader>
           <CardTitle>Informasi Sapi</CardTitle>
@@ -376,6 +485,113 @@ export default function NewCattlePage() {
           </form>
         </CardContent>
       </Card>
+      )}
+
+      {createdCattle && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Dokumentasi</CardTitle>
+            <CardDescription>Foto dan video dokumentasi sapi (opsional, bisa ditambah kapan saja lewat halaman edit)</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-6 space-y-4">
+              <Label>Upload Beberapa Foto/Video Sekaligus</Label>
+              <MultiMediaUploader cattleId={createdCattle.id} onUploaded={() => fetchMedia(createdCattle.id)} />
+            </div>
+
+            <div className="mb-6 space-y-4">
+              <Label>Atau Upload Satu per Satu</Label>
+              {uploadedMediaUrls.map((url, index) => (
+                <div key={index} className="relative">
+                  <ImageUploader
+                    folder="cattle"
+                    value={url}
+                    onChange={(newUrl) => {
+                      const updated = [...uploadedMediaUrls]
+                      updated[index] = newUrl
+                      setUploadedMediaUrls(updated)
+                    }}
+                  />
+                  {uploadedMediaUrls.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setUploadedMediaUrls(uploadedMediaUrls.filter((_, i) => i !== index))}
+                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      title="Hapus"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setUploadedMediaUrls([...uploadedMediaUrls, ''])}
+                className="w-full"
+              >
+                <Plus className="h-4 w-4 mr-2" />Tambah Foto/Video Lain
+              </Button>
+              {uploadedMediaUrls.filter((u) => u).length > 0 && (
+                <Button onClick={handleSaveMedia} disabled={mediaSaving}>
+                  {mediaSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Simpan Semua Media
+                </Button>
+              )}
+            </div>
+
+            {media.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {media.map((m) => {
+                  const isMain = createdCattle?.mainImage === m.fileUrl
+                  return (
+                  <div key={m.id} className={`relative aspect-square border rounded-lg overflow-hidden group ${isMain ? 'ring-2 ring-[hsl(var(--gold))]' : ''}`}>
+                    {m.fileType === 'VIDEO' || m.fileUrl.includes('/api/stream') ? (
+                      <video src={getVideoUrl(m.fileUrl)} className="w-full h-full object-cover" controls preload="metadata" />
+                    ) : (
+                      <img src={getDirectImageUrl(m.fileUrl)} alt="" className="w-full h-full object-cover" />
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1">{m.fileType}</div>
+                    {isMain && (
+                      <div className="absolute top-2 left-2 flex items-center gap-1 rounded-full bg-[hsl(var(--gold))] px-2 py-0.5 text-[10px] font-bold text-white shadow">
+                        <Star className="h-3 w-3 fill-current" />Utama
+                      </div>
+                    )}
+                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {!isMain && (
+                        <button
+                          type="button"
+                          onClick={() => handleSetMainImage(m.id, m.fileUrl)}
+                          disabled={settingMainImageId === m.id}
+                          className="p-2 bg-white text-[hsl(var(--forest))] rounded-full hover:bg-[hsl(var(--cream))] shadow-lg disabled:opacity-50"
+                          title="Jadikan foto/video utama"
+                        >
+                          {settingMainImageId === m.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className="h-4 w-4" />}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteMedia(m.id)}
+                        className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-lg"
+                        title="Hapus media"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                  )
+                })}
+              </div>
+            )}
+
+            <div className="flex justify-end mt-6">
+              <Button onClick={() => { router.push('/admin/cattle'); router.refresh() }}>
+                Selesai
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
