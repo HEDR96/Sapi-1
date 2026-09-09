@@ -79,30 +79,14 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
   const heroRef = useRef<HTMLElement>(null)
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [cattleCount, setCattleCount] = useState(0)
   const isSliderChange = useRef(false)
 
-  // Fetch cattle count from API
-  useEffect(() => {
-    async function fetchCattleCount() {
-      try {
-        const res = await fetch('/api/cattle/count')
-        if (res.ok) {
-          const data = await res.json()
-          // Ensure count is a valid number (handles undefined, null, or string)
-          const countValue = typeof data.count === 'number' ? data.count : parseInt(data.count, 10)
-          setCattleCount(isNaN(countValue) ? 0 : countValue)
-        }
-      } catch (error) {
-        console.error('Failed to fetch cattle count:', error)
-      }
-    }
-    fetchCattleCount()
-  }, [])
+  // Get total count from cattle array
+  const totalCattleCount = cattle.length
 
   // Dynamic stats with real cattle count
   const stats = [
-    { value: cattleCount, suffix: '', label: 'Sapi Terdaftar' },
+    { value: totalCattleCount, suffix: '', label: 'Sapi Terdaftar' },
     { value: 90, suffix: '%', label: 'Kepuasan %' },
     { value: 24, suffix: '/7', label: 'Jam Monitoring' },
     { value: 100, suffix: '%', label: 'Transparan %' },
