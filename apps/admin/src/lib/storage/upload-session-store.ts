@@ -11,6 +11,7 @@
  */
 
 import { promises as fs } from 'fs'
+import os from 'os'
 import path from 'path'
 
 export interface UploadSession {
@@ -23,7 +24,11 @@ export interface UploadSession {
   fileId?: string
 }
 
-const SESSION_DIR = path.join(process.env.DATA_DIR || '/app/data', 'upload-sessions')
+// Unlike token-store's DATA_DIR (meant to be a persistent Docker volume),
+// session data is short-lived by nature, so os.tmpdir() is an appropriate
+// default when DATA_DIR isn't set - on Vercel that's the only writable path
+// ('/app/data' does not exist there and mkdir on it throws ENOENT).
+const SESSION_DIR = path.join(process.env.DATA_DIR || os.tmpdir(), 'upload-sessions')
 const SESSION_TTL_SECONDS = 24 * 60 * 60
 
 function sessionKey(id: string): string {
@@ -53,8 +58,16 @@ export async function saveUploadSession(id: string, data: UploadSession): Promis
     }
   }
 
-  await fs.mkdir(SESSION_DIR, { recursive: true })
-  await fs.writeFile(path.join(SESSION_DIR, `${id}.json`), JSON.stringify(data), 'utf-8')
+  try {
+    await fs.mkdir(SESSION_DIR, { recursive: true })
+    await fs.writeFile(path.join(SESSION_DIR, `${id}.json`), JSON.stringify(data), 'utf-8')
+  } catch (error: any) {
+    console.error('[UploadSessionStore] File save failed:', error.message)
+    throw new Error(
+      'Gagal menyimpan sesi upload video. Konfigurasikan Vercel KV (KV_REST_API_URL / KV_REST_API_TOKEN) ' +
+      'agar upload video chunked bekerja secara andal di lingkungan serverless.'
+    )
+  }
 }
 
 export async function getUploadSession(id: string): Promise<UploadSession | null> {
