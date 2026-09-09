@@ -17,12 +17,23 @@ export async function GET() {
     // Get authorization URL
     const authUrl = getAuthorizationUrl()
 
-    console.log('[OAuth Init] Generated authorization URL')
+    // Log the full URL for debugging
+    console.log('[OAuth Init] Full authorization URL:', authUrl)
+
+    // Extract redirect_uri from URL for debugging
+    try {
+      const url = new URL(authUrl)
+      console.log('[OAuth Init] redirect_uri in URL:', url.searchParams.get('redirect_uri'))
+      console.log('[OAuth Init] client_id in URL:', url.searchParams.get('client_id'))
+    } catch (e) {
+      console.error('[OAuth Init] Failed to parse auth URL')
+    }
 
     return NextResponse.json({
       success: true,
       message: 'Redirect user to this URL to authorize',
       authUrl,
+      redirectUri: process.env.GOOGLE_OAUTH_REDIRECT_URI,
       instructions: [
         '1. Open the authUrl in your browser',
         '2. Sign in with your Google account',

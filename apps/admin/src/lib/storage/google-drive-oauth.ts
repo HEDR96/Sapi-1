@@ -66,6 +66,10 @@ export function getOAuth2Client() {
 export function getAuthorizationUrl(): string {
   const oauth2Client = getOAuth2Client()
 
+  const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI
+  console.log('[Google OAuth] Using redirect_uri:', redirectUri)
+  console.log('[Google OAuth] Using client_id:', process.env.GOOGLE_OAUTH_CLIENT_ID)
+
   return oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES,
