@@ -173,7 +173,7 @@ export async function uploadToGoogleDrive(
   fileName: string,
   mimeType: string,
   folder: 'image' | 'video' = 'image'
-): Promise<{ fileId: string; webViewLink: string; webContentLink: string; thumbnailLink: string; directUrl: string }> {
+): Promise<{ fileId: string; webViewLink: string; webContentLink: string; thumbnailLink: string; directUrl: string; isPublic: boolean }> {
   const drive = await getAuthenticatedDriveClient()
   const folderId = DRIVE_FOLDERS[folder]
 
@@ -223,11 +223,12 @@ export async function uploadToGoogleDrive(
     })
 
     // Make file publicly accessible
-    await makeFilePublic(drive, fileId)
+    const isPublic = await makeFilePublic(drive, fileId)
 
     console.log('[Google Drive OAuth] Upload successful:', {
       fileId,
       webViewLink,
+      isPublic,
     })
 
     // Generate direct download URL for images
@@ -239,6 +240,7 @@ export async function uploadToGoogleDrive(
       webContentLink,
       thumbnailLink,
       directUrl,
+      isPublic,
     }
   } catch (error: any) {
     console.error('[Google Drive OAuth] Upload failed:', {
@@ -276,7 +278,7 @@ export async function uploadToGoogleDrive(
 /**
  * Make a file publicly accessible
  */
-async function makeFilePublic(drive: drive_v3.Drive, fileId: string): Promise<void> {
+async function makeFilePublic(drive: drive_v3.Drive, fileId: string): Promise<boolean> {
   try {
     await drive.permissions.create({
       fileId,
@@ -286,9 +288,11 @@ async function makeFilePublic(drive: drive_v3.Drive, fileId: string): Promise<vo
       },
     })
     console.log('[Google Drive OAuth] File made public:', fileId)
+    return true
   } catch (error: any) {
     console.error('[Google Drive OAuth] Failed to make file public:', error.message)
-    // Don't throw - file is uploaded, just not public
+    // Don't throw - file is uploaded, just not public. Caller surfaces this via isPublic.
+    return false
   }
 }
 

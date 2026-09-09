@@ -159,6 +159,7 @@ export async function POST(request: NextRequest) {
       webViewLink: result.webViewLink,
       thumbnailUrl: result.thumbnailLink,
       mimeType: finalFileType,
+      ...(result.isPublic ? {} : { warning: 'File berhasil diupload tetapi gagal dibuat publik, URL mungkin tidak bisa diakses.' }),
     })
   } catch (error: any) {
     console.error('[Upload API] Error:', {

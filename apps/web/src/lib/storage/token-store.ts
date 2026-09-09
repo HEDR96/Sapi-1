@@ -26,14 +26,12 @@ let cacheExpiry: number = 0
 const CACHE_TTL = 60 * 1000 // 1 minute cache
 
 /**
- * Check if we're running on Vercel with KV available
+ * Check if Vercel KV is actually configured.
+ * Note: process.env.VERCEL is set on every Vercel deployment regardless of
+ * whether a KV store is provisioned, so it must not be used as the signal here.
  */
 function isVercelKV(): boolean {
-  return !!(
-    process.env.VERCEL ||
-    process.env.KV_REST_API_URL ||
-    process.env.VERCEL_KV_REST_API_URL
-  )
+  return !!(process.env.KV_REST_API_URL || process.env.VERCEL_KV_REST_API_URL)
 }
 
 /**
@@ -109,11 +107,14 @@ export async function loadTokens(): Promise<StoredToken | null> {
   if (envToken) {
     try {
       const parsed = JSON.parse(envToken)
-      // Handle both formats: with expiry_date (timestamp) or expires_in (seconds)
+      // Handle both formats: with expiry_date (absolute timestamp) or expires_in (seconds).
+      // expires_in is relative to when the token was originally issued, which we don't know
+      // here, so treat it as already expired to force an immediate refresh via refresh_token
+      // rather than assuming it's fresh for a full new expires_in window on every cold load.
       const tokens: StoredToken = {
         access_token: parsed.access_token,
         refresh_token: parsed.refresh_token,
-        expiry_date: parsed.expiry_date || (Date.now() + (parsed.expires_in || 3600) * 1000),
+        expiry_date: parsed.expiry_date || 0,
       }
       console.log('[TokenStore] Tokens loaded from environment variable')
       return tokens
@@ -150,8 +151,12 @@ export async function saveTokens(tokens: StoredToken): Promise<void> {
 
   // Save to Vercel KV in production
   if (isVercelKV()) {
-    await saveToVercelKV(tokens)
-    return
+    try {
+      await saveToVercelKV(tokens)
+      return
+    } catch (error: any) {
+      console.warn('[TokenStore] Vercel KV save failed, falling back to file storage:', error.message)
+    }
   }
 
   // Fallback: File storage
