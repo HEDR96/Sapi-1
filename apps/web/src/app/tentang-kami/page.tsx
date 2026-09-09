@@ -20,22 +20,22 @@ export default function TentangKamiPage() {
     {
       title: 'Sapi Berkualitas',
       description: 'Kami menyediakan sapi kurban dengan breed premium dan kondisi kesehatan yang terjamin.',
-      icon: '',
+      icon: '🐄',
     },
     {
       title: 'Pemantauan Pertumbuhan',
       description: 'Setiap sapi dipantau pertumbuhannya secara berkala dengan dokumentasi lengkap.',
-      icon: '',
+      icon: '📈',
     },
     {
       title: 'Pengiriman Seluruh Indonesia',
       description: 'Layanan pengiriman sapi kurban ke seluruh wilayah Indonesia dengan penanganan profesional.',
-      icon: '',
+      icon: '🚚',
     },
     {
       title: 'Konsultasi Gratis',
       description: 'Tim kami siap membantu Anda memilih sapi kurban yang tepat sesuai kebutuhan.',
-      icon: '',
+      icon: '💬',
     },
   ]
 

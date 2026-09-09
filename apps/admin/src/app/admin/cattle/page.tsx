@@ -85,7 +85,7 @@ export default function AdminCattlePage() {
   }, [])
 
   const handleDelete = async (id: string, code: string) => {
-    if (!confirm(`Hapus sapi ${code}? Tindakan ini tidak dapat dibatalkan.`)) return
+    if (!confirm(`Hapus sapi ${code}? Ini juga akan menghapus SELURUH riwayat timbang, kesehatan, pakan, dokumentasi, booking, dan penjualan sapi ini. Tindakan ini tidak dapat dibatalkan.`)) return
 
     setDeleting(id)
     try {

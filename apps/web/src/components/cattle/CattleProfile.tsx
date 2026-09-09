@@ -18,7 +18,6 @@ import { calculateWeightStats, estimateTargetCompletion } from '@samadya/shared/
 import { getDirectImageUrl } from '@samadya/shared/lib/utils/imageUrl'
 import { MessageCircle, Share2, ChevronLeft, ChevronRight, X, Check } from 'lucide-react'
 import { CattleWithRelations } from '@samadya/shared/types'
-import { BookingModal } from './BookingModal'
 
 interface CattleProfileProps {
   cattle: CattleWithRelations
@@ -31,7 +30,6 @@ export function CattleProfile({ cattle, nextCode }: CattleProfileProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('summary')
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
-  const [showBookingModal, setShowBookingModal] = useState(false)
   const [mobileView, setMobileView] = useState<'gallery' | 'details'>('gallery')
 
   const weightStats = calculateWeightStats(cattle.weights || [])
@@ -100,10 +98,6 @@ export function CattleProfile({ cattle, nextCode }: CattleProfileProps) {
       await navigator.clipboard.writeText(url)
       alert('Link copied to clipboard!')
     }
-  }
-
-  const handleBookingClick = () => {
-    setShowBookingModal(true)
   }
 
   return (
@@ -612,21 +606,6 @@ export function CattleProfile({ cattle, nextCode }: CattleProfileProps) {
         </div>
       )}
 
-      {/* Booking Modal */}
-      {showBookingModal && (
-        <BookingModal
-          isOpen={showBookingModal}
-          onClose={() => setShowBookingModal(false)}
-          cattle={{
-            id: cattle.id,
-            name: cattle.name,
-            code: cattle.code,
-            price: Number(cattle.price),
-            quantity: cattle.quantity || 1,
-          }}
-          onSuccess={() => alert('Booking berhasil! Anda akan dihubungi oleh admin.')}
-        />
-      )}
     </div>
   )
 }

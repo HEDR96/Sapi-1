@@ -66,7 +66,11 @@ export function RecentComments() {
         setTestimonials(items)
         setLoading(false)
       })
-      .catch(() => {
+      .catch((err) => {
+        // Testimonials are a non-critical section - fail quietly (hide the
+        // section) rather than showing an error banner on the homepage,
+        // but still log so a real outage is visible in monitoring.
+        console.error('Failed to load testimonials:', err)
         setTestimonials([])
         setLoading(false)
       })

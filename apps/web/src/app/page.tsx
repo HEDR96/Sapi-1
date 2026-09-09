@@ -54,6 +54,17 @@ export default function HomePage() {
         if (items.length > 0 && !selectedCattle) {
           setSelectedCattle(items[0])
         }
+        // Restore a previously-picked compare list (e.g. after navigating
+        // away to a cattle detail page and back) instead of losing it.
+        try {
+          const savedIds: string[] = JSON.parse(localStorage.getItem('compareCattleIds') || '[]')
+          if (savedIds.length > 0) {
+            const restored = items.filter((c: CattleWithRelations) => savedIds.includes(c.id))
+            if (restored.length > 0) setComparingCattle(restored)
+          }
+        } catch {
+          // Ignore malformed/inaccessible storage - compare list just starts empty
+        }
         setIsLoading(false)
       })
       .catch(() => {
@@ -90,13 +101,13 @@ export default function HomePage() {
   const handleCompareSelect = (cattle: CattleWithRelations) => {
     setComparingCattle(prev => {
       const exists = prev.find(x => x.id === cattle.id)
-      if (exists) {
-        return prev.filter(x => x.id !== cattle.id)
+      const next = exists ? prev.filter(x => x.id !== cattle.id) : prev.length >= 3 ? prev : [...prev, cattle]
+      try {
+        localStorage.setItem('compareCattleIds', JSON.stringify(next.map(c => c.id)))
+      } catch {
+        // Storage unavailable (private browsing, etc.) - selection still works for this session
       }
-      if (prev.length >= 3) {
-        return prev
-      }
-      return [...prev, cattle]
+      return next
     })
   }
 

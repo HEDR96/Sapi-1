@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from 'react'
 import { CatalogSwiperCard } from './CatalogSwiperCard'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { CattleWithLatestWeight, CattleWithRelations } from '@samadya/shared/types'
+import { calculateWeightStats, estimateTargetCompletion } from '@samadya/shared/lib/utils/calculations'
 
 interface CatalogSwiperProps {
   cattle: CattleWithLatestWeight[]
@@ -86,7 +87,13 @@ export function CatalogSwiper({
         className="flex gap-4 overflow-x-auto scroll-smooth scroll-snap-x-mandatory pb-4 px-4 sm:px-12
           [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']"
       >
-        {cattle.map((c) => (
+        {cattle.map((c) => {
+          const fullData = allCattle.find((x) => x.id === c.id)
+          const weightStats = calculateWeightStats(fullData?.weights || [])
+          const targetEstimation = fullData?.targetWeight && weightStats.lastWeight
+            ? estimateTargetCompletion(fullData.targetWeight, weightStats.lastWeight, weightStats.adg)
+            : null
+          return (
           <CatalogSwiperCard
             key={c.id}
             id={c.id}
@@ -98,12 +105,15 @@ export function CatalogSwiper({
             lastWeight={c.lastWeight}
             mainImage={c.mainImage}
             quantity={c.quantity}
+            adg={weightStats.adg}
+            progressPercentage={targetEstimation?.progressPercentage ?? null}
             isSelected={selectedId === c.id}
             isComparing={comparingIds.includes(c.id)}
             onClick={() => onSelect(c)}
             onCompare={() => handleCompare(c)}
           />
-        ))}
+          )
+        })}
       </div>
 
       {showRightArrow && (

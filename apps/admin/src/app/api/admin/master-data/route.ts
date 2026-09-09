@@ -6,6 +6,11 @@ export const dynamic = 'force-dynamic'
 
 // GET /api/admin/master-data - Get all master data
 export async function GET(request: NextRequest) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams
     const category = searchParams.get('category')
@@ -30,6 +35,11 @@ export async function GET(request: NextRequest) {
 
 // POST /api/admin/master-data - Create master data
 export async function POST(request: NextRequest) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const body = await request.json()
     const { category, key, value } = body
@@ -70,6 +80,11 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/admin/master-data - Update master data
 export async function PUT(request: NextRequest) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const body = await request.json()
     const { id, value, isActive, order } = body
@@ -96,6 +111,11 @@ export async function PUT(request: NextRequest) {
 
 // DELETE /api/admin/master-data?id=xxx - Delete master data
 export async function DELETE(request: NextRequest) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')

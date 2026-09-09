@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ShieldCheck, Instagram, Facebook, Play, Music2 } from 'lucide-react'
+import { ShieldCheck, Instagram, Facebook, Music2 } from 'lucide-react'
 
 const menuLinks = [
   { href: '/', label: 'Beranda' },
@@ -9,14 +9,12 @@ const menuLinks = [
 
 const infoLinks = [
   { href: '/tentang-kami', label: 'Tentang Kami' },
-  { href: '/#blog', label: 'Blog' },
   { href: '/#kontak', label: 'Kontak' },
 ]
 
 const socialLinks = [
   { icon: Instagram, href: 'https://instagram.com/samadyafarm.id', label: 'Instagram' },
   { icon: Facebook, href: 'https://www.facebook.com/samadyafarm.id', label: 'Facebook' },
-  { icon: Play, href: '#', label: 'YouTube' },
   { icon: Music2, href: 'https://www.tiktok.com/@samadyafarm.id', label: 'TikTok' },
 ]
 

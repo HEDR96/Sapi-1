@@ -2,11 +2,61 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState, useRef } from 'react'
 import { Columns3, Check, Film } from 'lucide-react'
 import { formatCurrency, formatWeight } from '@samadya/shared/lib/utils/formatters'
 import { Status } from '@samadya/shared/types'
 import { StatusBadge } from './CattleStatusBadge'
-import { getDirectImageUrl, isVideoUrl } from '@samadya/shared/lib/utils/imageUrl'
+import { getDirectImageUrl, getVideoUrl, isVideoUrl } from '@samadya/shared/lib/utils/imageUrl'
+
+// Captures a frame from the video as a thumbnail (browsers won't paint a
+// preview frame for a hidden/unplayed <video>, so grab one onto a canvas)
+function VideoCardThumbnail({ videoUrl }: { videoUrl: string }) {
+  const [thumbnail, setThumbnail] = useState<string | null>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  const handleSeeked = () => {
+    if (!videoRef.current) return
+    try {
+      const canvas = document.createElement('canvas')
+      canvas.width = 320
+      canvas.height = 240
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height)
+        setThumbnail(canvas.toDataURL('image/jpeg', 0.7))
+      }
+    } catch {
+      // CORS-tainted canvas or decode failure - keep the icon fallback
+    }
+  }
+
+  if (thumbnail) {
+    return <img src={thumbnail} alt="" className="absolute inset-0 h-full w-full object-cover" />
+  }
+
+  return (
+    <>
+      <video
+        ref={videoRef}
+        src={videoUrl}
+        className="hidden"
+        muted
+        crossOrigin="anonymous"
+        onLoadedData={() => {
+          if (videoRef.current) videoRef.current.currentTime = 1
+        }}
+        onSeeked={handleSeeked}
+      />
+      <div className="flex h-full items-center justify-center bg-gradient-to-br from-[hsl(var(--forest))/20] to-[hsl(var(--forest))/40]">
+        <div className="flex flex-col items-center gap-1">
+          <Film className="h-8 w-8 text-[hsl(var(--forest))/50]" />
+          <span className="text-[9px] text-[hsl(var(--forest))/60]">Video</span>
+        </div>
+      </div>
+    </>
+  )
+}
 
 interface CatalogSwiperCardProps {
   id: string
@@ -18,6 +68,8 @@ interface CatalogSwiperCardProps {
   lastWeight: number | null
   mainImage: string | null
   quantity?: number
+  adg?: number | null
+  progressPercentage?: number | null
   isSelected?: boolean
   isComparing?: boolean
   onClick?: () => void
@@ -34,6 +86,8 @@ export function CatalogSwiperCard({
   lastWeight,
   mainImage,
   quantity = 1,
+  adg,
+  progressPercentage,
   isSelected = false,
   isComparing = false,
   onClick,
@@ -55,6 +109,14 @@ export function CatalogSwiperCard({
     >
       <div
         onClick={onClick}
+        onKeyDown={(e) => {
+          if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault()
+            onClick()
+          }
+        }}
+        role="button"
+        tabIndex={0}
         className="relative aspect-[4/3] overflow-hidden rounded-t-lg cursor-pointer"
       >
         {mainImage && !isVideoUrl(mainImage) ? (
@@ -92,20 +154,15 @@ export function CatalogSwiperCard({
             )}
           </>
         ) : mainImage && isVideoUrl(mainImage) ? (
-          <div className="flex h-full items-center justify-center bg-gradient-to-br from-[hsl(var(--forest))/20] to-[hsl(var(--forest))/40]">
-            <div className="flex flex-col items-center gap-1">
-              <Film className="h-8 w-8 text-[hsl(var(--forest))/50]" />
-              <span className="text-[9px] text-[hsl(var(--forest))/60]">Video</span>
-            </div>
-          </div>
+          <VideoCardThumbnail videoUrl={getVideoUrl(mainImage)} />
         ) : (
           <div className="flex h-full items-center justify-center bg-[hsl(var(--cream))]">
             <span className="text-[10px] text-[hsl(var(--forest))/50]">Tidak Ada Foto</span>
           </div>
         )}
-        {lastWeight && !isSold && !isBooked && (
+        {progressPercentage != null && !isSold && !isBooked && (
           <div className="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[7px] font-bold text-[hsl(var(--forest))] shadow-sm">
-            85%
+            {Math.round(progressPercentage)}%
           </div>
         )}
       </div>
@@ -140,7 +197,7 @@ export function CatalogSwiperCard({
           </div>
           <div className="rounded bg-[hsl(var(--cream))] px-2 py-1.5">
             <span className="text-[hsl(var(--forest))/45]">ADG</span>
-            <div className="font-bold text-[hsl(var(--forest))]">1.05 kg</div>
+            <div className="font-bold text-[hsl(var(--forest))]">{adg != null ? `${adg.toFixed(2)} kg` : '-'}</div>
           </div>
         </div>
 

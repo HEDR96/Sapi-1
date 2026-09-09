@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, Search, Trash2, X, Check, ChevronDown } from 'lucide-react'
+import { Plus, Search, Trash2, X, Check, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@samadya/shared/components/ui/button'
 import { Input } from '@samadya/shared/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@samadya/shared/components/ui/card'
@@ -47,10 +47,19 @@ export default function SalesPage() {
   const [saving, setSaving] = useState(false)
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false)
   const [calculatedMargin, setCalculatedMargin] = useState<number | null>(null)
+  const [page, setPage] = useState(1)
+  const ITEMS_PER_PAGE = 10
 
   useEffect(() => {
     fetchData()
   }, [search])
+
+  useEffect(() => {
+    setPage(1)
+  }, [search])
+
+  const totalPages = Math.max(1, Math.ceil(sales.length / ITEMS_PER_PAGE))
+  const paginatedSales = sales.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
 
   const fetchData = async () => {
     try {
@@ -182,7 +191,7 @@ export default function SalesPage() {
               </tr>
             </thead>
             <tbody>
-              {sales.map((sale) => (
+              {paginatedSales.map((sale) => (
                 <tr key={sale.id} className="border-t">
                   <td className="p-3 text-sm">{formatDate(new Date(sale.createdAt))}</td>
                   <td className="p-3">
@@ -209,6 +218,18 @@ export default function SalesPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm text-muted-foreground">Halaman {page} dari {totalPages}</span>
+          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
       )}
 

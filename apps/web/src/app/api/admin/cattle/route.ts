@@ -59,7 +59,11 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    const items = cattle.map(({ weights, healthRecords, feedRecords, media, ...c }) => ({
+    // This route is called unauthenticated by the public site (homepage /
+    // katalog transparency features), so internal cost/margin fields must
+    // never be included in the response even though the DB query needs
+    // them for other calculations elsewhere in the app.
+    const items = cattle.map(({ weights, healthRecords, feedRecords, media, buyPrice, sellPrice, healthCost, feedCost, ...c }) => ({
       ...c,
       lastWeight: weights[0]?.weight || null,
       weights,

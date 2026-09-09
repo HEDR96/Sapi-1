@@ -261,13 +261,13 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
               <AnimatedCounter end={stat.value} suffix={stat.suffix} />
-              <div className="text-[5px] xs:text-[6px] sm:text-[8px] md:text-[10px] text-[hsl(var(--forest))/55]">{stat.label}</div>
+              <div className="text-[7px] xs:text-[8px] sm:text-[9px] md:text-[10px] text-[hsl(var(--forest))/55]">{stat.label}</div>
             </div>
           ))}
         </div>
 
         {/* Trust Features - Responsive */}
-        <div className="mt-1.5 xs:mt-2 sm:mt-3 md:mt-4 grid grid-cols-2 gap-x-1 xs:gap-x-2 gap-y-0.5 xs:gap-y-1 sm:gap-x-3 sm:gap-y-2 text-[6px] xs:text-[7px] sm:text-[9px] md:text-[10px] text-[hsl(var(--forest))/70]">
+        <div className="mt-1.5 xs:mt-2 sm:mt-3 md:mt-4 grid grid-cols-2 gap-x-1 xs:gap-x-2 gap-y-0.5 xs:gap-y-1 sm:gap-x-3 sm:gap-y-2 text-[8px] xs:text-[8px] sm:text-[9px] md:text-[10px] text-[hsl(var(--forest))/70]">
           {trustFeatures.map((feature, index) => (
             <div key={index} className="flex items-center gap-0.5 xs:gap-1 sm:gap-1.5">
               <feature.icon className="h-3 w-3 xs:h-4 xs:w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-[hsl(var(--olive))]" />
@@ -309,7 +309,7 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
               <div className="text-center text-[7px] xs:text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] font-extrabold tracking-[.02em] text-[hsl(var(--forest))] pt-0.5 sm:pt-1">
                 samadyafarm.id
               </div>
-              <div className="text-center text-[4px] xs:text-[5px] sm:text-[5.5px] md:text-[6px] lg:text-[7px] font-semibold uppercase tracking-[.12em] sm:tracking-[.14em] md:tracking-[.16em] text-[hsl(var(--forest))/70]">
+              <div className="text-center text-[6px] xs:text-[6.5px] sm:text-[7px] md:text-[7.5px] lg:text-[8px] font-semibold uppercase tracking-[.12em] sm:tracking-[.14em] md:tracking-[.16em] text-[hsl(var(--forest))/70]">
                 Sapi Pilihan
               </div>
 
@@ -331,7 +331,7 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
                 {showLoading ? (
                   <div className="flex h-full flex-col items-center justify-center text-center">
                     <Loader2 className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-4 sm:w-4 animate-spin text-[hsl(var(--forest))/50]" />
-                    <span className="text-[3px] xs:text-[4px] sm:text-[5px] text-[hsl(var(--forest))/50] mt-0.5">Memuat...</span>
+                    <span className="text-[5px] xs:text-[5.5px] sm:text-[6px] text-[hsl(var(--forest))/50] mt-0.5">Memuat...</span>
                   </div>
                 ) : currentCattle ? (
                   <div className="flex h-full items-center justify-center">
@@ -342,13 +342,13 @@ export function HeroSection({ cattle, selectedCattle, onSelectCattle, isLoading 
                     />
                   </div>
                 ) : (
-                  <div className="flex h-full items-center justify-center text-center text-[4px] xs:text-[5px] sm:text-[6px] text-[hsl(var(--forest))/50]">
+                  <div className="flex h-full items-center justify-center text-center text-[6px] xs:text-[6.5px] sm:text-[7px] text-[hsl(var(--forest))/50]">
                     QR Code
                   </div>
                 )}
               </div>
 
-              <div className="mt-0.5 xs:mt-1 sm:mt-1.5 text-center text-[4px] xs:text-[5px] sm:text-[6px] md:text-[7px] lg:text-[9px] font-bold uppercase tracking-[.02em] sm:tracking-[.03em] md:tracking-[.04em] text-[hsl(var(--forest))/75]">
+              <div className="mt-0.5 xs:mt-1 sm:mt-1.5 text-center text-[6px] xs:text-[6.5px] sm:text-[7px] md:text-[7.5px] lg:text-[9px] font-bold uppercase tracking-[.02em] sm:tracking-[.03em] md:tracking-[.04em] text-[hsl(var(--forest))/75]">
                 SCAN UNTUK PROFIL
               </div>
             </div>

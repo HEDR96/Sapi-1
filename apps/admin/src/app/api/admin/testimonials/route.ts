@@ -42,16 +42,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Nama dan konten wajib diisi' }, { status: 400 })
     }
 
-    // Check max 3 active testimonials
-    if (isActive !== false) {
-      const activeCount = await prisma.testimonial.count({
-        where: { isActive: true },
-      })
-      if (activeCount >= 3) {
-        return NextResponse.json({ error: 'Maksimal 3 testimoni aktif' }, { status: 400 })
-      }
-    }
-
     const testimonial = await prisma.testimonial.create({
       data: {
         customerName,
@@ -93,16 +83,6 @@ export async function PUT(request: NextRequest) {
     const existing = await prisma.testimonial.findUnique({ where: { id } })
     if (!existing) {
       return NextResponse.json({ error: 'Testimoni tidak ditemukan' }, { status: 404 })
-    }
-
-    // Check max 3 active testimonials when activating
-    if (isActive === true && !existing.isActive) {
-      const activeCount = await prisma.testimonial.count({
-        where: { isActive: true },
-      })
-      if (activeCount >= 3) {
-        return NextResponse.json({ error: 'Maksimal 3 testimoni aktif' }, { status: 400 })
-      }
     }
 
     const testimonial = await prisma.testimonial.update({

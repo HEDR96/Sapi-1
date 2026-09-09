@@ -6,6 +6,7 @@ import { CattleCard } from './CattleCard'
 import { CattleWithLatestWeight, CattleWithRelations } from '@samadya/shared/types'
 import { LayoutGrid, Columns3, ChevronLeft, ChevronRight } from 'lucide-react'
 import { SearchFilter, Filters } from './SearchFilter'
+import { calculateWeightStats, estimateTargetCompletion } from '@samadya/shared/lib/utils/calculations'
 
 interface CatalogSectionProps {
   cattle: CattleWithLatestWeight[]
@@ -142,7 +143,13 @@ export function CatalogSection({
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-            {paginatedCattle.map((c) => (
+            {paginatedCattle.map((c) => {
+              const fullData = allCattle.find((x) => x.id === c.id)
+              const weightStats = calculateWeightStats(fullData?.weights || [])
+              const targetEstimation = fullData?.targetWeight && weightStats.lastWeight
+                ? estimateTargetCompletion(fullData.targetWeight, weightStats.lastWeight, weightStats.adg)
+                : null
+              return (
               <div
                 key={c.id}
                 onClick={() => onSelect(c)}
@@ -162,12 +169,15 @@ export function CatalogSection({
                   lastWeight={c.lastWeight}
                   mainImage={c.mainImage}
                   quantity={c.quantity}
+                  adg={weightStats.adg}
+                  progressPercentage={targetEstimation?.progressPercentage ?? null}
                   isSelected={selectedId === c.id}
                   isComparing={comparingIds.includes(c.id)}
                   onCompare={() => handleCompare(c)}
                 />
               </div>
-            ))}
+              )
+            })}
           </div>
 
           {totalPages > 1 && (
