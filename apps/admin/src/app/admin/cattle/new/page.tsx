@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@samadya/shared/components/ui/label'
 import Link from 'next/link'
 import { ImageUploader } from '@/components/admin/ImageUploader'
+import { MultiMediaUploader } from '@/components/admin/MultiMediaUploader'
 import { getDirectImageUrl, getVideoUrl } from '@samadya/shared/lib/utils/imageUrl'
 
 interface MasterData {
@@ -471,7 +472,12 @@ export default function NewCattlePage() {
           </CardHeader>
           <CardContent>
             <div className="mb-6 space-y-4">
-              <Label>Upload Foto/Video</Label>
+              <Label>Upload Beberapa Foto/Video Sekaligus</Label>
+              <MultiMediaUploader cattleId={createdCattle.id} onUploaded={() => fetchMedia(createdCattle.id)} />
+            </div>
+
+            <div className="mb-6 space-y-4">
+              <Label>Atau Upload Satu per Satu</Label>
               {uploadedMediaUrls.map((url, index) => (
                 <div key={index} className="relative">
                   <ImageUploader
