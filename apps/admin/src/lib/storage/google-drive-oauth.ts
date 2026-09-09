@@ -66,6 +66,10 @@ export function getOAuth2Client() {
 export function getAuthorizationUrl(): string {
   const oauth2Client = getOAuth2Client()
 
+  const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI
+  console.log('[Google OAuth] Using redirect_uri:', redirectUri)
+  console.log('[Google OAuth] Using client_id:', process.env.GOOGLE_OAUTH_CLIENT_ID)
+
   return oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES,
@@ -90,22 +94,41 @@ export async function handleOAuthCallback(code: string): Promise<StoredToken> {
   const oauth2Client = getOAuth2Client()
 
   console.log('[Google OAuth] Exchanging code for tokens...')
+  console.log('[Google OAuth] Code type:', typeof code)
+  console.log('[Google OAuth] Code length:', code?.length)
 
-  const { tokens } = await oauth2Client.getToken(code)
+  let tokens: { tokens: any }
+  try {
+    tokens = await oauth2Client.getToken(code)
+  } catch (tokenError: any) {
+    console.error('[Google OAuth] Token exchange failed:', tokenError.message)
+    console.error('[Google OAuth] Token error details:', {
+      code: tokenError.code,
+      status: tokenError.status,
+      errors: tokenError.errors,
+      response: tokenError.response?.data
+    })
+    throw new Error(`Token exchange failed: ${tokenError.message}`)
+  }
 
+  if (!tokens || !tokens.tokens) {
+    throw new Error('Invalid response from Google OAuth')
+  }
+
+  const tokenData = tokens.tokens
   console.log('[Google OAuth] Tokens received:', {
-    hasAccessToken: !!tokens.access_token,
-    hasRefreshToken: !!tokens.refresh_token,
-    expiryDate: tokens.expiry_date,
+    hasAccessToken: !!tokenData.access_token,
+    hasRefreshToken: !!tokenData.refresh_token,
+    expiryDate: tokenData.expiry_date,
   })
 
   // Calculate actual expiry date if not provided (default: 1 hour from now)
-  const expiryDate = tokens.expiry_date || (Date.now() + 3600 * 1000)
+  const expiryDate = tokenData.expiry_date || (Date.now() + 3600 * 1000)
 
   // Build stored token object
   const storedToken: StoredToken = {
-    access_token: tokens.access_token!,
-    refresh_token: tokens.refresh_token!,
+    access_token: tokenData.access_token!,
+    refresh_token: tokenData.refresh_token!,
     expiry_date: expiryDate,
   }
 

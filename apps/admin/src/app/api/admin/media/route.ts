@@ -99,6 +99,14 @@ export async function POST(request: NextRequest) {
 
     // Upload file if provided (multipart only)
     if (file && file.size > 0) {
+      // Validate file type exists and is a valid string
+      if (!file.type || typeof file.type !== 'string') {
+        return NextResponse.json(
+          { error: 'File type tidak valid atau missing' },
+          { status: 400 }
+        )
+      }
+
       const buffer = Buffer.from(await file.arrayBuffer())
       const isVideo = file.type.startsWith('video/')
       const folder = isVideo ? 'video' : 'image'

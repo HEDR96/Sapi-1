@@ -35,6 +35,11 @@ export function ImageUploader({
   const isVideo = value?.includes('/api/stream') || value?.match(/\.(mp4|webm|ogg)$/i) || value?.startsWith('data:video')
 
   const validateFile = (file: File): string | null => {
+    // Check file type exists
+    if (!file.type || typeof file.type !== 'string') {
+      return 'File type tidak valid atau missing'
+    }
+
     const isVideoFile = file.type.startsWith('video/')
     const isImageFile = file.type.startsWith('image/')
 
@@ -126,6 +131,13 @@ export function ImageUploader({
     const validationError = validateFile(file)
     if (validationError) {
       setError(validationError)
+      return
+    }
+
+    // Validate file type exists
+    if (!file.type || typeof file.type !== 'string') {
+      setError('File type tidak valid atau missing')
+      setUploading(false)
       return
     }
 

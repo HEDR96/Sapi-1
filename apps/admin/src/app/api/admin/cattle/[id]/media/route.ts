@@ -41,6 +41,11 @@ export async function POST(
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
+    // Validate file type exists and is valid
+    if (!file.type || typeof file.type !== 'string') {
+      return NextResponse.json({ error: 'Invalid file type: missing or undefined' }, { status: 400 })
+    }
+
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm']
     if (!allowedTypes.includes(file.type)) {

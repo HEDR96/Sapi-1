@@ -22,7 +22,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate code format
+    if (typeof code !== 'string' || code.length < 10) {
+      return NextResponse.json(
+        { error: 'Invalid authorization code format' },
+        { status: 400 }
+      )
+    }
+
     console.log('[OAuth Callback] Processing callback...')
+    console.log('[OAuth Callback] Code length:', code.length)
+    console.log('[OAuth Callback] Code prefix:', code.substring(0, 20) + '...')
 
     // Exchange code for tokens
     const token = await handleOAuthCallback(code)
@@ -43,10 +53,36 @@ export async function POST(request: NextRequest) {
       ],
     })
   } catch (error: any) {
+    // Log full error details
     console.error('[OAuth Callback] Error:', error.message)
+    console.error('[OAuth Callback] Error name:', error.name)
+    console.error('[OAuth Callback] Error stack:', error.stack)
+    console.error('[OAuth Callback] Full error:', JSON.stringify(error, null, 2))
+
+    // Check for specific error types
+    let errorMessage = error.message || 'Unknown error'
+    let errorDetails: any = {}
+
+    if (error.message?.includes('invalid_grant')) {
+      errorDetails = {
+        type: 'invalid_grant',
+        cause: 'Authorization code expired, already used, or invalid redirect_uri mismatch',
+        solution: 'Get a new authorization code and ensure redirect_uri matches exactly'
+      }
+    } else if (error.message?.includes('startsWith')) {
+      errorDetails = {
+        type: 'undefined_property',
+        cause: 'Internal error - possibly malformed response from Google',
+        stack: error.stack
+      }
+    }
 
     return NextResponse.json(
-      { error: `Authorization failed: ${error.message}` },
+      {
+        error: `Authorization failed: ${errorMessage}`,
+        errorDetails,
+        hint: 'Check server logs for full stack trace'
+      },
       { status: 500 }
     )
   }
