@@ -1,11 +1,60 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Columns3, Check, Film } from 'lucide-react'
 import { Status } from '@samadya/shared/types'
 import { StatusBadge } from './CattleStatusBadge'
 import { formatCurrency, formatWeight } from '@samadya/shared/lib/utils/formatters'
-import { getDirectImageUrl, isVideoUrl } from '@samadya/shared/lib/utils/imageUrl'
+import { getDirectImageUrl, getVideoUrl, isVideoUrl } from '@samadya/shared/lib/utils/imageUrl'
+
+// Captures a frame from the video as a thumbnail (browsers won't paint a
+// preview frame for a hidden/unplayed <video>, so grab one onto a canvas)
+function VideoCardThumbnail({ videoUrl }: { videoUrl: string }) {
+  const [thumbnail, setThumbnail] = useState<string | null>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  const handleSeeked = () => {
+    if (!videoRef.current) return
+    try {
+      const canvas = document.createElement('canvas')
+      canvas.width = 320
+      canvas.height = 240
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height)
+        setThumbnail(canvas.toDataURL('image/jpeg', 0.7))
+      }
+    } catch {
+      // CORS-tainted canvas or decode failure - keep the icon fallback
+    }
+  }
+
+  if (thumbnail) {
+    return <img src={thumbnail} alt="" className="absolute inset-0 h-full w-full object-cover" />
+  }
+
+  return (
+    <>
+      <video
+        ref={videoRef}
+        src={videoUrl}
+        className="hidden"
+        muted
+        crossOrigin="anonymous"
+        onLoadedData={() => {
+          if (videoRef.current) videoRef.current.currentTime = 1
+        }}
+        onSeeked={handleSeeked}
+      />
+      <div className="flex h-full items-center justify-center bg-gradient-to-br from-[hsl(var(--forest))/20] to-[hsl(var(--forest))/40]">
+        <div className="flex flex-col items-center gap-1">
+          <Film className="h-8 w-8 text-[hsl(var(--forest))/50]" />
+          <span className="text-[9px] text-[hsl(var(--forest))/60]">Video</span>
+        </div>
+      </div>
+    </>
+  )
+}
 
 interface CattleCardProps {
   id: string
@@ -103,12 +152,7 @@ export function CattleCard({
             )}
           </>
         ) : mainImage && isVideoUrl(mainImage) ? (
-          <div className="flex h-full items-center justify-center bg-gradient-to-br from-[hsl(var(--forest))/20] to-[hsl(var(--forest))/40]">
-            <div className="flex flex-col items-center gap-1">
-              <Film className="h-8 w-8 text-[hsl(var(--forest))/50]" />
-              <span className="text-[9px] text-[hsl(var(--forest))/60]">Video</span>
-            </div>
-          </div>
+          <VideoCardThumbnail videoUrl={getVideoUrl(mainImage)} />
         ) : (
           <div className="flex h-full items-center justify-center bg-[hsl(var(--cream))]">
             <span className="text-[10px] text-[hsl(var(--forest))/50]">Tidak Ada Foto</span>

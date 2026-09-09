@@ -171,7 +171,7 @@ export default function KatalogPage() {
                 status={c.status}
                 price={Number(c.price)}
                 lastWeight={c.weights?.[c.weights.length - 1]?.weight || null}
-                mainImage={c.mainImage}
+                mainImage={c.mainImage || c.media?.[0]?.fileUrl || null}
                 quantity={c.quantity}
               />
             ))}

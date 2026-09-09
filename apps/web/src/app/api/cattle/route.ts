@@ -51,6 +51,10 @@ export async function GET(request: NextRequest) {
             orderBy: { measurementDate: 'desc' },
             take: 1,
           },
+          media: {
+            orderBy: { createdAt: 'asc' },
+            take: 1,
+          },
         },
       }),
       prisma.cattle.count({ where }),
@@ -67,10 +71,13 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Remove weights from response (only needed for filtering)
-    const items = filteredCattle.map(({ weights, ...c }) => ({
+    // Remove weights/media from response (only needed for filtering / fallback thumbnail)
+    const items = filteredCattle.map(({ weights, media, ...c }) => ({
       ...c,
       lastWeight: weights[0]?.weight || null,
+      // Fall back to the first gallery item when no dedicated mainImage was set
+      // (e.g. photos/videos added only via the Dokumentasi tab)
+      mainImage: c.mainImage || media[0]?.fileUrl || null,
     }))
 
     return NextResponse.json({
