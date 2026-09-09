@@ -29,6 +29,11 @@ async function generateCattleCode(): Promise<string> {
 }
 
 export async function GET(request: NextRequest) {
+  const admin = await getCurrentAdmin()
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     console.log('[GET /api/admin/cattle] Starting...')
 

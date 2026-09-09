@@ -61,8 +61,12 @@ export async function GET(
       ? cattle.weights[cattle.weights.length - 1].weight
       : null
 
+    // This is an unauthenticated public route - never include internal
+    // cost/margin fields in the response.
+    const { buyPrice, sellPrice, healthCost, feedCost, ...publicCattle } = cattle
+
     return NextResponse.json({
-      ...cattle,
+      ...publicCattle,
       lastWeight,
       weightStats,
       targetEstimation,

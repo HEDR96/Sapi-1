@@ -6,7 +6,6 @@ import { useState, useRef } from 'react'
 import { Columns3, Check, Film } from 'lucide-react'
 import { formatCurrency, formatWeight } from '@samadya/shared/lib/utils/formatters'
 import { Status } from '@samadya/shared/types'
-import { StatusBadge } from './CattleStatusBadge'
 import { getDirectImageUrl, getVideoUrl, isVideoUrl } from '@samadya/shared/lib/utils/imageUrl'
 
 // Captures a frame from the video as a thumbnail (browsers won't paint a

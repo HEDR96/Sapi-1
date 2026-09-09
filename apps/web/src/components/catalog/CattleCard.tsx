@@ -3,7 +3,6 @@ import Image from 'next/image'
 import { useState, useRef } from 'react'
 import { Columns3, Check, Film } from 'lucide-react'
 import { Status } from '@samadya/shared/types'
-import { StatusBadge } from './CattleStatusBadge'
 import { formatCurrency, formatWeight } from '@samadya/shared/lib/utils/formatters'
 import { getDirectImageUrl, getVideoUrl, isVideoUrl } from '@samadya/shared/lib/utils/imageUrl'
 

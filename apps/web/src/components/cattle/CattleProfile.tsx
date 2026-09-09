@@ -675,29 +675,3 @@ function StatCard({ label, value }: { label: string; value: string }) {
     </div>
   )
 }
-
-function WeightsTab({ weights }: { weights: any[] }) {
-  if (weights.length === 0) {
-    return (
-      <div className="text-center py-12 text-[hsl(var(--forest))/60]">
-        <div className="mb-2 text-4xl">📋</div>
-        <p className="text-[14px]">Belum ada data penimbangan.</p>
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-4">
-      {/* Chart */}
-      <div className="rounded-lg border border-[hsl(var(--line))] bg-white p-4">
-        <WeightChart weights={weights} />
-      </div>
-
-      {/* History by Month */}
-      <div className="rounded-lg border border-[hsl(var(--line))] bg-white p-4">
-        <div className="text-[13px] font-bold text-[hsl(var(--forest))] mb-3">Riwayat Penimbangan</div>
-        <WeightHistoryTab weights={weights} />
-      </div>
-    </div>
-  )
-}

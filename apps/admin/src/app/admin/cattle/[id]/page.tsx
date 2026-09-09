@@ -271,13 +271,13 @@ export default function CattleDetailPage() {
                     <div className="space-y-2"><Label>Kode</Label><Input value={form.code} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, code: e.target.value })} /></div>
                     <div className="space-y-2"><Label>Nama</Label><Input value={form.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })} /></div>
                     <div className="space-y-2"><Label>Jenis</Label>
-                      <Select value={form.breed} onValueChange={(v: string) => setForm({ ...form, breed: v })} disabled={loadingMasterData || editing}>
+                      <Select value={form.breed} onValueChange={(v: string) => setForm({ ...form, breed: v })} disabled={loadingMasterData}>
                         <SelectTrigger><SelectValue placeholder={loadingMasterData ? 'Memuat...' : 'Pilih jenis sapi'} /></SelectTrigger>
                         <SelectContent>{cattleBreeds.map((b) => <SelectItem key={b.id} value={b.key}>{b.value}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2"><Label>Status</Label>
-                      <Select value={form.status} onValueChange={(v: string) => setForm({ ...form, status: v })} disabled={loadingMasterData || editing}>
+                      <Select value={form.status} onValueChange={(v: string) => setForm({ ...form, status: v })} disabled={loadingMasterData}>
                         <SelectTrigger><SelectValue placeholder={loadingMasterData ? 'Memuat...' : 'Pilih status'} /></SelectTrigger>
                         <SelectContent>{cattleStatuses.map((s) => <SelectItem key={s.id} value={s.key}>{s.value}</SelectItem>)}</SelectContent>
                       </Select>

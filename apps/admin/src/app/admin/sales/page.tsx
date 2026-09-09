@@ -34,6 +34,8 @@ interface Cattle {
   name: string
   breed: string
   buyPrice: number | null
+  healthCost: number | null
+  feedCost: number | null
 }
 
 export default function SalesPage() {
@@ -59,7 +61,10 @@ export default function SalesPage() {
   }, [search])
 
   const totalPages = Math.max(1, Math.ceil(sales.length / ITEMS_PER_PAGE))
-  const paginatedSales = sales.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+  // Clamp so deleting the last item on the last page doesn't strand the
+  // view on a page number that no longer exists.
+  const safePage = Math.min(page, totalPages)
+  const paginatedSales = sales.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE)
 
   const fetchData = async () => {
     try {
@@ -85,8 +90,11 @@ export default function SalesPage() {
   useEffect(() => {
     if (form.cattleId && form.price) {
       const selectedCattle = cattle.find(c => c.id === form.cattleId)
-      if (selectedCattle?.buyPrice) {
-        const margin = parseFloat(form.price) - selectedCattle.buyPrice
+      if (selectedCattle) {
+        const margin = parseFloat(form.price)
+          - (selectedCattle.buyPrice || 0)
+          - (selectedCattle.healthCost || 0)
+          - (selectedCattle.feedCost || 0)
         setCalculatedMargin(margin)
       } else {
         setCalculatedMargin(parseFloat(form.price))
@@ -223,11 +231,11 @@ export default function SalesPage() {
 
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
+          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage === 1}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-sm text-muted-foreground">Halaman {page} dari {totalPages}</span>
-          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
+          <span className="text-sm text-muted-foreground">Halaman {safePage} dari {totalPages}</span>
+          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
