@@ -51,9 +51,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file has type
-    if (!file.type) {
+    if (!file.type || typeof file.type !== 'string') {
       return NextResponse.json(
-        { error: 'File type tidak valid' },
+        { error: 'File type tidak valid atau missing' },
         { status: 400 }
       )
     }
