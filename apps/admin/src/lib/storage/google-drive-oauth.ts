@@ -162,6 +162,11 @@ export async function getAuthenticatedDriveClient(): Promise<drive_v3.Drive> {
       })
     } catch (refreshError: any) {
       console.error('[Google OAuth] Token refresh failed:', refreshError.message)
+      console.error('[Google OAuth] Error details:', {
+        code: refreshError.code,
+        status: refreshError.status,
+        errors: refreshError.errors,
+      })
       throw new Error(
         'Token expired and refresh failed. Please re-authorize at /api/auth/google/init'
       )
@@ -250,11 +255,28 @@ export async function uploadToGoogleDrive(
     console.error('[Google Drive OAuth] Upload failed:', {
       error: error.message,
       code: error.code,
+      errors: error.errors,
+      status: error.status,
     })
 
     if (error.message?.includes('No OAuth tokens found')) {
       throw new Error(
         'Google Drive not authorized. Please visit /api/auth/google/init to authorize.'
+      )
+    }
+
+    // Check for invalid credentials
+    if (error.code === 401 || error.message?.includes('invalid_credentials')) {
+      throw new Error(
+        'Invalid OAuth credentials. The refresh token may be invalid or expired. ' +
+        'Please re-authorize at /api/auth/google/init'
+      )
+    }
+
+    // Check for insufficient permissions
+    if (error.code === 403 || error.message?.includes('insufficientPermission')) {
+      throw new Error(
+        'Insufficient permissions. Please share the Google Drive folder with the OAuth app.'
       )
     }
 
