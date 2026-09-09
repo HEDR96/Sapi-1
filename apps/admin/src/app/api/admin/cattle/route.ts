@@ -4,10 +4,11 @@ import { getCurrentAdmin } from '@/lib/auth/jwt'
 
 export const dynamic = 'force-dynamic'
 
-// Auto-generate cattle code with sequential numbering (7 digits: NF-xxxxxxx)
+// Auto-generate cattle code as SP-<year><month>-<sequence>, e.g. SP-202602-001
 async function generateCattleCode(): Promise<string> {
-  const year = new Date().getFullYear()
-  const prefix = `SP-${year}`
+  const now = new Date()
+  const yearMonth = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`
+  const prefix = `SP-${yearMonth}-`
 
   const lastCattle = await prisma.cattle.findFirst({
     where: { code: { startsWith: prefix } },
@@ -15,21 +16,31 @@ async function generateCattleCode(): Promise<string> {
     select: { code: true },
   })
 
+  let nextNum = 1
   if (lastCattle) {
-    const parts = lastCattle.code.split('-')
-    const lastNum = parseInt(parts[parts.length - 1], 10)
-    return `${prefix}${String(lastNum + 1).padStart(7, '0')}`
+    // Slice off the known prefix rather than splitting on '-' so the
+    // extracted sequence can't accidentally swallow the year/month too
+    // (that mistake previously produced codes like "SP-20262026002").
+    const lastNum = parseInt(lastCattle.code.slice(prefix.length), 10)
+    if (!isNaN(lastNum)) nextNum = lastNum + 1
   }
 
-  return `${prefix}001`
+  return `${prefix}${String(nextNum).padStart(3, '0')}`
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     console.log('[GET /api/admin/cattle] Starting...')
 
+    const { searchParams } = new URL(request.url)
+    const status = searchParams.get('status')
+    const limitParam = searchParams.get('limit')
+    const limit = limitParam ? parseInt(limitParam, 10) : undefined
+
     const cattle = await prisma.cattle.findMany({
+      where: status ? { status: status as any } : undefined,
       orderBy: { createdAt: 'desc' },
+      take: limit,
       include: {
         weights: { orderBy: { measurementDate: 'desc' }, take: 1 },
         media: { orderBy: { createdAt: 'desc' }, take: 5 },

@@ -60,6 +60,36 @@ async function getCattle(code: string) {
   }
 }
 
+// Finds the next non-sold cattle to browse to, following the same
+// createdAt-desc order used by the catalog, wrapping around to the first
+// one when the current cattle is the last in the list.
+async function getNextCattleCode(currentId: string, currentCreatedAt: Date): Promise<string | null> {
+  try {
+    const next = await prisma.cattle.findFirst({
+      where: {
+        status: { not: 'SOLD' },
+        OR: [
+          { createdAt: { lt: currentCreatedAt } },
+          { createdAt: currentCreatedAt, id: { lt: currentId } },
+        ],
+      },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      select: { code: true },
+    })
+    if (next) return next.code
+
+    const wrapped = await prisma.cattle.findFirst({
+      where: { status: { not: 'SOLD' }, id: { not: currentId } },
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      select: { code: true },
+    })
+    return wrapped?.code ?? null
+  } catch (error) {
+    console.error('Error fetching next cattle:', error)
+    return null
+  }
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const cattle = await getCattle(params.code)
 
@@ -80,5 +110,7 @@ export default async function CattleDetailPage({ params }: PageProps) {
     notFound()
   }
 
-  return <CattleProfile cattle={cattle} />
+  const nextCode = await getNextCattleCode(cattle.id, cattle.createdAt)
+
+  return <CattleProfile cattle={cattle} nextCode={nextCode} />
 }

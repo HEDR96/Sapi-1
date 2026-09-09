@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Breadcrumb } from '@/components/shared/Breadcrumb'
 import { CattleStats } from './CattleStats'
 import { QRCodeCard } from './QRCodeCard'
+import { CattleIdTag } from './CattleIdTag'
 import { StatusBadge } from '@/components/catalog/CattleStatusBadge'
 import { WeightChart } from '@/components/weight/WeightChart'
 import { WeightHistoryTab } from './WeightHistoryTab'
@@ -21,11 +22,12 @@ import { BookingModal } from './BookingModal'
 
 interface CattleProfileProps {
   cattle: CattleWithRelations
+  nextCode?: string | null
 }
 
 type TabKey = 'summary' | 'weights' | 'health' | 'feed' | 'media'
 
-export function CattleProfile({ cattle }: CattleProfileProps) {
+export function CattleProfile({ cattle, nextCode }: CattleProfileProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('summary')
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
@@ -534,6 +536,22 @@ export function CattleProfile({ cattle }: CattleProfileProps) {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* ID Tag + Next Cattle */}
+        <div className="mt-4">
+          <CattleIdTag code={cattle.code} name={cattle.name} breed={cattle.breed} />
+          {nextCode && (
+            <div className="flex justify-center pb-2">
+              <Link
+                href={`/sapi/${nextCode}`}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[hsl(var(--forest))] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[hsl(var(--forest2))]"
+              >
+                Sapi Berikutnya
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* QR Code Section */}

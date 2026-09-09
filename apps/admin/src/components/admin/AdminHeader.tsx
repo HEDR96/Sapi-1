@@ -1,9 +1,10 @@
 'use client'
 
-import { ShieldCheck, Menu, User, LogOut } from 'lucide-react'
+import { Menu, User, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { NotificationDropdown, useNotifications } from './NotificationDropdown'
+import Logo from '../../app/logo.jpeg'
 
 interface AdminHeaderProps {
   onMenuClick?: () => void
@@ -32,9 +33,11 @@ export function AdminHeader({ onMenuClick }: AdminHeaderProps) {
           <Menu className="h-5 w-5 text-[hsl(var(--forest))]" />
         </button>
         <Link href="/admin/dashboard" className="flex items-center gap-2">
-          <div className="grid h-8 w-8 place-items-center rounded-full border border-[hsl(var(--forest))/30] bg-[hsl(var(--forest))]">
-            <ShieldCheck className="h-4 w-4 text-white" />
-          </div>
+          <img
+            src={Logo.src}
+            alt="Samadya Farm Logo"
+            className="h-8 w-8 rounded-full object-cover border border-[hsl(var(--forest))/30]"
+          />
           <span className="hidden sm:block text-[13px] font-extrabold tracking-[.08em] text-[hsl(var(--forest))]">
             samadyafarm.id
           </span>

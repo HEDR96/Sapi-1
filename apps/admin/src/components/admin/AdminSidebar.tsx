@@ -14,6 +14,7 @@ import {
   ChevronDown,
   MessageSquareQuote,
 } from 'lucide-react'
+import Logo from '../../app/logo.jpeg'
 
 // Consolidated nav - per redesign plan
 const navItems = [
@@ -79,9 +80,11 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
         {/* Header */}
         <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4 bg-gradient-to-r from-emerald-600 to-emerald-700">
           <Link href="/admin/dashboard" className="flex items-center gap-3" onClick={handleLinkClick}>
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-white/20 backdrop-blur shadow-lg">
-              <span className="text-sm font-bold text-white">NF</span>
-            </div>
+            <img
+              src={Logo.src}
+              alt="Samadya Farm Logo"
+              className="h-9 w-9 rounded-full object-cover border border-white/30 shadow-lg"
+            />
             <div>
               <div className="text-[13px] font-bold tracking-wide text-white">
                 samadyafarm.id

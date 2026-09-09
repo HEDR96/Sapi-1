@@ -470,11 +470,22 @@ export default function CattleDetailPage() {
           <Card>
             <CardHeader><CardTitle>Dokumentasi</CardTitle><CardDescription>Foto dan video dokumentasi sapi</CardDescription></CardHeader>
             <CardContent>
+              {!editing && (
+                <div className="mb-6 flex items-center justify-between rounded-lg border border-dashed border-[hsl(var(--line))] bg-[hsl(var(--cream))/30] p-4">
+                  <p className="text-sm text-muted-foreground">Klik <strong>Edit</strong> untuk menambah, mengganti, atau menghapus dokumentasi.</p>
+                  <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+                    <Pencil className="h-4 w-4 mr-2" />Edit
+                  </Button>
+                </div>
+              )}
+              {editing && (
               <div className="mb-6 space-y-4">
                 <Label>Upload Beberapa Foto/Video Sekaligus</Label>
                 <MultiMediaUploader cattleId={cattleId} onUploaded={fetchCattle} />
               </div>
+              )}
 
+              {editing && (
               <div className="mb-6 space-y-4">
                 <Label>Atau Upload Satu per Satu</Label>
                 {uploadedMediaUrls.map((url, index) => (
@@ -549,6 +560,7 @@ export default function CattleDetailPage() {
                   </div>
                 )}
               </div>
+              )}
               {cattle.media && cattle.media.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{cattle.media.map((m) => {
                   const isMain = cattle.mainImage === m.fileUrl
@@ -570,7 +582,7 @@ export default function CattleDetailPage() {
                         <Star className="h-3 w-3 fill-current" />Utama
                       </div>
                     )}
-                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className={`absolute top-2 right-2 flex gap-1 transition-opacity ${editing ? 'opacity-0 group-hover:opacity-100' : 'hidden'}`}>
                       {!isMain && (
                         <button
                           type="button"
