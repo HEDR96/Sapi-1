@@ -127,6 +127,12 @@ export function ImageUploader({
       return
     }
 
+    // Validate file type exists
+    if (!file.type) {
+      setError('File type tidak valid')
+      return
+    }
+
     setUploading(true)
     const isVideoFile = file.type.startsWith('video/')
     setUploadingIsVideo(isVideoFile)
