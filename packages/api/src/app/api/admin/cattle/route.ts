@@ -4,7 +4,11 @@ import { getCurrentUser } from '@/lib/auth/jwt'
 
 export const dynamic = 'force-dynamic'
 
+<<<<<<< HEAD
+// Auto-generate cattle code with sequential numbering (format: NF-YYYY-NNN)
+=======
 // Auto-generate cattle code as SP-<year><month>-<sequence>, e.g. SP-202602-001
+>>>>>>> 76cefde8fae70799441b6f29bb3312c9dd7fabee
 async function generateCattleCode(): Promise<string> {
   const now = new Date()
   const yearMonth = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`
@@ -18,6 +22,17 @@ async function generateCattleCode(): Promise<string> {
 
   let nextNum = 1
   if (lastCattle) {
+<<<<<<< HEAD
+    // Extract the number from the last code (e.g., "NF-2026-001" -> 1)
+    const parts = lastCattle.code.split('-')
+    const lastNum = parseInt(parts[parts.length - 1], 10)
+    const newNum = lastNum + 1
+    return `${prefix}-${String(newNum).padStart(3, '0')}`
+  }
+
+  // First cattle of the year
+  return `${prefix}-001`
+=======
     // Slice off the known prefix rather than splitting on '-' so the
     // extracted sequence can't accidentally swallow the year/month too
     // (that mistake previously produced codes like "SP-20262026002").
@@ -26,6 +41,7 @@ async function generateCattleCode(): Promise<string> {
   }
 
   return `${prefix}${String(nextNum).padStart(3, '0')}`
+>>>>>>> 76cefde8fae70799441b6f29bb3312c9dd7fabee
 }
 
 export async function GET(request: NextRequest) {

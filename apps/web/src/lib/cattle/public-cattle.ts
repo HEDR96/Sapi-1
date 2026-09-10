@@ -48,11 +48,6 @@ export async function getPublicCattleList({ status, excludeStatus, limit }: Publ
   }))
 }
 
-/** Every cattle ever registered - the landing page's "Sapi Terdaftar" stat */
-export function countAllCattle() {
-  return prisma.cattle.count()
-}
-
 /**
  * One cattle's full public profile: complete weigh-in, health, feed and
  * gallery history. Never includes internal cost/margin fields.

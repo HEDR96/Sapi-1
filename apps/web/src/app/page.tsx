@@ -1,5 +1,5 @@
 import { HomePageClient } from '../components/home/HomePageClient'
-import { countAllCattle, getPublicCattleDetail, getPublicCattleList } from '@/lib/cattle/public-cattle'
+import { getPublicCattleDetail, getPublicCattleList } from '@/lib/cattle/public-cattle'
 import { loadForPrerender, toPlainJson } from '@/lib/prerender'
 import type { CattleWithRelations } from '@samadya/shared/types'
 
@@ -9,10 +9,7 @@ import type { CattleWithRelations } from '@samadya/shared/types'
 export const revalidate = 60
 
 async function loadHomePageData() {
-  const [cattle, cattleCount] = await Promise.all([
-    getPublicCattleList({ status: ['AVAILABLE'], limit: 50 }),
-    countAllCattle(),
-  ])
+  const cattle = await getPublicCattleList({ status: ['AVAILABLE'], limit: 50 })
   // The first cattle is pre-selected in "Pantau Perkembangan", so include its
   // full history up front instead of fetching it right after the page loads
   const firstDetails = cattle[0] ? await getPublicCattleDetail({ id: cattle[0].id }) : null
@@ -20,7 +17,6 @@ async function loadHomePageData() {
   return {
     initialCattle: toPlainJson<CattleWithRelations[]>(cattle),
     initialDetails: firstDetails ? toPlainJson<CattleWithRelations>(firstDetails) : null,
-    cattleCount,
   }
 }
 
@@ -28,7 +24,6 @@ export default async function HomePage() {
   const data = await loadForPrerender(loadHomePageData, {
     initialCattle: null,
     initialDetails: null,
-    cattleCount: null,
   })
 
   return <HomePageClient {...data} generatedAt={Date.now()} />

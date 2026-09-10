@@ -46,11 +46,10 @@ interface HomePageClientProps {
   initialCattle: CattleWithRelations[] | null
   /** Full history of the first (pre-selected) cattle */
   initialDetails: CattleWithRelations | null
-  cattleCount: number | null
   generatedAt: number
 }
 
-export function HomePageClient({ initialCattle, initialDetails, cattleCount, generatedAt }: HomePageClientProps) {
+export function HomePageClient({ initialCattle, initialDetails, generatedAt }: HomePageClientProps) {
   const [fullCattleData, setFullCattleData] = useState<CattleWithRelations[]>(initialCattle ?? [])
   const [history, setHistory] = useState<Record<string, CattleHistory>>(
     initialDetails ? { [initialDetails.id]: pickHistory(initialDetails) } : {}
@@ -229,7 +228,6 @@ export function HomePageClient({ initialCattle, initialDetails, cattleCount, gen
         selectedCattle={selectedCattle}
         onSelectCattle={handleSelectCattle}
         isLoading={isLoading}
-        cattleCount={cattleCount}
       />
       <JourneySection />
       {/* KATALOG - Combined Swiper/Grid with Toggle */}
