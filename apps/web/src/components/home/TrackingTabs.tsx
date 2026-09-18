@@ -66,11 +66,6 @@ export function TrackingTabs({ cattle, isLoadingHistory = false }: TrackingTabsP
   const firstWeight = sortedWeights[0]?.weight
   const totalGain = lastWeight && firstWeight ? lastWeight - firstWeight : 0
 
-  const birthDate = cattle.birthDate ? new Date(cattle.birthDate) : null
-  const ageMonths = birthDate
-    ? Math.floor((Date.now() - birthDate.getTime()) / (1000 * 60 * 60 * 24 * 30))
-    : null
-
   const latestHealth = healthRecords[0]
 
   return (
@@ -140,12 +135,6 @@ export function TrackingTabs({ cattle, isLoadingHistory = false }: TrackingTabsP
                     <div className="text-[hsl(var(--forest))/60] text-[10px]">Target Bobot</div>
                     <div className="text-sm font-bold text-[hsl(var(--forest))]">{formatWeight(cattle.targetWeight)}</div>
                     <div className="mt-0.5 text-[10px] text-[hsl(var(--forest))/50]">Target Qurban</div>
-                  </div>
-
-                  <div className="rounded-lg border border-[hsl(var(--line))] bg-[hsl(var(--cream))/20] p-2.5 text-xs">
-                    <div className="text-[hsl(var(--forest))/60] text-[10px]">Umur Sapi</div>
-                    <div className="text-sm font-bold text-[hsl(var(--forest))]">{ageMonths ? `${ageMonths} Bulan` : '-'}</div>
-                    <div className="mt-0.5 text-[10px] text-[hsl(var(--forest))/50]">Estimasi Usia</div>
                   </div>
 
                   <div className="rounded-lg border border-[hsl(var(--line))] bg-[hsl(var(--cream))/20] p-2.5 text-xs">

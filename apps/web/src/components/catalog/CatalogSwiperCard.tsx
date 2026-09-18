@@ -110,11 +110,6 @@ export function CatalogSwiperCard({
             <span className="text-[10px] text-[hsl(var(--forest))/50]">Tidak Ada Foto</span>
           </div>
         )}
-        {progressPercentage != null && !isSold && !isBooked && (
-          <div className="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[7px] font-bold text-[hsl(var(--forest))] shadow-sm">
-            {Math.round(progressPercentage)}%
-          </div>
-        )}
       </div>
 
       <div className="p-2.5">
